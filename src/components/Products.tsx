@@ -1,6 +1,6 @@
-import csBaconImage from "../../img/cs-bacon.PNG";
-import csRompeImage from "../../img/cs-rompedieta.JPG";
-import csClasicaImage from "../../img/cs-clasica.png";
+import csBaconImage from "../../img/cs-bacon-prod.png";
+import csRompeImage from "../../img/cs-rompedieta-prod.png";
+import csClasicaImage from "../../img/cs-clasica-prod.png";
 
 type Product = {
   name: string;
