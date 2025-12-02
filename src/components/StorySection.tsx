@@ -8,9 +8,9 @@ export function StorySection() {
       </div>
       <div className="space-y-4">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600" />
+          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-red-500 to-red-700" />
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-700">Nuestra historia</p>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-red-700">Nuestra historia</p>
             <h3 className="text-2xl font-bold text-slate-900">Cristóbal y el origen de Ceeseburgers</h3>
           </div>
         </div>

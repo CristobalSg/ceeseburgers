@@ -19,7 +19,7 @@ export function CTABanner({ title, subtitle, ctaHref, variant = "light" }: CTABa
           <p className={`${isDark ? "text-slate-100/80" : "text-slate-600"}`}>{subtitle}</p>
         </div>
         <a
-          className="inline-flex items-center justify-center rounded-full bg-cyan-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-cyan-500"
+          className="inline-flex items-center justify-center rounded-full bg-red-700 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-red-600"
           href={ctaHref}
         >
           Pide tu Ceeseburger ahora

@@ -23,7 +23,7 @@ export function Hero({ ctaHref }: HeroProps) {
           </p>
           <div className="flex flex-wrap items-center gap-3">
             <a
-              className="rounded-full bg-cyan-600 px-6 py-3 text-sm font-semibold text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-cyan-500"
+              className="rounded-full bg-red-700 px-6 py-3 text-sm font-semibold text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-red-600"
               href={ctaHref}
             >
               Pide tu Ceeseburger ahora

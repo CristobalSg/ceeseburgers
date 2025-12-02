@@ -1,9 +1,15 @@
- 
+import { AnnouncementBar } from "./components/AnnouncementBar";
+import { AboutSection } from "./components/AboutSection";
 import { BlogTeaser } from "./components/BlogTeaser";
 import { CTABanner } from "./components/CTABanner";
 import { Header } from "./components/Header";
 import { HeroCarousel } from "./components/HeroCarousel";
-import { Products } from "./components/Products";
+import { Layout } from "./components/Layout";
+import { ProductDetail } from "./components/ProductDetail";
+import { Products, products } from "./components/Products";
+import { ReviewsSection } from "./components/ReviewsSection";
+import { SiteFooter } from "./components/SiteFooter";
+import { BackToTop } from "./components/BackToTop";
 import { SocialLinks } from "./components/SocialLinks";
 import { StorySection } from "./components/StorySection";
 import { ValueProps } from "./components/ValueProps";
@@ -15,6 +21,8 @@ import logoImage from "../img/logo.PNG";
 export default function App() {
   const CTA_LINK = "https://wa.me/56945568889";
   const INSTAGRAM_LINK = "https://www.instagram.com/ceeseburgers";
+  const productMatch = window.location.pathname.match(/^\/producto\/([^/]+)$/);
+  const matchedProduct = productMatch ? products.find((item) => item.slug === productMatch[1]) ?? null : null;
 
   const slides = [
     {
@@ -46,36 +54,64 @@ export default function App() {
     },
   ];
 
+  if (productMatch) {
+    return (
+      <Layout
+        header={
+          <div className="space-y-3">
+            <AnnouncementBar
+              message="Cada 15 de cada mes: ofertas imperdibles y nuevas."
+              ctaHref={CTA_LINK}
+              ctaLabel="Aprovechar"
+            />
+            <Header logoSrc={logoImage} brandName="Ceeseburgers" instagramHref={INSTAGRAM_LINK} whatsappHref={CTA_LINK} />
+          </div>
+        }
+        footer={<SiteFooter brandName="Ceeseburgers" instagramHref={INSTAGRAM_LINK} whatsappHref={CTA_LINK} />}
+      >
+        <ProductDetail product={matchedProduct} ctaHref={CTA_LINK} />
+      </Layout>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-900">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-4 py-10 sm:px-6 lg:px-10 lg:py-14">
-        <Header logoSrc={logoImage} brandName="Ceeseburgers" instagramHref={INSTAGRAM_LINK} whatsappHref={CTA_LINK} />
+    <Layout
+      header={
+        <div className="space-y-3">
+          <AnnouncementBar
+            message="Cada 15 de cada mes: ofertas imperdibles y nuevas."
+            ctaHref={CTA_LINK}
+            ctaLabel="Aprovechar"
+          />
+          <Header logoSrc={logoImage} brandName="Ceeseburgers" instagramHref={INSTAGRAM_LINK} whatsappHref={CTA_LINK} />
+        </div>
+      }
+      footer={<SiteFooter brandName="Ceeseburgers" instagramHref={INSTAGRAM_LINK} whatsappHref={CTA_LINK} />}
+    >
+      <HeroCarousel slides={slides} />
 
-        <HeroCarousel slides={slides} />
+      <ValueProps />
 
-        <ValueProps />
+      <Products />
 
-        <CTABanner
-          title="Elige, paga online y recibe en 14–17 minutos"
-          subtitle="Segmento 20–30 años · Exploradores y Luchadores · Zona Labranza"
-          ctaHref={CTA_LINK}
-        />
+      <CTABanner
+        title="Listo para tu próxima Ceeseburger?"
+        subtitle="Pedidos online seguros, horarios jue-sáb 16:00-22:30, entrega promedio 14-17 minutos."
+        ctaHref={CTA_LINK}
+        variant="dark"
+      />
+      
+      <BlogTeaser />
 
-        <Products ctaHref={CTA_LINK} />
+      <ReviewsSection />
 
-        <BlogTeaser />
+      <AboutSection />
 
-        <StorySection />
+      <StorySection />
 
-        <SocialLinks instagramUrl={INSTAGRAM_LINK} />
+      <SocialLinks instagramUrl={INSTAGRAM_LINK} />
 
-        <CTABanner
-          title="Listo para tu próxima Ceeseburger?"
-          subtitle="Pedidos online seguros, horarios jue–sáb 16:00–22:30, entrega promedio 14–17 minutos."
-          ctaHref={CTA_LINK}
-          variant="dark"
-        />
-      </div>
-    </div>
+      <BackToTop />
+    </Layout>
   );
 }

@@ -71,7 +71,7 @@ export function HeroSplitCarousel({ slides }: HeroSplitCarouselProps) {
               return (
                 <span
                   key={dotIndex}
-                  className={`h-1.5 w-8 rounded-full ${isActive ? "bg-cyan-400" : "bg-white/30"}`}
+                  className={`h-1.5 w-8 rounded-full ${isActive ? "bg-red-600" : "bg-white/30"}`}
                   aria-label={`Slide ${dotIndex + 1}`}
                 />
               );

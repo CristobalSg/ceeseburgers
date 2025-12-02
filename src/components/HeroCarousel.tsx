@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type Slide = {
   title: string;
@@ -16,6 +16,7 @@ type HeroCarouselProps = {
 export function HeroCarousel({ slides }: HeroCarouselProps) {
   const [index, setIndex] = useState(0);
   const current = useMemo(() => slides[index] ?? slides[0], [index, slides]);
+  const intervalMs = 6000;
 
   const goTo = (nextIndex: number) => {
     if (nextIndex < 0) {
@@ -29,9 +30,17 @@ export function HeroCarousel({ slides }: HeroCarouselProps) {
     setIndex(nextIndex);
   };
 
+  useEffect(() => {
+    if (!slides.length) return;
+    const id = window.setInterval(() => {
+      setIndex((prev) => (prev + 1) % slides.length);
+    }, intervalMs);
+    return () => window.clearInterval(id);
+  }, [slides.length, intervalMs]);
+
   return (
     <section
-      className="relative overflow-hidden rounded-3xl text-white shadow-lg"
+      className="relative overflow-hidden rounded-3xl text-white shadow-lg animate-fade-up motion-reduce:animate-none"
       style={{
         backgroundImage: `url(${current.imageSrc})`,
         backgroundSize: "cover",
@@ -64,7 +73,7 @@ export function HeroCarousel({ slides }: HeroCarouselProps) {
 
           <div className={`flex flex-wrap items-center gap-3 ${current.align === "right" ? "justify-end" : ""}`}>
             <a
-              className="rounded-full bg-cyan-500 px-6 py-3 text-sm font-semibold text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-cyan-400"
+              className="rounded-full bg-red-700 px-6 py-3 text-sm font-semibold text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-red-600"
               href={current.ctaHref}
             >
               Pide tu Ceeseburger ahora
@@ -81,7 +90,7 @@ export function HeroCarousel({ slides }: HeroCarouselProps) {
                 key={dotIndex}
                 aria-label={`Ir al slide ${dotIndex + 1}`}
                 onClick={() => goTo(dotIndex)}
-                className={`h-2 w-12 rounded-full transition ${isActive ? "bg-cyan-400" : "bg-white/35 hover:bg-white/50"}`}
+                className={`h-2 w-12 rounded-full transition ${isActive ? "bg-red-600" : "bg-white/35 hover:bg-white/50"}`}
               />
             );
           })}

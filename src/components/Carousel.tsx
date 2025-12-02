@@ -62,7 +62,7 @@ export function Carousel({ slides }: CarouselProps) {
           <h2 className="text-3xl font-bold text-slate-900 sm:text-4xl">{current.title}</h2>
           <p className="text-base leading-relaxed text-slate-700">{current.description}</p>
           <a
-            className="inline-flex w-fit items-center gap-2 rounded-full bg-cyan-600 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-cyan-500"
+            className="inline-flex w-fit items-center gap-2 rounded-full bg-red-700 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-red-600"
             href={current.ctaHref}
           >
             Hacer pedido

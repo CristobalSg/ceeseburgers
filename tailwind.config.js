@@ -8,7 +8,19 @@ module.exports = {
   theme: {
     extend: {
       animation: {
-        // tailwindcss-animate
+        "fade-up": "fade-up 700ms ease-out forwards",
+        glow: "glow 2.8s ease-in-out infinite",
+      },
+      keyframes: {
+        "fade-up": {
+          "0%": { opacity: "0", transform: "translateY(16px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        glow: {
+          "0%": { boxShadow: "0 0 0 0 rgba(255,255,255,0.25)", backgroundColor: "rgba(255,255,255,0.08)" },
+          "60%": { boxShadow: "0 0 0 10px rgba(255,255,255,0)", backgroundColor: "rgba(255,255,255,0.18)" },
+          "100%": { boxShadow: "0 0 0 0 rgba(255,255,255,0)" },
+        },
       },
       colors: {
         primary: {
