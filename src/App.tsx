@@ -11,6 +11,9 @@ import { ReviewsSection } from "./components/ReviewsSection";
 import { SiteFooter } from "./components/SiteFooter";
 import { BackToTop } from "./components/BackToTop";
 import { SocialLinks } from "./components/SocialLinks";
+import { BlogList } from "./components/BlogList";
+import { BlogPostPage } from "./components/BlogPostPage";
+import { getBlogPostBySlug } from "./data/blogPosts";
 import { StorySection } from "./components/StorySection";
 import { ValueProps } from "./components/ValueProps";
 
@@ -21,8 +24,11 @@ import logoImage from "../img/logo.PNG";
 export default function App() {
   const CTA_LINK = "https://wa.me/56945568889";
   const INSTAGRAM_LINK = "https://www.instagram.com/ceeseburgers";
-  const productMatch = window.location.pathname.match(/^\/producto\/([^/]+)$/);
+  const path = window.location.pathname;
+  const productMatch = path.match(/^\/producto\/([^/]+)$/);
+  const blogDetailMatch = path.match(/^\/blog\/([^/]+)$/);
   const matchedProduct = productMatch ? products.find((item) => item.slug === productMatch[1]) ?? null : null;
+  const matchedPost = blogDetailMatch ? getBlogPostBySlug(blogDetailMatch[1]) ?? null : null;
 
   const slides = [
     {
@@ -70,6 +76,46 @@ export default function App() {
         footer={<SiteFooter brandName="Ceeseburgers" instagramHref={INSTAGRAM_LINK} whatsappHref={CTA_LINK} />}
       >
         <ProductDetail product={matchedProduct} ctaHref={CTA_LINK} />
+      </Layout>
+    );
+  }
+
+  if (path === "/blog") {
+    return (
+      <Layout
+        header={
+          <div className="space-y-3">
+            <AnnouncementBar
+              message="Cada 15 de cada mes: ofertas imperdibles y nuevas."
+              ctaHref={CTA_LINK}
+              ctaLabel="Aprovechar"
+            />
+            <Header logoSrc={logoImage} brandName="Ceeseburgers" instagramHref={INSTAGRAM_LINK} whatsappHref={CTA_LINK} />
+          </div>
+        }
+        footer={<SiteFooter brandName="Ceeseburgers" instagramHref={INSTAGRAM_LINK} whatsappHref={CTA_LINK} />}
+      >
+        <BlogList />
+      </Layout>
+    );
+  }
+
+  if (blogDetailMatch) {
+    return (
+      <Layout
+        header={
+          <div className="space-y-3">
+            <AnnouncementBar
+              message="Cada 15 de cada mes: ofertas imperdibles y nuevas."
+              ctaHref={CTA_LINK}
+              ctaLabel="Aprovechar"
+            />
+            <Header logoSrc={logoImage} brandName="Ceeseburgers" instagramHref={INSTAGRAM_LINK} whatsappHref={CTA_LINK} />
+          </div>
+        }
+        footer={<SiteFooter brandName="Ceeseburgers" instagramHref={INSTAGRAM_LINK} whatsappHref={CTA_LINK} />}
+      >
+        <BlogPostPage post={matchedPost} />
       </Layout>
     );
   }
