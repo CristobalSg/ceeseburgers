@@ -12,301 +12,332 @@ export type BlogPost = {
 export const blogPosts: BlogPost[] = [
   {
     id: "1",
-    slug: "hamburguesas-artesanales",
-    title: "Guía definitiva: qué hace que una hamburguesa sea verdaderamente artesanal",
+    slug: "como-guardar-hamburguesas-en-el-refrigerador",
+    title: "Guía definitiva: cómo conservar tus hamburguesas artesanales en el refri sin perder sabor ni calidad",
     subtitle:
-      "Si estudias, trabajas y llegas tarde a casa, elegir una hamburguesa artesanal puede ser la diferencia entre “llenar la guata” y darte un momento real de descanso.",
+      "Aprende a guardar correctamente tus hamburguesas caseras o artesanales en el refrigerador para aprovechar cada porción, evitar desperdicios y mantener el sabor lo más parecido posible a recién hechas.",
     date: "2025-01-15",
-    category: "Hamburguesas artesanales",
-    tags: ["hamburguesas artesanales", "comida honesta", "ingredientes", "jóvenes ocupados"],
+    category: "Conservación y almacenamiento",
+    tags: ["cómo guardar hamburguesas en el refrigerador", "conservación de alimentos", "batch cooking", "jóvenes ocupados"],
     content: `
 <div class="blog-callout">
   <p class="blog-callout-title">Para quién es este artículo</p>
   <p>
-    Si estudias, trabajas o terminas el día con la cabeza a mil, esta guía es para ti. No vamos a hablar de tecnicismos de chef,
-    sino de cómo reconocer una hamburguesa <strong>realmente artesanal</strong> cuando solo quieres comer algo rico sin perder tiempo.
+    Este contenido está pensado para personas que estudian, trabajan, hacen mil cosas al día
+    y quieren sacar el máximo provecho a cada compra sin desperdiciar comida ni perder calidad.
   </p>
 </div>
 
 <div class="blog-highlight">
   <p>
-    La idea es simple: que puedas diferenciar, incluso desde el celu, cuándo una burger está hecha con cuidado y cuándo es solo otra opción genérica
-    más en la lista de delivery.
+    La idea es simple: que puedas abrir el refri después de una jornada larga y encontrar hamburguesas bien guardadas, seguras y ricas,
+    en vez de envases tristes que ya perdieron sabor o terminarán en la basura.
   </p>
 </div>
 
-<h2>1. La carne: selección y molienda pensadas en el sabor (no solo en el volumen)</h2>
+<h2>1. Antes de guardar: qué tipo de hamburguesa tienes</h2>
 
 <p>
-  En un formato industrial, la carne suele priorizar precio y rendimiento por sobre el sabor. Se usan mezclas muy magras, recortes de poca calidad
-  o combinaciones estándar que “funcionan para todo el mundo”, pero no sorprenden a nadie.
+  No todas las hamburguesas se guardan igual. Antes de meter nada al refri, identifica en qué estado están:
 </p>
 
-<p>En una hamburguesa artesanal, la historia es distinta:</p>
+<ul>
+  <li><strong>Hamburguesas crudas ya formadas</strong>: discos de carne listos para cocinar, sin haber tocado sartén ni horno.</li>
+  <li><strong>Hamburguesas ya cocidas</strong>: carne que pasó por plancha, parrilla o sartén, con o sin queso encima.</li>
+  <li><strong>Hamburguesas armadas completas</strong>: pan, carne, queso, salsas y vegetales ya montados.</li>
+  <li><strong>Sobras de un pedido</strong>: lo que no alcanzaste a comer, que viene con envase y salsas mezcladas.</li>
+</ul>
 
 <ul>
-  <li><strong>Cortes elegidos a propósito</strong>: se combinan partes con más sabor y algo de grasa natural (como sobrecostilla, punta picana o similares) para lograr una mezcla jugosa.</li>
-  <li><strong>Proporción de grasa consciente</strong>: por lo general se busca un equilibrio cercano al 20% de grasa, suficiente para aportar sabor sin dejarte pesado.</li>
-  <li><strong>Molienda fresca</strong>: la carne se muele en el momento o en tandas pequeñas. Eso reduce la oxidación y mantiene mejor textura y sabor.</li>
+  <li>Las <strong>crudas</strong> y las <strong>cocidas sin armar</strong> son las que mejor se conservan.</li>
+  <li>Las <strong>armadas completas</strong> y <strong>sobras de delivery</strong> duran menos y son más delicadas.</li>
 </ul>
 
 <p>
-  ¿Cómo lo notas tú, que llegas cansado a casa? En que el primer bocado no sabe a “carne genérica”, sino que tiene jugosidad real, textura agradable
-  y un sabor que no necesita esconderse detrás de litros de salsa.
+  Entender esto es clave para definir cuánto tiempo puedes guardarlas sin sacrificar sabor ni seguridad.
 </p>
 
-<h2>2. El pan: más que un soporte, parte del sabor</h2>
+<h2>2. Temperatura ideal y dónde guardarlas en el refri</h2>
 
 <p>
-  Seguro te ha pasado: hamburguesa que se ve gigante en la foto, pero cuando la muerdes el pan se desarma, se humedece demasiado o domina todo el sabor.
-  Eso suele pasar cuando se usan panes industriales pensados para durar semanas en una bolsa.
+  Para conservar bien las hamburguesas, el refrigerador debería estar entre <strong>0 ºC y 4 ºC</strong>. Más caliente que eso es terreno
+  perfecto para bacterias; más frío puede resecar en exceso o congelar parcialmente la carne.
 </p>
 
-<p>En una propuesta artesanal, el pan se trata casi como un ingrediente estrella:</p>
+<p>Además de la temperatura, importa el lugar dentro del refri:</p>
 
 <ul>
-  <li><strong>Frescura</strong>: el pan se hornea en el día o se trabaja con proveedores pequeños que entregan por tandas.</li>
-  <li><strong>Textura equilibrada</strong>: la miga es suave, pero la corteza mantiene estructura. Soporta la jugosidad sin romperse.</li>
-  <li><strong>Sabor real</strong>: mantequilla, huevos, semillas o leche entera aportan carácter. No se siente como “aire dulce”, sino como parte del conjunto.</li>
+  <li><strong>Nunca en la puerta</strong>: es la zona con más variaciones de temperatura cada vez que abres el refri.</li>
+  <li><strong>Mejor en la parte media o baja</strong>: más estable y fría.</li>
+  <li><strong>Separadas de alimentos crudos</strong> como pollo o pescados, para evitar contaminación cruzada.</li>
 </ul>
 
 <p>
-  Cuando llegas tarde y solo quieres comer algo rico sin discutir con el pan, una hamburguesa artesanal se nota porque la última mordida
-  sigue teniendo buena textura, no un pan deshecho e imposible de agarrar.
+  Si llegas tarde, guardas rápido y cierras el refri sin pensar, todo bien. Pero si dejas los envases abiertos en cualquier parte, al día siguiente
+  se nota: la carne se reseca, el pan se humedece de más y el olor cambia.
 </p>
 
-<h2>3. Recetas propias: combinar ingredientes con intención</h2>
+<h2>3. Los mejores recipientes y envoltorios</h2>
 
 <p>
-  Otra gran diferencia entre lo industrial y lo artesanal está en la creatividad. En una línea de producción masiva, las recetas son
-  prácticamente inamovibles: deben funcionar en miles de locales, con ingredientes ultra estandarizados y procesos rígidos.
+  Guardar “como sea” suele terminar mal. Un buen recipiente marca la diferencia entre una hamburguesa que todavía se disfruta y una que termina
+  siendo un sacrificio.
 </p>
 
-<p>En una cocina artesanal, en cambio:</p>
+<p>Opciones recomendadas:</p>
 
 <ul>
-  <li>Se prueban <strong>combinaciones nuevas</strong> hasta encontrar sabores que de verdad valen la pena.</li>
-  <li>Se equilibran <strong>texturas</strong> (crocante, cremoso, jugoso) para que cada bocado tenga algo interesante.</li>
-  <li>Se incorporan <strong>ingredientes pensados para el contexto local</strong>: lo que a la gente realmente le gusta comer en ese barrio o ciudad.</li>
+  <li><strong>Envases herméticos bajos</strong>: ideales para hamburguesas ya cocidas o armadas sin demasiada altura.</li>
+  <li><strong>Film plástico o papel aluminio</strong>: útil para envolver cada disco de carne por separado y luego guardar todo en un envase.</li>
+  <li><strong>Papel mantequilla + bolsa hermética</strong>: muy práctico para hamburguesas crudas apiladas.</li>
 </ul>
 
 <p>
-  Para alguien que estudia y trabaja, esto significa que, cuando decide darse el gusto de una hamburguesa, no recibe “más de lo mismo”,
-  sino una receta armada con cariño y prueba-error. Una experiencia que te saca del piloto automático del día.
+  Mientras menos aire quede dentro del recipiente, mejor. El oxígeno reseca y oxida la superficie de la carne, cambiando color y sabor.
 </p>
 
-<h2>4. El proceso de cocción: tiempos, temperatura y atención al detalle</h2>
+<h2>4. ¿Separar o no los ingredientes?</h2>
 
 <p>
-  La cocción es donde una buena mezcla de carne puede convertirse en algo increíble… o arruinarse en segundos. En contextos industriales,
-  la prioridad suele ser la velocidad y la uniformidad, aunque eso implique hamburguesas recocidas, secas o sin carácter.
+  Esta es una de las grandes dudas: ¿se guarda todo junto o se desarma la hamburguesa antes de refrigerar?
 </p>
 
-<p>En la cocina artesanal se cuidan aspectos como:</p>
+<p>Regla general: mientras más separados estén los elementos, mejor se conserva la experiencia completa.</p>
 
 <ul>
-  <li><strong>Control de temperatura</strong>: planchas o parrillas bien pre calentadas para lograr sellos intensos y jugos internos.</li>
-  <li><strong>Puntos de cocción definidos</strong>: no todas las burgers necesitan estar “hechas como suela”; se respeta el punto ideal según el grosor.</li>
-  <li><strong>Atención en el servicio</strong>: la hamburguesa no se deja “esperando” minutos eternos armada; se coordina bien con el pan, las salsas y los acompañamientos.</li>
+  <li><strong>Pan por un lado</strong>: envuelto en bolsa o recipiente aparte para evitar que se empape con jugos de la carne.</li>
+  <li><strong>Carne por otro</strong>: idealmente sola, con queso o sin queso, en un envase hermético.</li>
+  <li><strong>Vegetales frescos</strong> (lechuga, tomate, pepinillos): mejor guardarlos aparte o cortarlos frescos cuando vayas a recalentar.</li>
+  <li><strong>Salsas</strong>: en potes pequeños, para agregar al final. Así evitas que se corten o cambien de textura al recalentarlas.</li>
 </ul>
 
 <p>
-  El resultado para ti: una burger que llega caliente, jugosa y viva, incluso si la estás comiendo después de un día de clases, trabajo, micro llena y cero energía.
+  Si estás agotado y no quieres complicarte, al menos separa pan de carne. Son pocos segundos que marcan una diferencia enorme cuando toque recalentar.
 </p>
 
-<h2>5. Ingredientes que cuentan una historia (y que se notan en tu día a día)</h2>
-
-<p>Hablar de “artesanal” no es solo una etiqueta bonita; tiene que verse en los ingredientes. No se trata de que todo sea “gourmet”, pero sí de:</p>
-
-<ul>
-  <li><strong>Verduras frescas</strong>, crujientes y bien lavadas.</li>
-  <li><strong>Quesos con sabor real</strong>, no laminas plásticas que se derriten pero no aportan nada.</li>
-  <li><strong>Salsas caseras</strong> o al menos bien pensadas, que acompañan en vez de tapar.</li>
-</ul>
+<h2>5. Cuánto duran realmente en el refrigerador</h2>
 
 <p>
-  Cuando llegas agotado y decides pedir una hamburguesa, estos detalles hacen que el momento sea algo más que “un delivery más”. Se siente como una pequeña
-  pausa que te cuida, no como una solución rápida que te deja pesado e igual de cansado.
+  Más allá de los “2 a 3 días” genéricos, vale la pena diferenciar por tipo de hamburguesa:
 </p>
-
-<h2>6. ¿Cómo reconocer una hamburguesa artesanal cuando estás scrolleando en el celu?</h2>
 
 <div class="blog-callout">
-  <p class="blog-callout-title">Checklist rápida</p>
-  <p>Mientras revisas apps de delivery o redes sociales, puedes fijarte en estas pistas para detectar hamburguesas realmente artesanales:</p>
+  <p class="blog-callout-title">Tiempos orientativos en refri (0 ºC a 4 ºC)</p>
   <ul>
-    <li>Descripciones que hablan de los <strong>cortes de carne</strong> o de la mezcla usada.</li>
-    <li>Mención al <strong>pan fresco</strong>, brioche o de receta propia.</li>
-    <li>Recetas con identidad, no solo “clásica/italiana/americana” sin más contexto.</li>
-    <li>Fotos donde se note la textura real de la carne y del pan (no solo montaña de salsa).</li>
+    <li><strong>Hamburguesas crudas formadas</strong>: 1 a 2 días.</li>
+    <li><strong>Hamburguesas cocidas (solo carne)</strong>: 2 a 3 días.</li>
+    <li><strong>Hamburguesas armadas completas</strong>: idealmente consumir en 24 horas.</li>
+    <li><strong>Sobras de un pedido</strong>: 1 día máximo, siempre que hayan estado poco tiempo a temperatura ambiente.</li>
   </ul>
 </div>
 
 <p>
-  A la larga, entender qué hace que una hamburguesa sea verdaderamente artesanal te ayuda a elegir mejor dónde invertir tu dinero y tu energía.
-  Especialmente si tu tiempo libre es limitado, vale la pena que ese momento de “me voy a dar un gusto” se sienta a la altura.
+  Si notas olor extraño, cambio de color muy marcado o textura pegajosa, no arriesgues: es mejor descartar.
+</p>
+
+<h2>6. Errores comunes que arruinan el sabor</h2>
+
+<p>
+  Incluso con buena intención, hay errores típicos que hacen que una hamburguesa guardada sea muy distinta a lo que podría ser:
+</p>
+
+<ul>
+  <li><strong>Dejar la hamburguesa caliente muchas horas afuera</strong> antes de refrigerar.</li>
+  <li><strong>Guardar en envases abiertos</strong>, sin tapa o mal cerrados.</li>
+  <li><strong>Recalentar varias veces la misma porción</strong> en lugar de servir solo lo que vas a comer.</li>
+  <li><strong>Guardar pan húmedo con carne caliente</strong>, lo que termina en una masa sin textura.</li>
+</ul>
+
+<p>
+  Si evitas estos errores, la diferencia en sabor y textura es grande, sobre todo cuando comes tarde, con hambre real y cero paciencia.
+</p>
+
+<h2>7. Mini checklist antes de irte a dormir</h2>
+
+<div class="blog-callout">
+  <p class="blog-callout-title">Checklist para guardar sin estrés</p>
+  <ul>
+    <li>¿Separaste pan y carne antes de guardar?</li>
+    <li>¿Usaste un envase hermético o envolviste bien cada porción?</li>
+    <li>¿Dejaste las hamburguesas en la zona fría del refri (no en la puerta)?</li>
+    <li>¿Te acuerdas de cuándo las guardaste?</li>
+  </ul>
+</div>
+
+<p>
+  Con estas ideas, guardar hamburguesas en el refrigerador deja de ser un “a ver qué sale mañana” y pasa a ser parte de tu estrategia para
+  ahorrar tiempo, evitar desperdicios y seguir comiendo rico incluso en días caóticos.
 </p>
     `,
   },
   {
     id: "2",
-    slug: "cebolla-caramelizada-hamburguesas",
-    title: "Paso a paso: conviértete en maestro de la cebolla caramelizada y eleva tus hamburguesas caseras",
+    slug: "selladitos-perfectos-en-3-minutos",
+    title: "Receta express: prepara los selladitos perfectos en solo 3 minutos (truco de chef)",
     subtitle:
-      "No necesitas ser chef ni tener una cocina enorme. Con una sartén, paciencia y buena música de fondo puedes preparar cebolla caramelizada que cambia por completo cualquier hamburguesa casera.",
+      "Selladitos crujientes por fuera, suaves por dentro y listos en pocos minutos para acompañar tus comidas o salvarte una noche de estudio sin tiempo para cocinar.",
     date: "2025-01-22",
-    category: "Técnicas de cocina",
-    tags: ["cebolla caramelizada", "recetas fáciles", "hamburguesas caseras", "para estudiantes y trabajadores"],
+    category: "Recetas express",
+    tags: ["cómo hacer selladitos en 3 minutos", "recetas rápidas", "técnicas de sellado", "snacks para estudiar"],
     content: `
 <div class="blog-callout">
   <p class="blog-callout-title">Lo que vas a lograr</p>
   <p>
-    En menos de una hora y sin equipo raro, vas a aprender a preparar cebolla caramelizada que cambia por completo el sabor de tus hamburguesas caseras,
-    panes con queso o sándwiches de “última hora”.
+    Una técnica rápida y clara para preparar <strong>selladitos crujientes</strong>, con el interior suave y bien derretido, usando lo que ya tienes en la cocina.
+    Ideal para acompañar hamburguesas caseras, ensaladas o para sobrevivir a una sesión larga de estudio.
   </p>
 </div>
 
 <div class="blog-highlight">
   <p>
-    Si estudias, trabajas o estás siempre corriendo, piensa en esta técnica como una inversión pequeña de tiempo que después te ahorra esfuerzo
-    y te regala comidas mucho más ricas.
+    Este contenido está pensado para quienes aman probar cosas nuevas, pero también necesitan resultados rápidos y eficientes. No necesitas ser chef,
+    solo seguir el orden y respetar tiempos.
   </p>
 </div>
 
-<h2>1. Qué es realmente la cebolla caramelizada (y qué no)</h2>
+<h2>1. Qué es exactamente un selladito perfecto</h2>
 
 <p>
-  Primero, una aclaración importante: <strong>caramelizar cebolla no es simplemente tirarle azúcar encima</strong>. La cebolla tiene azúcares naturales
-  que, con el tiempo y el calor correcto, se van concentrando hasta lograr ese sabor dulce, profundo y casi adictivo.
+  Cuando hablamos de selladitos nos referimos a pequeñas piezas de pan, masa o tortilla <strong>cerradas y doradas por fuera</strong>,
+  con un relleno sabroso y caliente por dentro. Pueden ser cuadrados, triángulos o medias lunas, según el pan que uses.
 </p>
 
 <p>
-  Puedes agregar una pizca de azúcar para ayudar, pero si todo el sabor depende de eso, lo que tienes es cebolla salteada dulce, no una caramelización de verdad.
+  Lo importante no es la forma, sino el contraste:
 </p>
 
-<h2>2. Ingredientes y utensilios que necesitas</h2>
+<ul>
+  <li><strong>Exterior</strong>: dorado, levemente crocante, sin partes crudas.</li>
+  <li><strong>Interior</strong>: queso derretido y relleno caliente, pero aún jugoso.</li>
+  <li><strong>Bordes</strong>: bien sellados para que no se escape el relleno al dar vuelta.</li>
+</ul>
+
+<h2>2. Ingredientes básicos (adaptables a lo que tengas)</h2>
+
+<p>La gracia de esta receta express es que se adapta al refri de cualquier estudiante o trabajador:</p>
+
+<ul>
+  <li><strong>Base</strong>: pan de molde, tortillas de trigo pequeñas o pan pita.</li>
+  <li><strong>Queso</strong>: laminado, rallado o en trozos (idealmente que funda bien).</li>
+  <li><strong>Relleno</strong>: jamón, pollo desmenuzado, restos de carne, verduras salteadas, etc.</li>
+  <li><strong>Grasa para sellar</strong>: un poco de aceite, mantequilla o mezcla de ambos.</li>
+</ul>
+
+<p>Utensilios recomendados:</p>
+
+<ul>
+  <li>Una sartén antiadherente pequeña o mediana.</li>
+  <li>Una espátula para dar vuelta sin romper.</li>
+  <li>Un cuchillo o cortador para dar forma (opcional).</li>
+</ul>
+
+<h2>3. Preparación previa en 60 segundos</h2>
+
+<p>
+  Antes de encender la cocina, organiza todo. Esto marca la diferencia para que el proceso completo dure realmente 3 minutos activos.
+</p>
+
 <div class="blog-callout">
-  <p class="blog-callout-title">Ficha rápida</p>
-  <p><strong>Rinde:</strong> 3 a 4 hamburguesas generosas</p>
-  <p><strong>Tiempo estimado:</strong> 25 a 40 minutos</p>
-  <p><strong>Dificultad:</strong> baja (requiere más paciencia que técnica)</p>
+  <p class="blog-callout-title">Mise en place exprés</p>
+  <ul>
+    <li>Corta el queso y el relleno en trozos pequeños (se derriten y calientan más rápido).</li>
+    <li>Deja el pan o tortilla listo sobre una tabla.</li>
+    <li>Ten la sartén, la espátula y la grasa para cocinar a mano.</li>
+  </ul>
 </div>
 
-<p>Para una tanda básica necesitas:</p>
+<h2>4. Técnica de sellado en sartén (3 minutos)</h2>
 
-<ul>
-  <li>2 a 3 cebollas grandes (amarillas o moradas funcionan muy bien).</li>
-  <li>1 a 2 cucharadas de aceite (puede ser vegetal, de maravilla o de oliva suave).</li>
-  <li>1 cucharada de mantequilla (opcional, pero suma mucho sabor).</li>
-  <li>Sal fina.</li>
-  <li>Opcional: una pizca de azúcar, unas gotas de vinagre balsámico o de vino, o un chorrito de agua si se seca demasiado.</li>
-</ul>
-
-<p>En cuanto a utensilios:</p>
-
-<ul>
-  <li>Una sartén amplia, idealmente de fondo grueso.</li>
-  <li>Una tabla y un buen cuchillo para cortar cómodo, incluso si ya estás medio cansado.</li>
-  <li>Una espátula o cuchara de madera.</li>
-</ul>
-
-<h2>3. Paso a paso: de cebolla cruda a cebolla caramelizada</h2>
-
-<h3>Paso 1: cortar con calma</h3>
+<h3>Paso 1: calentar la sartén (30 segundos)</h3>
 
 <p>
-  Pela las cebollas y córtalas en pluma o en medias lunas finas. No hace falta que queden milimétricas, pero mientras más parecidas en grosor,
-  más pareja será la cocción.
+  Lleva la sartén a fuego medio y agrega una fina capa de aceite o un poco de mantequilla. No busques una piscina de grasa, solo lo justo para dorar.
 </p>
 
-<h3>Paso 2: fuego medio-bajo, no apuro</h3>
+<h3>Paso 2: armar los selladitos (60 segundos)</h3>
 
 <p>
-  Calienta la sartén a fuego medio-bajo y agrega el aceite. Si vas a usar mantequilla, añádela cuando el aceite ya esté tibio, así evitas que se queme.
+  Mientras la sartén toma temperatura, arma las piezas:
 </p>
 
 <p>
-  Incorpora la cebolla y una pizca de sal. Revuelve bien para que toda la superficie tome contacto con la grasa.
+  Coloca el pan o tortilla sobre la tabla, agrega una capa fina de queso, un poco de relleno y cierra doblando o colocando otra tapa encima.
+  Presiona los bordes con los dedos o con un tenedor para que queden sellados.
 </p>
 
-<h3>Paso 3: dejar que el tiempo haga su trabajo</h3>
+<h3>Paso 3: sellar el primer lado (60 a 90 segundos)</h3>
 
 <p>
-  Aquí viene la parte clave: la paciencia. La cebolla caramelizada no se hace en cinco minutos. Según la cantidad y la intensidad de tu cocina,
-  puede tomar entre 25 y 40 minutos.
-</p>
-
-<p>
-  Durante ese tiempo:
-</p>
-
-<ul>
-  <li>Revuelve cada pocos minutos para que no se pegue.</li>
-  <li>Si ves que la base de la sartén se oscurece demasiado, baja un poco el fuego.</li>
-  <li>Si empieza a resecarse, agrega una o dos cucharadas de agua y raspa el fondo: eso rescata sabor.</li>
-</ul>
-
-<p>
-  Verás que la cebolla pasa por varias etapas: primero se ablanda, luego se vuelve translúcida, después empieza a dorarse y finalmente toma un color
-  café ámbar intenso. Ese es el punto ideal.
-</p>
-
-<h3>Paso 4: ajustar sabor al final</h3>
-
-<p>
-  Cuando la cebolla ya esté profundamente dorada y suave, prueba un poco. Si quieres potenciar el lado dulce, puedes añadir una pizca de azúcar.
-  Si prefieres un contraste más complejo, unas gotas de vinagre balsámico o de vino le dan un toque increíble.
+  Lleva los selladitos a la sartén caliente. No los muevas de inmediato. Deja que se forme una capa dorada. Cuando veas que los bordes se ven
+  firmes y el pan gana color, es momento de dar vuelta.
 </p>
 
 <p>
-  Ajusta la sal y listo. Ya tienes una base de sabor brutal para tus hamburguesas caseras.
+  La clave aquí es el fuego medio: si está muy alto, se queman por fuera y quedan fríos por dentro.
 </p>
 
-<h2>4. Cómo usar la cebolla caramelizada en tus hamburguesas caseras</h2>
+<h3>Paso 4: dorar el otro lado y terminar (45 a 60 segundos)</h3>
 
 <p>
-  Aquí van algunas ideas fáciles para cuando llegas tarde, pero igual quieres comer algo que se sienta especial:
+  Da vuelta con cuidado y deja que el otro lado se dore. En este punto, el queso ya debería estar fundiéndose. Puedes presionar ligeramente
+  con la espátula para asegurar contacto con la sartén.
+</p>
+
+<p>
+  En total, no deberías estar más de 3 minutos por tanda. Si el relleno está precocido, solo necesitas calentar y derretir.
+</p>
+
+<p>
+  Al sacarlos, déjalos reposar 30 segundos en un plato o rejilla para que no quemen al primer bocado y el interior se asiente.
+</p>
+
+<h2>5. Versión en airfryer u horno eléctrico</h2>
+
+<p>
+  Si prefieres evitar la sartén o quieres hacer varias unidades a la vez, puedes usar airfryer u horno pequeño:
 </p>
 
 <ul>
-  <li><strong>Clásica con queso</strong>: carne a la plancha, queso que se derrita bien y una buena cucharada de cebolla caramelizada encima.</li>
-  <li><strong>Versión “limpia el refri”</strong>: usa lo que tengas (queso rallado, restos de pollo, verduras) y súmale cebolla caramelizada para unir sabores.</li>
-  <li><strong>Sandwich exprés</strong>: pan tostado, queso, alguna proteína y una capa de cebolla caramelizada. Ideal para noches de estudio.</li>
+  <li>Arma los selladitos como en la versión de sartén.</li>
+  <li>Unta ligeramente con aceite por fuera o pincela con mantequilla derretida.</li>
+  <li>Llévalos a <strong>180 ºC por 5 a 7 minutos</strong>, hasta que estén dorados.</li>
 </ul>
 
 <p>
-  Lo importante es que la cebolla no quede perdida: agrégala al final, cuando la hamburguesa ya está lista, para que mantenga su textura suave
-  y su sabor concentrado.
+  No será exactamente 3 minutos, pero ganas en comodidad y puedes preparar más por tanda sin estar parado frente a la cocina.
 </p>
 
-<h2>5. Cómo organizarte para no cocinar todo desde cero cada vez</h2>
+<h2>6. Ideas de rellenos para distintas situaciones</h2>
 
 <p>
-  Si tienes poco tiempo entre universidad, trabajo y otras responsabilidades, lo mejor es pensar en la cebolla caramelizada como un <strong>“ingrediente base”</strong>
-  que puedes dejar listo con anticipación.
+  Aquí van algunas combinaciones pensadas para noches largas, fines de semana relajados o “necesito algo rico ya”:
 </p>
 
 <ul>
-  <li>Prepárala una vez a la semana y guárdala en un frasco hermético en el refrigerador.</li>
-  <li>Dura varios días en buenas condiciones, siempre que esté refrigerada.</li>
-  <li>Para usarla, solo caliéntala unos segundos en la sartén o en el microondas.</li>
+  <li><strong>Modo estudio</strong>: queso, jamón y un poco de orégano.</li>
+  <li><strong>Modo limpia el refri</strong>: restos de pollo desmenuzado, queso y algún vegetal cocido que te haya sobrado.</li>
+  <li><strong>Modo snack de tarde</strong>: queso crema, espinaca salteada y un toque de ajo.</li>
+  <li><strong>Modo antojo</strong>: mezcla de quesos distintos para jugar con la textura.</li>
 </ul>
 
 <p>
-  Así, cuando llegas a casa después de un día largo, solo necesitas armar la hamburguesa, calentar pan, sumar queso y terminar con una cucharada
-  de esa cebolla caramelizada que ya hiciste con calma el fin de semana.
+  No se trata de tener ingredientes perfectos, sino de aprovechar lo que ya tienes y darle una vuelta rápida.
 </p>
 
-<h2>6. Un pequeño truco mental para motivarte a cocinar</h2>
+<h2>7. Cómo incorporar los selladitos a tu rutina</h2>
+
+<div class="blog-callout">
+  <p class="blog-callout-title">Consejos para el día a día</p>
+  <ul>
+    <li>Deja quesos y rellenos ya picados en contenedores pequeños en el refri.</li>
+    <li>Reserva un paquete de pan de molde o tortillas solo para este tipo de preparaciones rápidas.</li>
+    <li>Cuando te sobre algo rico de otra comida, piensa inmediatamente si puede convertirse en relleno.</li>
+  </ul>
+</div>
 
 <p>
-  Cocinar después de un día intenso puede sentirse imposible. Pero a veces, saber que tienes un ingrediente que eleva todo (como la cebolla caramelizada)
-  cambia la ecuación: ya no estás “partiendo desde cero”, solo estás armando algo con piezas que tú mismo dejaste listas.
-</p>
-
-<p>
-  No necesitas producir una cena perfecta todas las noches. Con un par de técnicas simples como esta, puedes transformar una hamburguesa casera rápida
-  en un momento que realmente se sienta como una recompensa después de todo el esfuerzo del día.
+  Así, cada vez que te sientes a estudiar, trabajar o ver algo en la noche, no tienes que empezar de cero. Solo armas, sellas y en cuestión de minutos
+  tienes un snack caliente que se siente mucho más pensado que un paquete de galletas abierto a la rápida.
 </p>
     `,
   },
