@@ -13,7 +13,7 @@ export function SocialLinks({ instagramUrl = "https://instagram.com/tu-cuenta", 
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-red-300">Redes sociales</p>
           <h3 className="text-2xl font-bold">Síguenos y vive el backstage</h3>
           <p className="text-sm text-slate-100/80">
-            Publicamos contenido de producto, empresa, educación y trends en video para activar antojo y comunidad.
+            Publicamos contenido de producto, educación y trends en video para activar antojo y comunidad.
           </p>
         </div>
         <div className="flex flex-wrap gap-3">

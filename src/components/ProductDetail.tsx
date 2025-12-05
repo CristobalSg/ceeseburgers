@@ -93,13 +93,12 @@ export function ProductDetail({ product, ctaHref }: ProductDetailProps) {
 
       <div className="grid gap-4 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:grid-cols-2 sm:p-8">
         <div className="space-y-3">
-          <h2 className="text-xl font-bold text-slate-900">Resumen de conversión</h2>
+          <h2 className="text-xl font-bold text-slate-900">Resumen para tu pedido</h2>
           <dl className="space-y-2 text-sm text-slate-700">
             <div className="flex gap-2">
               <dt className="w-32 font-semibold text-slate-900">Precio</dt>
               <dd>
-                $2.390. Precio competitivo que refuerza la accesibilidad del menú manteniendo una percepción de calidad superior. Su margen permite un
-                crecimiento sostenible.
+                {product.price}. Precio pensado para que puedas pedir algo rico y contundente sin complicarte después de un día largo.
               </dd>
             </div>
             <div className="flex gap-2">
@@ -117,12 +116,6 @@ export function ProductDetail({ product, ctaHref }: ProductDetailProps) {
           <ul className="space-y-2 text-sm text-slate-700">
             <li>
               <span className="font-semibold text-slate-900">Ingredientes:</span> {product.detail?.ingredients ?? product.description}
-            </li>
-            <li>
-              <span className="font-semibold text-slate-900">Costo:</span> {product.detail?.cost ?? "—"}
-            </li>
-            <li>
-              <span className="font-semibold text-slate-900">Ganancia estimada:</span> {product.detail?.profit ?? "—"}
             </li>
           </ul>
         </div>

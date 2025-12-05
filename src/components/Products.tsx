@@ -17,8 +17,6 @@ export type Product = {
     longDescription: string;
     reviews: string[];
     ingredients: string;
-    cost: string;
-    profit: string;
     availability: string;
     images: string[];
   };
@@ -43,8 +41,6 @@ export const products: Product[] = [
         "“Una hamburguesa que sorprende por su sabor y precio. Ideal para el fin de semana.” — Cliente real.",
       ],
       ingredients: "Pan brioche, hamburguesa 90g, queso cheddar (1 lámina), tocino ahumado, cebolla caramelizada, aderezos.",
-      cost: "$954",
-      profit: "$1.436",
       availability: "Disponible para despacho (14–17 minutos promedio) y retiro en el local.",
       images: [csBaconImage, csBaconImage, csBaconImage],
     },
@@ -53,8 +49,8 @@ export const products: Product[] = [
     name: "Cs-Romp II",
     price: "$2.990",
     description: "Hamburguesa 100g, doble cheddar, doble tocino, huevo frito, cebolla caramelizada y pan artesanal.",
-    spec: "Premium accesible · ideal fin de semana",
-    tag: "Producto premium",
+    spec: "Cargada de sabor · ideal fin de semana",
+    tag: "Intensa",
     slug: "cs-romp-ii",
     image: csRompeImage,
     imageAlt: "Hamburguesa Cs-Romp II con doble cheddar y huevo",
@@ -63,8 +59,8 @@ export const products: Product[] = [
     name: "Cs-Clásica",
     price: "$1.990",
     description: "Pan brioche, 90g de vacuno, cheddar, tomate, lechuga y aderezos. La opción segura y rápida.",
-    spec: "Opción económica · pedidos frecuentes",
-    tag: "Complemento",
+    spec: "Opción conveniente para el día a día",
+    tag: "Clásica",
     slug: "cs-clasica",
     image: csClasicaImage,
     imageAlt: "Hamburguesa Cs-Clásica de Ceeseburgers",
@@ -77,7 +73,7 @@ export function Products() {
       <div className="grid gap-2 text-center">
         <p className="text-sm font-semibold uppercase tracking-[0.18em] text-red-700">Productos destacados</p>
         <h3 className="text-3xl font-bold text-slate-900">Lo mejor de Ceeseburgers para tu antojo</h3>
-        <p className="text-base text-slate-600">Seleccionados para maximizar conversión: un estrella, un premium y un clásico.</p>
+        <p className="text-base text-slate-600">Tres opciones pensadas para distintos niveles de hambre y antojo.</p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
