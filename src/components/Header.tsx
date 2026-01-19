@@ -20,6 +20,12 @@ export function Header({ logoSrc, brandName, instagramHref, whatsappHref }: Head
 
       <div className="flex flex-wrap items-center gap-2">
         <a
+          href="/menu"
+          className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-600 transition hover:text-red-700"
+        >
+          Menú
+        </a>
+        <a
           href="/blog"
           className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-600 transition hover:text-red-700"
         >

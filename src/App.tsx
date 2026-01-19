@@ -7,6 +7,7 @@ import { HeroCarousel } from "./components/HeroCarousel";
 import { Layout } from "./components/Layout";
 import { ProductDetail } from "./components/ProductDetail";
 import { Products, products } from "./components/Products";
+import { MenuPage } from "./components/MenuPage";
 import { ReviewsSection } from "./components/ReviewsSection";
 import { SiteFooter } from "./components/SiteFooter";
 import { BackToTop } from "./components/BackToTop";
@@ -96,6 +97,26 @@ export default function App() {
         footer={<SiteFooter brandName="Ceeseburgers" instagramHref={INSTAGRAM_LINK} whatsappHref={CTA_LINK} />}
       >
         <BlogList />
+      </Layout>
+    );
+  }
+
+  if (path === "/menu") {
+    return (
+      <Layout
+        header={
+          <div className="space-y-3">
+            <AnnouncementBar
+              message="Cada 15 de cada mes: ofertas imperdibles y nuevas."
+              ctaHref={CTA_LINK}
+              ctaLabel="Aprovechar"
+            />
+            <Header logoSrc={logoImage} brandName="Ceeseburgers" instagramHref={INSTAGRAM_LINK} whatsappHref={CTA_LINK} />
+          </div>
+        }
+        footer={<SiteFooter brandName="Ceeseburgers" instagramHref={INSTAGRAM_LINK} whatsappHref={CTA_LINK} />}
+      >
+        <MenuPage />
       </Layout>
     );
   }
