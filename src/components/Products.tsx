@@ -1,5 +1,5 @@
 import { StarIcon } from "@heroicons/react/24/solid";
-import csBaconImage from "../../img/cs-bacon-prod.png";
+import csBaconImage from "../../img/prod-cs-bacon.png";
 import csRompeImage from "../../img/cs-rompedieta-prod.png";
 import csClasicaImage from "../../img/cs-clasica-prod.png";
 import csItalianaImage from "../../img/cs-italiana-prod.png";
