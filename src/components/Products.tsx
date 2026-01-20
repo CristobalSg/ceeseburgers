@@ -29,9 +29,9 @@ export const products: Product[] = [
   {
     name: "Cs-Bacon",
     price: "$2.390",
-    description: "Pan brioche, 90g de vacuno, cheddar, tocino ahumado, cebolla caramelizada y aderezos de la casa.",
+    description: "Pan de hamburguesa, 90g de hamburguesa, cheddar, tocino ahumado, cebolla caramelizada y salsa BBQ.",
     spec: "Gancho estrella · lista en 14–17 min",
-    tag: "Más pedida",
+    tag: "Top ventas",
     slug: "cs-bacon",
     featured: true,
     mostOrdered: true,
@@ -39,7 +39,7 @@ export const products: Product[] = [
     imageAlt: "Hamburguesa Cs-Bacon con tocino y queso cheddar",
     detail: {
       longDescription:
-        "Hamburguesa artesanal con pan brioche, hamburguesa de vacuno de 90g, queso cheddar, tocino ahumado, cebolla caramelizada y aderezos de la casa. Su sabor equilibrado y su estética fotogénica la vuelven la opción favorita del público joven.",
+        "Hamburguesa con pan de hamburguesa, carne de 90g, queso cheddar, tocino ahumado, cebolla caramelizada y salsa BBQ; opción ideal para quienes buscan sabores ahumados y balanceados.",
       reviews: [
         "“Exquisita y contundente. El tocino es un 10/10, volvería a pedir sin pensarlo.” — Cliente real.",
         "“Una hamburguesa que sorprende por su sabor y precio. Ideal para el fin de semana.” — Cliente real.",
@@ -52,17 +52,18 @@ export const products: Product[] = [
   {
     name: "Cs-Romp II",
     price: "$2.990",
-    description: "Hamburguesa 100g, doble cheddar, doble tocino, huevo frito, cebolla caramelizada y pan artesanal.",
+    description: "Pan artesanal, hamburguesa de 90g, doble cheddar, doble tocino ahumado, huevo frito, cebolla caramelizada y salsa BBQ.",
     spec: "Cargada de sabor · ideal fin de semana",
-    tag: "Intensa",
+    tag: "Top ventas",
     slug: "cs-romp-ii",
+    mostOrdered: true,
     image: csRompeImage,
     imageAlt: "Hamburguesa Cs-Romp II con doble cheddar y huevo",
   },
   {
     name: "Cs-Clásica",
     price: "$1.990",
-    description: "Pan brioche, 90g de vacuno, cheddar, tomate, lechuga y aderezos. La opción segura y rápida.",
+    description: "Pan de hamburguesa, hamburguesa de 90g, cheddar, tomate, lechuga y aderezo tipo Big Mac.",
     spec: "Opción conveniente para el día a día",
     tag: "Clásica",
     slug: "cs-clasica",
@@ -71,8 +72,8 @@ export const products: Product[] = [
   },
   {
     name: "Cs-Italiana",
-    price: "$2.490",
-    description: "Pan brioche, 90g de vacuno, cheddar, mayonesa, tomate y palta.",
+    price: "$2.190",
+    description: "Pan de hamburguesa, 90g de hamburguesa, cheddar, mayonesa, tomate y palta.",
     spec: "Frescura y cremosidad",
     tag: "Italiana",
     slug: "cs-italiana",
@@ -81,8 +82,8 @@ export const products: Product[] = [
   },
   {
     name: "Cs-Nueva",
-    price: "$2.190",
-    description: "Pan brioche, 90g de vacuno y aderezos especiales.",
+    price: "$2.890",
+    description: "Pan brioche, hamburguesa de 90g, doble queso cheddar, tocino, lechuga, tomate, cebolla morada y salsa Chick-fil-A.",
     spec: "Nueva incorporación al menú",
     tag: "Nueva",
     slug: "cs-nueva",
