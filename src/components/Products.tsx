@@ -2,6 +2,8 @@ import { StarIcon } from "@heroicons/react/24/solid";
 import csBaconImage from "../../img/cs-bacon-prod.png";
 import csRompeImage from "../../img/cs-rompedieta-prod.png";
 import csClasicaImage from "../../img/cs-clasica-prod.png";
+import csItalianaImage from "../../img/cs-italiana-prod.png";
+import csNuevaImage from "../../img/cs-nueva-prod.png";
 
 export type Product = {
   name: string;
@@ -12,6 +14,7 @@ export type Product = {
   slug: string;
   featured?: boolean;
   image: string;
+  mostOrdered?: boolean;
   imageAlt: string;
   detail?: {
     longDescription: string;
@@ -28,9 +31,10 @@ export const products: Product[] = [
     price: "$2.390",
     description: "Pan brioche, 90g de vacuno, cheddar, tocino ahumado, cebolla caramelizada y aderezos de la casa.",
     spec: "Gancho estrella · lista en 14–17 min",
-    tag: "Producto estrella",
+    tag: "Más pedida",
     slug: "cs-bacon",
     featured: true,
+    mostOrdered: true,
     image: csBaconImage,
     imageAlt: "Hamburguesa Cs-Bacon con tocino y queso cheddar",
     detail: {
@@ -64,6 +68,26 @@ export const products: Product[] = [
     slug: "cs-clasica",
     image: csClasicaImage,
     imageAlt: "Hamburguesa Cs-Clásica de Ceeseburgers",
+  },
+  {
+    name: "Cs-Italiana",
+    price: "$2.490",
+    description: "Pan brioche, 90g de vacuno, cheddar, mayonesa, tomate y palta.",
+    spec: "Frescura y cremosidad",
+    tag: "Italiana",
+    slug: "cs-italiana",
+    image: csItalianaImage,
+    imageAlt: "Hamburguesa Cs-Italiana con cheddar, tomate y palta",
+  },
+  {
+    name: "Cs-Nueva",
+    price: "$2.190",
+    description: "Pan brioche, 90g de vacuno y aderezos especiales.",
+    spec: "Nueva incorporación al menú",
+    tag: "Nueva",
+    slug: "cs-nueva",
+    image: csNuevaImage,
+    imageAlt: "Hamburguesa Cs-Nueva",
   },
 ];
 
