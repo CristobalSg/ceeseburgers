@@ -1,10 +1,13 @@
 import { products } from "./Products";
 import type { Product } from "./Products";
 import { StarIcon, TagIcon } from "@heroicons/react/24/solid";
+import csBaconImage from "../../img/prod-cs-bacon.png";
+import promoImage from "../../img/promo-3-clasicas-2-bacon.jpg";
 import { useState } from "react";
 
 export function MenuPage() {
   const [isOpen, setIsOpen] = useState(false);
+  const [promoToConfirm, setPromoToConfirm] = useState<any | null>(null);
   const [cart, setCart] = useState<Record<string, { qty: number; note?: string }>>({});
   const [showNoteEditor, setShowNoteEditor] = useState<Record<string, boolean>>({});
   const [tagHint, setTagHint] = useState<string | null>(null);
@@ -49,6 +52,70 @@ export function MenuPage() {
     return { product, qty: data.qty, note: data.note, price };
   });
 
+  const promotions = [
+    {
+      id: "promo-1",
+      title: "Promo 3 Clásicas + 2 BBQ Bacon",
+      description: "5 hamburguesas para compartir",
+      price: 9990,
+      image: promoImage,
+      items: [
+        { slug: "cs-clasica", qty: 3 },
+        { slug: "cs-bacon", qty: 2 },
+      ],
+    },
+    {
+      id: "promo-2",
+      title: "Combo Pareja",
+      description: "2 Clásicas",
+      price: 6990,
+      image: promoImage,
+      items: [
+        { slug: "cs-clasica", qty: 2 },
+      ],
+    },
+    {
+      id: "promo-3",
+      title: "Duo Italiana",
+      description: "2 Italiana",
+      price: 7490,
+      image: promoImage,
+      items: [
+        { slug: "cs-italiana", qty: 2 },
+      ],
+    },
+    {
+      id: "promo-4",
+      title: "Family Pack",
+      description: "4 Clásicas + 1 Rompedieta",
+      price: 12990,
+      image: csBaconImage,
+      items: [
+        { slug: "cs-clasica", qty: 4 },
+        { slug: "cs-romp-ii", qty: 1 },
+      ],
+    },
+  ];
+
+  
+
+  function confirmPromo(promo: any) {
+    // build message for the promotion and open WhatsApp
+    const lines: string[] = [];
+    lines.push(`Hola, quiero la promoción: ${promo.title}`);
+    lines.push(`Precio: $${formatPrice(promo.price)}`);
+    lines.push(`Incluye:`);
+    promo.items.forEach((it: any) => {
+      const prod = products.find((p) => p.slug === it.slug);
+      lines.push(`- ${prod ? prod.name : it.slug} x${it.qty}`);
+    });
+    const message = lines.join("\n");
+    const phone = "56945568889";
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+    window.open(url, "_blank");
+    setPromoToConfirm(null);
+  }
+
   const total = cartItems.reduce((s, it) => s + it.price * it.qty, 0);
   const totalCount = cartItems.reduce((s, it) => s + it.qty, 0);
 
@@ -57,10 +124,64 @@ export function MenuPage() {
       <div className="grid gap-2 text-center">
         <p className="text-sm font-semibold uppercase tracking-[0.18em] text-red-700">Menú completo</p>
         <h3 className="text-3xl font-bold text-slate-900">Todos nuestros productos</h3>
-        <p className="text-base text-slate-600">Explora el menú completo y haz clic en cualquier producto para ver más detalles.</p>
+        <p className="text-base text-slate-600">Explora el menú completo, de momento tenemos 5 variedades de hamburguesas, pero más adelante tendremos un montón de opciones.</p>
       </div>
 
-      <div className="grid gap-4 grid-cols-2">
+      {/* Promociones: carrusel horizontal */}
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h4 className="text-lg font-semibold text-slate-900">Promociones</h4>
+          <span className="text-sm text-slate-500">Ofertas seleccionadas</span>
+        </div>
+          <div className="-mx-4 overflow-x-auto px-4 pb-2">
+          <div className="flex gap-4 snap-x snap-mandatory">
+              {promotions.map((promo, idx) => (
+                idx === 0 ? (
+                  <article
+                    key={promo.id}
+                    onClick={() => setPromoToConfirm(promo)}
+                    className="cursor-pointer min-w-[200px] snap-start rounded-2xl overflow-hidden bg-white shadow-md transition hover:scale-105"
+                  >
+                    <div className="w-full aspect-square overflow-hidden">
+                      <img src={promo.image} alt={promo.title} className="h-full w-full object-cover" />
+                    </div>
+                    <div className="p-2">
+                      <div className="text-sm font-semibold text-slate-900">{promo.title}</div>
+                      <div className="text-xs text-slate-500">{promo.description}</div>
+                      <div className="mt-2">
+                        <div className="text-lg font-bold text-slate-900">${formatPrice(promo.price)}</div>
+                      </div>
+                    </div>
+                  </article>
+                ) : (
+                  <article key={promo.id} className="min-w-[200px] snap-start rounded-2xl overflow-hidden bg-white shadow-md relative">
+                    <div className="w-full aspect-square overflow-hidden">
+                      <img src={promo.image} alt={promo.title} className="h-full w-full object-cover filter grayscale opacity-70" />
+                    </div>
+                    <div className="p-2">
+                      <div className="text-sm font-semibold text-slate-900">Próximamente</div>
+                      <div className="text-xs text-slate-500">{promo.title}</div>
+                      <div className="mt-2">
+                        <div className="text-lg font-bold text-slate-900">—</div>
+                      </div>
+                    </div>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="rounded-full bg-white/80 px-3 py-1 text-sm font-medium">Próximamente</div>
+                    </div>
+                  </article>
+                )
+              ))}
+          </div>
+        </div>
+      </section>
+
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h4 className="text-lg font-semibold text-slate-900">Hamburguesas</h4>
+          <span className="text-sm text-slate-500">Todas las opciones disponibles</span>
+        </div>
+
+        <div className="grid gap-4 grid-cols-2">
         {products.map((product: Product) => {
           return (
             <div
@@ -95,6 +216,8 @@ export function MenuPage() {
             </div>
           );
         })}
+      </div>
+
       </div>
 
       {/* Floating CTA (centered, small float animation). Hidden when modal open */}
@@ -320,6 +443,20 @@ export function MenuPage() {
             style={{ animation: "hintAnimGlobal 6s forwards", width: "50vw" }}
           >
             Si aprietas el botón señalando la etiqueta puedes agregar un detalle
+          </div>
+        </div>
+      ) : null}
+      {/* Promo confirmation modal */}
+      {promoToConfirm ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setPromoToConfirm(null)} />
+          <div className="relative w-full max-w-sm rounded-xl bg-white p-6 shadow-2xl">
+            <h3 className="text-lg font-semibold">Confirmar promoción</h3>
+            <p className="mt-2 text-sm text-slate-600">¿Deseas realizar el pedido de "{promoToConfirm.title}" por ${formatPrice(promoToConfirm.price)}?</p>
+            <div className="mt-4 flex items-center justify-end gap-3">
+              <button className="rounded-md px-3 py-2 text-sm" onClick={() => setPromoToConfirm(null)}>Cancelar</button>
+              <button className="rounded-full bg-red-700 px-4 py-2 text-sm text-white" onClick={() => confirmPromo(promoToConfirm)}>Realizar el pedido</button>
+            </div>
           </div>
         </div>
       ) : null}
