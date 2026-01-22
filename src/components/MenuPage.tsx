@@ -1,8 +1,9 @@
 import { products } from "./Products";
 import type { Product } from "./Products";
 import { StarIcon, TagIcon } from "@heroicons/react/24/solid";
-import csBaconImage from "../../img/prod-cs-bacon.png";
-import promoImage from "../../img/promo-3-clasicas-2-bacon.jpg";
+import comboFamiliarImg from "../../img/combos/combo-familiar.jpg";
+import comboClasicasFullImg from "../../img/combos/combo-clasicas-full.png";
+import comboBaconLoversImg from "../../img/combos/combo-bacon-lovers.png";
 import { useState } from "react";
 
 export function MenuPage() {
@@ -52,57 +53,54 @@ export function MenuPage() {
     return { product, qty: data.qty, note: data.note, price };
   });
 
-  const promotions = [
+  const combos = [
     {
-      id: "promo-1",
-      title: "Promo 3 Clásicas + 2 BBQ Bacon",
-      description: "5 hamburguesas para compartir",
+      id: "combo-familiar",
+      title: "Combo Familiar",
+      description: "3 Clásicas + 2 Bacon a $9.990",
       price: 9990,
-      image: promoImage,
+      image: comboFamiliarImg,
       items: [
         { slug: "cs-clasica", qty: 3 },
         { slug: "cs-bacon", qty: 2 },
       ],
+      favorite: true,
     },
     {
-      id: "promo-2",
-      title: "Combo Pareja",
-      description: "2 Clásicas",
-      price: 6990,
-      image: promoImage,
+      id: "combo-clasico-full",
+      title: "Combo Clásico Full",
+      description: "5 Hamburguesas Clásicas a $8.990",
+      price: 8990,
+      image: comboClasicasFullImg,
       items: [
-        { slug: "cs-clasica", qty: 2 },
+        { slug: "cs-clasica", qty: 5 },
       ],
     },
     {
-      id: "promo-3",
-      title: "Duo Italiana",
-      description: "2 Italiana",
-      price: 7490,
-      image: promoImage,
+      id: "combo-bacon-lovers",
+      title: "Combo Bacon Lovers",
+      description: "5 Hamburguesas Bacon a $10.990",
+      price: 10990,
+      image: comboBaconLoversImg,
       items: [
-        { slug: "cs-italiana", qty: 2 },
+        { slug: "cs-bacon", qty: 5 },
       ],
     },
     {
-      id: "promo-4",
-      title: "Family Pack",
-      description: "4 Clásicas + 1 Rompedieta",
-      price: 12990,
-      image: csBaconImage,
-      items: [
-        { slug: "cs-clasica", qty: 4 },
-        { slug: "cs-romp-ii", qty: 1 },
-      ],
+      id: "combo-proximamente",
+      title: "Próximamente",
+      description: "Nuevo combo pronto disponible",
+      price: null,
+      image: comboFamiliarImg,
+      items: [],
+      comingSoon: true,
     },
   ];
-
-  
 
   function confirmPromo(promo: any) {
     // build message for the promotion and open WhatsApp
     const lines: string[] = [];
-    lines.push(`Hola, quiero la promoción: ${promo.title}`);
+    lines.push(`Quiero la promoción: ${promo.title}`);
     lines.push(`Precio: $${formatPrice(promo.price)}`);
     lines.push(`Incluye:`);
     promo.items.forEach((it: any) => {
@@ -130,43 +128,51 @@ export function MenuPage() {
       {/* Promociones: carrusel horizontal */}
       <section className="space-y-3">
         <div className="flex items-center justify-between">
-          <h4 className="text-lg font-semibold text-slate-900">Promociones</h4>
+          <h4 className="text-lg font-semibold text-slate-900">Combos</h4>
           <span className="text-sm text-slate-500">Ofertas seleccionadas</span>
         </div>
           <div className="-mx-4 overflow-x-auto px-4 pb-2">
           <div className="flex gap-4 snap-x snap-mandatory">
-              {promotions.map((promo, idx) => (
-                idx === 0 ? (
+              {combos.map((combo) => (
+                combo.comingSoon ? (
                   <article
-                    key={promo.id}
-                    onClick={() => setPromoToConfirm(promo)}
-                    className="cursor-pointer min-w-[200px] snap-start rounded-2xl overflow-hidden bg-white shadow-md transition hover:scale-105"
+                    key={combo.id}
+                    className="min-w-[200px] snap-start rounded-2xl overflow-hidden bg-white shadow-md relative opacity-60 grayscale"
                   >
                     <div className="w-full aspect-square overflow-hidden">
-                      <img src={promo.image} alt={promo.title} className="h-full w-full object-cover" />
+                      <img src={combo.image} alt={combo.title} className="h-full w-full object-cover" />
                     </div>
                     <div className="p-2">
-                      <div className="text-sm font-semibold text-slate-900">{promo.title}</div>
-                      <div className="text-xs text-slate-500">{promo.description}</div>
-                      <div className="mt-2">
-                        <div className="text-lg font-bold text-slate-900">${formatPrice(promo.price)}</div>
-                      </div>
-                    </div>
-                  </article>
-                ) : (
-                  <article key={promo.id} className="min-w-[200px] snap-start rounded-2xl overflow-hidden bg-white shadow-md relative">
-                    <div className="w-full aspect-square overflow-hidden">
-                      <img src={promo.image} alt={promo.title} className="h-full w-full object-cover filter grayscale opacity-70" />
-                    </div>
-                    <div className="p-2">
-                      <div className="text-sm font-semibold text-slate-900">Próximamente</div>
-                      <div className="text-xs text-slate-500">{promo.title}</div>
+                      <div className="text-sm font-semibold text-slate-900">{combo.title}</div>
+                      <div className="text-xs text-slate-500">{combo.description}</div>
                       <div className="mt-2">
                         <div className="text-lg font-bold text-slate-900">—</div>
                       </div>
                     </div>
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div className="rounded-full bg-white/80 px-3 py-1 text-sm font-medium">Próximamente</div>
+                    </div>
+                  </article>
+                ) : (
+                  <article
+                    key={combo.id}
+                    onClick={() => setPromoToConfirm(combo)}
+                    className={`cursor-pointer min-w-[200px] snap-start rounded-2xl overflow-hidden bg-white shadow-md transition hover:scale-105 ${combo.favorite ? 'border-2 border-yellow-400' : ''}`}
+                  >
+                    <div className="w-full aspect-square overflow-hidden">
+                      <img src={combo.image} alt={combo.title} className="h-full w-full object-cover" />
+                    </div>
+                    <div className="p-2">
+                      <div className="text-sm font-semibold text-slate-900 flex items-center gap-1">
+                        {combo.title}
+                        {combo.favorite && <StarIcon className="w-4 h-4 text-yellow-400" />}
+                      </div>
+                      <div className="text-xs text-slate-500">{combo.description}</div>
+                      <div className="mt-2">
+                        <div className="text-lg font-bold text-slate-900">
+                          {combo.price !== null ? `$${formatPrice(combo.price)}` : '—'}
+                        </div>
+                      </div>
                     </div>
                   </article>
                 )
@@ -223,16 +229,39 @@ export function MenuPage() {
       {/* Floating CTA (centered, small float animation). Hidden when modal open */}
       {!isOpen && (
         <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2">
-          <style>{`@keyframes floatY{0%{transform:translateY(0)}50%{transform:translateY(-6px)}100%{transform:translateY(0)}}`}</style>
+          <style>{`
+            @keyframes floatY{0%{transform:translateY(0)}50%{transform:translateY(-6px)}100%{transform:translateY(0)}}
+            @keyframes shine {
+              0% { opacity: 0; background-position: -120px 0; }
+              80% { opacity: 0; background-position: -120px 0; }
+              83% { opacity: 1; background-position: -120px 0; }
+              87% { opacity: 1; background-position: 120px 0; }
+              90% { opacity: 0; background-position: 120px 0; }
+              100% { opacity: 0; background-position: 120px 0; }
+            }
+          `}</style>
           <button
             aria-label="Abrir carrito"
             onClick={() => setIsOpen(true)}
-            style={{ animation: "floatY 3s ease-in-out infinite" }}
-            className="inline-flex items-center gap-3 rounded-full bg-red-700 px-4 py-3 text-white shadow-2xl"
+            style={{
+              animation: "floatY 3s ease-in-out infinite",
+              boxShadow: "0 0 12px 2px rgba(255,255,255,0.25)"
+            }}
+            className="inline-flex items-center gap-3 rounded-full bg-red-700 px-4 py-3 text-white shadow-2xl relative overflow-hidden"
           >
-            Pedir ahora
+            <span className="relative z-10">Pedir ahora</span>
+            <span
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                animation: "shine 6s linear infinite",
+                backgroundImage: "linear-gradient(120deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,0) 100%)",
+                backgroundSize: "240px 100%",
+                backgroundRepeat: "no-repeat",
+                opacity: 0
+              }}
+            ></span>
             {totalCount > 0 ? (
-              <span className="ml-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/20 text-xs font-bold">{totalCount}</span>
+              <span className="ml-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/20 text-xs font-bold relative z-10">{totalCount}</span>
             ) : null}
           </button>
         </div>
@@ -390,16 +419,17 @@ export function MenuPage() {
                     }
                     onClick={() => {
                       // build message
-                      const lines = ["Hola, quiero hacer un pedido:"];
-                      lines.push(`Tipo: ${orderType === 'delivery' ? 'Delivery' : 'Retiro en local'}`);
+                      const lines = ["Quiero hacer un pedido:"];
+                      lines.push(`Tipo: ${orderType === 'delivery' ? '*Delivery*' : '*Retiro en local*'}`);
                       if (orderType === 'delivery') {
-                        lines.push(`Dirección: ${address}`);
+                        lines.push(`Dirección: *${address}*`);
+                        lines.push(`_Falta agregar el valor del envío/delivery_`);
                       }
                       cartItems.forEach((it) => {
                         const notePart = it.note ? ` (${it.note})` : "";
-                        lines.push(`- ${it.product.name} x${it.qty} - $${formatPrice(it.price * it.qty)}${notePart}`);
+                        lines.push(`- ${it.product.name} x *${it.qty}* -- $${formatPrice(it.price * it.qty)}${notePart}`);
                       });
-                      lines.push(`Total: $${formatPrice(total)}`);
+                      lines.push(`Total: *$${formatPrice(total)}*`);
                       const message = lines.join("\n");
                       const phone = "56945568889";
                       const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
