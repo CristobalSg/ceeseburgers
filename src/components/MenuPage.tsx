@@ -57,7 +57,7 @@ export function MenuPage() {
     {
       id: "combo-familiar",
       title: "Combo Familiar",
-      description: "3 Clásicas + 2 Bacon a $9.990",
+      description: "3 Clásicas + 2 Bacon",
       price: 9990,
       image: comboFamiliarImg,
       items: [
@@ -69,7 +69,7 @@ export function MenuPage() {
     {
       id: "combo-clasico-full",
       title: "Combo Clásico Full",
-      description: "5 Hamburguesas Clásicas a $8.990",
+      description: "5 Hamburguesas Clásicas",
       price: 8990,
       image: comboClasicasFullImg,
       items: [
@@ -79,7 +79,7 @@ export function MenuPage() {
     {
       id: "combo-bacon-lovers",
       title: "Combo Bacon Lovers",
-      description: "5 Hamburguesas Bacon a $10.990",
+      description: "5 Hamburguesas Bacon",
       price: 10990,
       image: comboBaconLoversImg,
       items: [
@@ -134,48 +134,29 @@ export function MenuPage() {
           <div className="-mx-4 overflow-x-auto px-4 pb-2">
           <div className="flex gap-4 snap-x snap-mandatory">
               {combos.map((combo) => (
-                combo.comingSoon ? (
+                <div key={combo.id} className="flex flex-col items-start min-w-[200px]">
                   <article
-                    key={combo.id}
-                    className="min-w-[200px] snap-start rounded-2xl overflow-hidden bg-white shadow-md relative opacity-60 grayscale"
+                    onClick={!combo.comingSoon ? () => setPromoToConfirm(combo) : undefined}
+                    className={`w-full aspect-square snap-start rounded-2xl overflow-hidden bg-white shadow-md transition hover:scale-105 flex items-center justify-center ${combo.comingSoon ? 'opacity-60 grayscale pointer-events-none' : 'cursor-pointer'} ${combo.favorite && !combo.comingSoon ? 'border-2 border-yellow-400' : ''}`}
                   >
-                    <div className="w-full aspect-square overflow-hidden">
-                      <img src={combo.image} alt={combo.title} className="h-full w-full object-cover" />
-                    </div>
-                    <div className="p-2">
-                      <div className="text-sm font-semibold text-slate-900">{combo.title}</div>
-                      <div className="text-xs text-slate-500">{combo.description}</div>
-                      <div className="mt-2">
-                        <div className="text-lg font-bold text-slate-900">—</div>
+                    <img src={combo.image} alt={combo.title} className="h-full w-full object-cover" />
+                    {combo.comingSoon && (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="rounded-full bg-white/80 px-3 py-1 text-sm font-medium">Próximamente</div>
                       </div>
-                    </div>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="rounded-full bg-white/80 px-3 py-1 text-sm font-medium">Próximamente</div>
-                    </div>
+                    )}
                   </article>
-                ) : (
-                  <article
-                    key={combo.id}
-                    onClick={() => setPromoToConfirm(combo)}
-                    className={`cursor-pointer min-w-[200px] snap-start rounded-2xl overflow-hidden bg-white shadow-md transition hover:scale-105 ${combo.favorite ? 'border-2 border-yellow-400' : ''}`}
-                  >
-                    <div className="w-full aspect-square overflow-hidden">
-                      <img src={combo.image} alt={combo.title} className="h-full w-full object-cover" />
+                  <div className="mt-2 w-full">
+                    <div className="text-base font-semibold text-slate-900 flex items-center gap-1">
+                      {combo.title}
+                      {combo.favorite && !combo.comingSoon && <StarIcon className="w-4 h-4 text-yellow-400" />}
                     </div>
-                    <div className="p-2">
-                      <div className="text-sm font-semibold text-slate-900 flex items-center gap-1">
-                        {combo.title}
-                        {combo.favorite && <StarIcon className="w-4 h-4 text-yellow-400" />}
-                      </div>
-                      <div className="text-xs text-slate-500">{combo.description}</div>
-                      <div className="mt-2">
-                        <div className="text-lg font-bold text-slate-900">
-                          {combo.price !== null ? `$${formatPrice(combo.price)}` : '—'}
-                        </div>
-                      </div>
+                    <div className="text-xs text-slate-500">{combo.description}</div>
+                    <div className="mt-1 text-lg font-bold text-slate-900">
+                      {combo.price !== null && !combo.comingSoon ? `$${formatPrice(combo.price)}` : '—'}
                     </div>
-                  </article>
-                )
+                  </div>
+                </div>
               ))}
           </div>
         </div>
