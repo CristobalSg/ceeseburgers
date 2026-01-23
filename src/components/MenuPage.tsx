@@ -1,7 +1,7 @@
 import { products } from "./Products";
 import type { Product } from "./Products";
 import { StarIcon, TagIcon } from "@heroicons/react/24/solid";
-import comboFamiliarImg from "../../img/combos/combo-familiar.jpg";
+import comboFamiliarImg from "../../img/combos/combo-familiar.png";
 import comboClasicasFullImg from "../../img/combos/combo-clasicas-full.png";
 import comboBaconLoversImg from "../../img/combos/combo-bacon-lovers.png";
 import { useState } from "react";
