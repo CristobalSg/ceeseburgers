@@ -814,7 +814,7 @@ export function MenuPage() {
           `}</style>
           {cartFeedback ? (
             <div
-              className="mb-3 ml-auto w-max max-w-[220px] rounded-2xl bg-slate-900 px-3 py-2 text-right text-xs text-white shadow-xl"
+              className="pointer-events-none absolute bottom-[calc(100%+12px)] right-0 w-max max-w-[220px] rounded-2xl bg-slate-900 px-3 py-2 text-right text-xs text-white shadow-xl"
               style={{ animation: "feedbackIn 1.8s ease forwards" }}
             >
               {cartFeedback.mode === "edited" ? "Producto actualizado" : "Producto agregado"}
