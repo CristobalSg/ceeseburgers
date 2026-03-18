@@ -1,19 +1,42 @@
 import { products } from "./Products";
-import type { Product } from "./Products";
 import { StarIcon, TagIcon } from "@heroicons/react/24/solid";
 import comboFamiliarImg from "../../img/combos/combo-familiar.png";
 import comboClasicasFullImg from "../../img/combos/combo-clasicas-full.png";
 import comboBaconLoversImg from "../../img/combos/combo-bacon-lovers.png";
 import { useState } from "react";
 
+type MenuCombo = {
+  id: string;
+  title: string;
+  description: string;
+  priceLabel: string;
+  image: string;
+  items?: { slug: string; qty: number }[];
+  favorite?: boolean;
+  note?: string;
+  comingSoon?: boolean;
+};
+
+type MenuCategoryItem = {
+  name: string;
+  description: string;
+  priceLabel: string;
+  image: string;
+  imageAlt: string;
+  badge?: string;
+};
+
+type MenuTab = "hamburguesas" | "acompanamientos" | "bebidas" | "salsas";
+
 export function MenuPage() {
   const [isOpen, setIsOpen] = useState(false);
-  const [promoToConfirm, setPromoToConfirm] = useState<any | null>(null);
+  const [promoToConfirm, setPromoToConfirm] = useState<MenuCombo | null>(null);
   const [cart, setCart] = useState<Record<string, { qty: number; note?: string }>>({});
   const [showNoteEditor, setShowNoteEditor] = useState<Record<string, boolean>>({});
   const [tagHint, setTagHint] = useState<string | null>(null);
   const [orderType, setOrderType] = useState<'pickup' | 'delivery'>('pickup');
   const [address, setAddress] = useState('');
+  const [activeMenuTab, setActiveMenuTab] = useState<MenuTab>("hamburguesas");
 
   function addToCart(slug: string) {
     const prevCount = Object.values(cart).reduce((s, it) => s + it.qty, 0);
@@ -53,57 +76,165 @@ export function MenuPage() {
     return { product, qty: data.qty, note: data.note, price };
   });
 
-  const combos = [
+  const individualCombos: MenuCombo[] = [
     {
-      id: "combo-familiar",
-      title: "Combo Familiar",
+      id: "combo-clasico",
+      title: "Combo Clasico",
+      description: "Hamburguesa clasica + papitas + bebida + salsa",
+      priceLabel: "$3.990",
+      image: comboClasicasFullImg,
+      favorite: true,
+      note: "Hamburguesa + Papitas + Bebida + Salsa",
+    },
+    {
+      id: "combo-bacon",
+      title: "Combo Bacon",
+      description: "Hamburguesa bacon + papitas + bebida + salsa",
+      priceLabel: "$4.490",
+      image: comboBaconLoversImg,
+      note: "Hamburguesa + Papitas + Bebida + Salsa",
+    },
+    {
+      id: "combo-doble",
+      title: "Combo Doble",
+      description: "Hamburguesa doble + papitas + bebida + salsa",
+      priceLabel: "$4.990",
+      image: comboFamiliarImg,
+      note: "Hamburguesa + Papitas + Bebida + Salsa",
+    },
+  ];
+
+  const familyCombos: MenuCombo[] = [
+    {
+      id: "combo-familiar-clasico",
+      title: "Combo Familiar Clasico",
       description: "3 Clásicas + 2 Bacon",
-      price: 9990,
+      priceLabel: "$9.990",
       image: comboFamiliarImg,
       items: [
         { slug: "cs-clasica", qty: 3 },
         { slug: "cs-bacon", qty: 2 },
       ],
       favorite: true,
+      note: "Ideales para compartir",
     },
     {
-      id: "combo-clasico-full",
-      title: "Combo Clásico Full",
-      description: "5 Hamburguesas Clásicas",
-      price: 8990,
-      image: comboClasicasFullImg,
-      items: [
-        { slug: "cs-clasica", qty: 5 },
-      ],
-    },
-    {
-      id: "combo-bacon-lovers",
-      title: "Combo Bacon Lovers",
-      description: "5 Hamburguesas Bacon",
-      price: 10990,
+      id: "combo-familiar-bacon",
+      title: "Combo Familiar Bacon",
+      description: "5 hamburguesas bacon",
+      priceLabel: "$10.990",
       image: comboBaconLoversImg,
-      items: [
-        { slug: "cs-bacon", qty: 5 },
-      ],
+      note: "Ideales para compartir",
     },
     {
-      id: "combo-proximamente",
-      title: "Próximamente",
-      description: "Nuevo combo pronto disponible",
-      price: null,
-      image: comboFamiliarImg,
-      items: [],
-      comingSoon: true,
+      id: "combo-familiar-mix",
+      title: "Combo Familiar Mix",
+      description: "2 clasicas + 2 bacon + papas grandes",
+      priceLabel: "$10.490",
+      image: comboClasicasFullImg,
+      note: "Ideales para compartir",
     },
   ];
 
-  function confirmPromo(promo: any) {
+  const sideMenu: MenuCategoryItem[] = [
+    {
+      name: "Papitas fritas",
+      description: "El acompanamiento clasico para cualquier pedido.",
+      priceLabel: "$1.490",
+      image: comboClasicasFullImg,
+      imageAlt: "Papitas fritas",
+    },
+    {
+      name: "Aros de cebolla",
+      description: "En promo porque se viene proximamente.",
+      priceLabel: "$1.990",
+      image: comboBaconLoversImg,
+      imageAlt: "Aros de cebolla",
+      badge: "Proximamente",
+    },
+    {
+      name: "Nuggets",
+      description: "En promo porque se viene proximamente.",
+      priceLabel: "$2.490",
+      image: comboFamiliarImg,
+      imageAlt: "Nuggets",
+      badge: "Proximamente",
+    },
+    {
+      name: "Empanadas de queso",
+      description: "En promo porque se viene proximamente.",
+      priceLabel: "$2.290",
+      image: comboClasicasFullImg,
+      imageAlt: "Empanadas de queso",
+      badge: "Proximamente",
+    },
+  ];
+
+  const drinkMenu: MenuCategoryItem[] = [
+    {
+      name: "Bebida mediana",
+      description: "Formato mediano para acompanar combos o pedidos individuales.",
+      priceLabel: "$990",
+      image: comboFamiliarImg,
+      imageAlt: "Bebida mediana",
+    },
+    {
+      name: "Bebida grande",
+      description: "Formato grande para quienes quieren mas bebida.",
+      priceLabel: "$1.290",
+      image: comboBaconLoversImg,
+      imageAlt: "Bebida grande",
+    },
+  ];
+
+  const sauceMenu: MenuCategoryItem[] = [
+    {
+      name: "Mayo casera",
+      description: "Extra para acompanar tu pedido.",
+      priceLabel: "$300",
+      image: comboClasicasFullImg,
+      imageAlt: "Mayo casera",
+    },
+    {
+      name: "Ketchup",
+      description: "Extra para acompanar tu pedido.",
+      priceLabel: "$300",
+      image: comboFamiliarImg,
+      imageAlt: "Ketchup",
+    },
+    {
+      name: "Mostaza",
+      description: "Extra para acompanar tu pedido.",
+      priceLabel: "$300",
+      image: comboBaconLoversImg,
+      imageAlt: "Mostaza",
+    },
+    {
+      name: "BBQ",
+      description: "Extra para acompanar tu pedido.",
+      priceLabel: "$500",
+      image: comboBaconLoversImg,
+      imageAlt: "Salsa BBQ",
+    },
+    {
+      name: "Ajo",
+      description: "Extra para acompanar tu pedido.",
+      priceLabel: "$500",
+      image: comboFamiliarImg,
+      imageAlt: "Salsa de ajo",
+    },
+  ];
+
+  function confirmPromo(promo: MenuCombo) {
     // build message for the promotion and open WhatsApp
     const lines: string[] = [];
     lines.push(`Quiero la promoción: ${promo.title}`);
-    lines.push(`Precio: $${formatPrice(promo.price)}`);
-    lines.push(`Incluye:`);
-    promo.items.forEach((it: any) => {
+    lines.push(`Precio: ${promo.priceLabel}`);
+    lines.push("Incluye:");
+    if (promo.note) {
+      lines.push(`- ${promo.note}`);
+    }
+    promo.items?.forEach((it) => {
       const prod = products.find((p) => p.slug === it.slug);
       lines.push(`- ${prod ? prod.name : it.slug} x${it.qty}`);
     });
@@ -116,96 +247,196 @@ export function MenuPage() {
 
   const total = cartItems.reduce((s, it) => s + it.price * it.qty, 0);
   const totalCount = cartItems.reduce((s, it) => s + it.qty, 0);
+  const menuTabs: { id: MenuTab; label: string }[] = [
+    { id: "hamburguesas", label: "Hamburguesas" },
+    { id: "acompanamientos", label: "Acompañamientos" },
+    { id: "bebidas", label: "Bebidas" },
+    { id: "salsas", label: "Salsas" },
+  ];
+
+  function renderCategoryCards(items: MenuCategoryItem[], columnsClassName = "grid-cols-2") {
+    return (
+      <div className={`grid gap-4 ${columnsClassName}`}>
+        {items.map((item) => (
+          <div key={item.name} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div className="relative aspect-square overflow-hidden">
+              <img src={item.image} alt={item.imageAlt} className="h-full w-full object-cover" />
+              {item.badge ? (
+                <span className="absolute right-3 top-3 rounded-full bg-amber-100 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-800">
+                  {item.badge}
+                </span>
+              ) : null}
+            </div>
+            <div className="p-4">
+              <div className="flex items-center justify-between gap-2">
+                <div className="text-sm font-semibold text-slate-900">{item.name}</div>
+                <div className="text-sm font-semibold text-red-700">{item.priceLabel}</div>
+              </div>
+              <p className="mt-2 text-sm text-slate-600">{item.description}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <section className="space-y-6">
       <div className="grid gap-2 text-center">
         <p className="text-sm font-semibold uppercase tracking-[0.18em] text-red-700">Menú completo</p>
         <h3 className="text-3xl font-bold text-slate-900">Todos nuestros productos</h3>
-        <p className="text-base text-slate-600">Explora el menú completo, de momento tenemos 5 variedades de hamburguesas, pero más adelante tendremos un montón de opciones.</p>
+        <p className="text-base text-slate-600">Explora el menú completo con el nuevo orden de categorías y los combos destacados en carrusel.</p>
       </div>
 
-      {/* Promociones: carrusel horizontal */}
       <section className="space-y-3">
         <div className="flex items-center justify-between">
-          <h4 className="text-lg font-semibold text-slate-900">Combos</h4>
-          <span className="text-sm text-slate-500">Ofertas seleccionadas</span>
+          <h4 className="text-lg font-semibold text-slate-900">Combos Individuales</h4>
+          <span className="text-sm text-slate-500">Hamburguesa + Papitas + Bebida + Salsa</span>
         </div>
-          <div className="-mx-4 overflow-x-auto px-4 pb-2">
+        <div className="-mx-4 overflow-x-auto px-4 pb-2">
           <div className="flex gap-4 snap-x snap-mandatory">
-              {combos.map((combo) => (
-                <div key={combo.id} className="flex flex-col items-start min-w-[200px]">
-                  <article
-                    onClick={!combo.comingSoon ? () => setPromoToConfirm(combo) : undefined}
-                    className={`w-full aspect-square snap-start rounded-2xl overflow-hidden bg-white shadow-md transition hover:scale-105 flex items-center justify-center ${combo.comingSoon ? 'opacity-60 grayscale pointer-events-none' : 'cursor-pointer'} ${combo.favorite && !combo.comingSoon ? 'border-2 border-yellow-400' : ''}`}
-                  >
-                    <img src={combo.image} alt={combo.title} className="h-full w-full object-cover" />
-                    {combo.comingSoon && (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="rounded-full bg-white/80 px-3 py-1 text-sm font-medium">Próximamente</div>
-                      </div>
-                    )}
-                  </article>
-                  <div className="mt-2 w-full">
-                    <div className="text-base font-semibold text-slate-900 flex items-center gap-1">
-                      {combo.title}
-                      {combo.favorite && !combo.comingSoon && <StarIcon className="w-4 h-4 text-yellow-400" />}
-                    </div>
-                    <div className="text-xs text-slate-500">{combo.description}</div>
-                    <div className="mt-1 text-lg font-bold text-slate-900">
-                      {combo.price !== null && !combo.comingSoon ? `$${formatPrice(combo.price)}` : '—'}
-                    </div>
+            {individualCombos.map((combo) => (
+              <div key={combo.id} className="flex flex-col items-start min-w-[200px]">
+                <article
+                  onClick={() => setPromoToConfirm(combo)}
+                  className={`w-full aspect-square snap-start rounded-2xl overflow-hidden bg-white shadow-md transition hover:scale-105 flex items-center justify-center cursor-pointer ${combo.favorite ? 'border-2 border-yellow-400' : ''}`}
+                >
+                  <img src={combo.image} alt={combo.title} className="h-full w-full object-cover" />
+                </article>
+                <div className="mt-2 w-full">
+                  <div className="text-base font-semibold text-slate-900 flex items-center gap-1">
+                    {combo.title}
+                    {combo.favorite && <StarIcon className="w-4 h-4 text-yellow-400" />}
                   </div>
+                  <div className="text-xs text-slate-500">{combo.description}</div>
+                  <div className="mt-1 text-lg font-bold text-slate-900">{combo.priceLabel}</div>
                 </div>
-              ))}
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h4 className="text-lg font-semibold text-slate-900">Hamburguesas</h4>
-          <span className="text-sm text-slate-500">Todas las opciones disponibles</span>
+          <h4 className="text-lg font-semibold text-slate-900">Combos Familiares</h4>
+          <span className="text-sm text-slate-500">Ideales para compartir</span>
+        </div>
+        <div className="-mx-4 overflow-x-auto px-4 pb-2">
+          <div className="flex gap-4 snap-x snap-mandatory">
+            {familyCombos.map((combo) => (
+              <div key={combo.id} className="flex flex-col items-start min-w-[200px]">
+                <article
+                  onClick={() => setPromoToConfirm(combo)}
+                  className={`w-full aspect-square snap-start rounded-2xl overflow-hidden bg-white shadow-md transition hover:scale-105 flex items-center justify-center cursor-pointer ${combo.favorite ? 'border-2 border-yellow-400' : ''}`}
+                >
+                  <img src={combo.image} alt={combo.title} className="h-full w-full object-cover" />
+                </article>
+                <div className="mt-2 w-full">
+                  <div className="text-base font-semibold text-slate-900 flex items-center gap-1">
+                    {combo.title}
+                    {combo.favorite && <StarIcon className="w-4 h-4 text-yellow-400" />}
+                  </div>
+                  <div className="text-xs text-slate-500">{combo.description}</div>
+                  <div className="mt-1 text-lg font-bold text-slate-900">{combo.priceLabel}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h4 className="text-lg font-semibold text-slate-900">Explora por categoria</h4>
+          <span className="text-sm text-slate-500">Contenido dinamico segun el boton</span>
+        </div>
+        <div className="-mx-4 overflow-x-auto px-4 pb-2">
+          <div className="flex w-max gap-3">
+            {menuTabs.map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveMenuTab(tab.id)}
+                className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+                  activeMenuTab === tab.id
+                    ? "bg-red-700 text-white shadow-md"
+                    : "bg-white text-slate-700 ring-1 ring-slate-200"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="grid gap-4 grid-cols-2">
-        {products.map((product: Product) => {
-          return (
-            <div
-              key={product.slug}
-              className="group relative overflow-hidden rounded-2xl border border-slate-200 shadow-lg transition-transform duration-200 hover:scale-105 flex flex-col bg-white"
-            >
-              <div className="relative w-full aspect-square overflow-hidden">
-                <img
-                  src={product.image}
-                  alt={product.imageAlt}
-                  className="w-full h-full object-cover transition duration-200"
-                />
-                {(product.mostOrdered || product.tag === "Top ventas") && (
-                  <div
-                    className={`absolute left-3 top-3 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${
-                      product.mostOrdered ? "bg-amber-100 text-amber-800 ring-1 ring-amber-200" : "bg-red-50 text-red-700"
-                    }`}
-                  >
-                    <StarIcon className="h-3 w-3" aria-hidden />
-                    {product.tag}
-                  </div>
-                )}
-              </div>
-
-              <div className="p-3">
-                <div className="flex items-baseline justify-between gap-2">
-                  <h4 className="text-sm font-semibold text-slate-900">{product.name}</h4>
-                  <span className="text-sm font-semibold text-red-700">{product.price}</span>
-                </div>
-                <p className="mt-2 text-sm text-slate-700">{product.description}</p>
-              </div>
+        {activeMenuTab === "hamburguesas" ? (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h5 className="text-base font-semibold text-slate-900">Hamburguesas Solas</h5>
+              <span className="text-sm text-slate-500">Las 5 hamburguesas del menu anterior</span>
             </div>
-          );
-        })}
-      </div>
+            <div className="grid gap-4 grid-cols-2">
+              {products.map((product) => (
+                <div
+                  key={product.slug}
+                  className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg transition-transform duration-200 hover:scale-105"
+                >
+                  <div className="relative aspect-square overflow-hidden">
+                    <img
+                      src={product.image}
+                      alt={product.imageAlt}
+                      className="h-full w-full object-cover transition duration-200"
+                    />
+                    {(product.mostOrdered || product.tag === "Top ventas") && (
+                      <div className="absolute left-3 top-3 inline-flex items-center gap-2 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800 ring-1 ring-amber-200">
+                        <StarIcon className="h-3 w-3" aria-hidden />
+                        {product.tag}
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-3">
+                    <div className="flex items-baseline justify-between gap-2">
+                      <h4 className="text-sm font-semibold text-slate-900">{product.name}</h4>
+                      <span className="text-sm font-semibold text-red-700">{product.price}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
 
-      </div>
+        {activeMenuTab === "acompanamientos" ? (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h5 className="text-base font-semibold text-slate-900">Acompañamientos</h5>
+              <span className="text-sm text-slate-500">Para complementar tu pedido</span>
+            </div>
+            {renderCategoryCards(sideMenu)}
+          </div>
+        ) : null}
+
+        {activeMenuTab === "bebidas" ? (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h5 className="text-base font-semibold text-slate-900">Bebidas</h5>
+              <span className="text-sm text-slate-500">Formatos disponibles</span>
+            </div>
+            {renderCategoryCards(drinkMenu)}
+          </div>
+        ) : null}
+
+        {activeMenuTab === "salsas" ? (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h5 className="text-base font-semibold text-slate-900">Salsas Extra</h5>
+              <span className="text-sm text-slate-500">Elige tu favorita</span>
+            </div>
+            {renderCategoryCards(sauceMenu)}
+          </div>
+        ) : null}
+      </section>
 
       {/* Floating CTA (centered, small float animation). Hidden when modal open */}
       {!isOpen && (
@@ -453,7 +684,7 @@ export function MenuPage() {
             className="mx-auto rounded-md bg-black/90 px-3 py-2 text-xs text-white shadow text-center"
             style={{ animation: "hintAnimGlobal 6s forwards", width: "50vw" }}
           >
-            Si aprietas el botón señalando la etiqueta puedes agregar un detalle
+            Si aprietas el boton senalando la etiqueta puedes agregar un detalle
           </div>
         </div>
       ) : null}
@@ -462,8 +693,8 @@ export function MenuPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/50" onClick={() => setPromoToConfirm(null)} />
           <div className="relative w-full max-w-sm rounded-xl bg-white p-6 shadow-2xl">
-            <h3 className="text-lg font-semibold">Confirmar promoción</h3>
-            <p className="mt-2 text-sm text-slate-600">¿Deseas realizar el pedido de "{promoToConfirm.title}" por ${formatPrice(promoToConfirm.price)}?</p>
+            <h3 className="text-lg font-semibold">Confirmar promocion</h3>
+            <p className="mt-2 text-sm text-slate-600">¿Deseas realizar el pedido de "{promoToConfirm.title}" por {promoToConfirm.priceLabel}?</p>
             <div className="mt-4 flex items-center justify-end gap-3">
               <button className="rounded-md px-3 py-2 text-sm" onClick={() => setPromoToConfirm(null)}>Cancelar</button>
               <button className="rounded-full bg-red-700 px-4 py-2 text-sm text-white" onClick={() => confirmPromo(promoToConfirm)}>Realizar el pedido</button>
