@@ -1,252 +1,270 @@
+import { ShoppingCartIcon, StarIcon, XMarkIcon } from "@heroicons/react/24/solid";
+import { useState } from "react";
 import { products } from "./Products";
-import { StarIcon, TagIcon } from "@heroicons/react/24/solid";
 import comboFamiliarImg from "../../img/combos/combo-familiar.png";
 import comboClasicasFullImg from "../../img/combos/combo-clasicas-full.png";
 import comboBaconLoversImg from "../../img/combos/combo-bacon-lovers.png";
-import { useState } from "react";
 
-type MenuCombo = {
+type MenuTab = "hamburguesas" | "acompanamientos" | "bebidas" | "salsas";
+type MenuCategory = "combo-individual" | "combo-familiar" | "hamburguesas" | "acompanamientos" | "bebidas" | "salsas";
+
+type MenuOptionGroup = {
+  id: string;
+  label: string;
+  choices: string[];
+};
+
+type MenuItem = {
   id: string;
   title: string;
   description: string;
-  priceLabel: string;
-  image: string;
-  items?: { slug: string; qty: number }[];
-  favorite?: boolean;
-  note?: string;
-  comingSoon?: boolean;
-};
-
-type MenuCategoryItem = {
-  name: string;
-  description: string;
-  priceLabel: string;
+  price: number;
   image: string;
   imageAlt: string;
+  category: MenuCategory;
   badge?: string;
+  favorite?: boolean;
+  options?: MenuOptionGroup[];
 };
 
-type MenuTab = "hamburguesas" | "acompanamientos" | "bebidas" | "salsas";
+type CartItem = {
+  id: string;
+  item: MenuItem;
+  qty: number;
+  selections: Record<string, string>;
+  unitSelections?: Record<string, string>[];
+};
+
+const comboDrinkOptions = ["Sprite", "Coca-Cola", "Fanta"];
+const friesSauceOptions = ["Mayo casera", "Ketchup", "Mostaza", "BBQ", "Ajo"];
+
+function parsePrice(price: string) {
+  const digits = price.replace(/\D/g, "");
+  return parseInt(digits || "0", 10);
+}
+
+function formatPrice(amount: number) {
+  return new Intl.NumberFormat("es-CL").format(amount);
+}
+
+function buildCartSignature(itemId: string, selections: Record<string, string>) {
+  const selectionKey = Object.entries(selections)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([key, value]) => `${key}:${value}`)
+    .join("|");
+  return `${itemId}::${selectionKey}`;
+}
 
 export function MenuPage() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [promoToConfirm, setPromoToConfirm] = useState<MenuCombo | null>(null);
-  const [cart, setCart] = useState<Record<string, { qty: number; note?: string }>>({});
-  const [showNoteEditor, setShowNoteEditor] = useState<Record<string, boolean>>({});
-  const [tagHint, setTagHint] = useState<string | null>(null);
-  const [orderType, setOrderType] = useState<'pickup' | 'delivery'>('pickup');
-  const [address, setAddress] = useState('');
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
+  const [selectedQty, setSelectedQty] = useState(1);
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
+  const [selectedUnitOptions, setSelectedUnitOptions] = useState<Record<string, string>[]>([]);
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [orderType, setOrderType] = useState<"pickup" | "delivery">("pickup");
+  const [address, setAddress] = useState("");
   const [activeMenuTab, setActiveMenuTab] = useState<MenuTab>("hamburguesas");
 
-  function addToCart(slug: string) {
-    const prevCount = Object.values(cart).reduce((s, it) => s + it.qty, 0);
-    setCart((prev) => ({ ...prev, [slug]: { qty: (prev[slug]?.qty ?? 0) + 1, note: prev[slug]?.note } }));
-    if (prevCount === 0) {
-      setTagHint(slug);
-      setTimeout(() => setTagHint(null), 6000);
-    }
-  }
-
-  function removeFromCart(slug: string) {
-    setCart((prev) => {
-      const copy = { ...prev };
-      if (!copy[slug]) return prev;
-      copy[slug] = { qty: copy[slug].qty - 1, note: copy[slug].note };
-      if (copy[slug].qty <= 0) delete copy[slug];
-      return copy;
-    });
-  }
-
-  function toggleNoteEditor(slug: string) {
-    setShowNoteEditor((prev) => ({ ...prev, [slug]: !prev[slug] }));
-  }
-
-  function parsePrice(price: string) {
-    const digits = price.replace(/\D/g, "");
-    return parseInt(digits || "0", 10);
-  }
-
-  function formatPrice(amount: number) {
-    return new Intl.NumberFormat("es-CL").format(amount);
-  }
-
-  const cartItems = Object.entries(cart).map(([slug, data]) => {
-    const product = products.find((p) => p.slug === slug)!;
-    const price = parsePrice(product.price);
-    return { product, qty: data.qty, note: data.note, price };
-  });
-
-  const individualCombos: MenuCombo[] = [
+  const individualCombos: MenuItem[] = [
     {
       id: "combo-clasico",
       title: "Combo Clasico",
       description: "Hamburguesa clasica + papitas + bebida + salsa",
-      priceLabel: "$3.990",
+      price: 3990,
       image: comboClasicasFullImg,
+      imageAlt: "Combo clasico",
+      category: "combo-individual",
       favorite: true,
-      note: "Hamburguesa + Papitas + Bebida + Salsa",
+      options: [
+        { id: "bebida", label: "Sabor de bebida", choices: comboDrinkOptions },
+        { id: "salsa", label: "Salsa para las papas", choices: friesSauceOptions },
+      ],
     },
     {
       id: "combo-bacon",
       title: "Combo Bacon",
       description: "Hamburguesa bacon + papitas + bebida + salsa",
-      priceLabel: "$4.490",
+      price: 4490,
       image: comboBaconLoversImg,
-      note: "Hamburguesa + Papitas + Bebida + Salsa",
+      imageAlt: "Combo bacon",
+      category: "combo-individual",
+      options: [
+        { id: "bebida", label: "Sabor de bebida", choices: comboDrinkOptions },
+        { id: "salsa", label: "Salsa para las papas", choices: friesSauceOptions },
+      ],
     },
     {
       id: "combo-doble",
       title: "Combo Doble",
       description: "Hamburguesa doble + papitas + bebida + salsa",
-      priceLabel: "$4.990",
+      price: 4990,
       image: comboFamiliarImg,
-      note: "Hamburguesa + Papitas + Bebida + Salsa",
+      imageAlt: "Combo doble",
+      category: "combo-individual",
+      options: [
+        { id: "bebida", label: "Sabor de bebida", choices: comboDrinkOptions },
+        { id: "salsa", label: "Salsa para las papas", choices: friesSauceOptions },
+      ],
     },
   ];
 
-  const familyCombos: MenuCombo[] = [
+  const familyCombos: MenuItem[] = [
     {
       id: "combo-familiar-clasico",
       title: "Combo Familiar Clasico",
-      description: "3 Clásicas + 2 Bacon",
-      priceLabel: "$9.990",
+      description: "3 hamburguesas clasicas + 2 hamburguesas bacon",
+      price: 9990,
       image: comboFamiliarImg,
-      items: [
-        { slug: "cs-clasica", qty: 3 },
-        { slug: "cs-bacon", qty: 2 },
-      ],
+      imageAlt: "Combo familiar clasico",
+      category: "combo-familiar",
       favorite: true,
-      note: "Ideales para compartir",
     },
     {
       id: "combo-familiar-bacon",
       title: "Combo Familiar Bacon",
       description: "5 hamburguesas bacon",
-      priceLabel: "$10.990",
+      price: 10990,
       image: comboBaconLoversImg,
-      note: "Ideales para compartir",
+      imageAlt: "Combo familiar bacon",
+      category: "combo-familiar",
     },
     {
       id: "combo-familiar-mix",
       title: "Combo Familiar Mix",
       description: "2 clasicas + 2 bacon + papas grandes",
-      priceLabel: "$10.490",
+      price: 10490,
       image: comboClasicasFullImg,
-      note: "Ideales para compartir",
+      imageAlt: "Combo familiar mix",
+      category: "combo-familiar",
     },
   ];
 
-  const sideMenu: MenuCategoryItem[] = [
+  const burgerItems: MenuItem[] = products.map((product) => ({
+    id: product.slug,
+    title: product.name,
+    description: product.description,
+    price: parsePrice(product.price),
+    image: product.image,
+    imageAlt: product.imageAlt,
+    category: "hamburguesas",
+    badge: product.mostOrdered || product.tag === "Top ventas" ? product.tag : undefined,
+    favorite: product.mostOrdered,
+  }));
+
+  const sideItems: MenuItem[] = [
     {
-      name: "Papitas fritas",
+      id: "papitas-fritas",
+      title: "Papitas fritas",
       description: "El acompanamiento clasico para cualquier pedido.",
-      priceLabel: "$1.490",
+      price: 1490,
       image: comboClasicasFullImg,
       imageAlt: "Papitas fritas",
+      category: "acompanamientos",
     },
     {
-      name: "Aros de cebolla",
+      id: "aros-de-cebolla",
+      title: "Aros de cebolla",
       description: "En promo porque se viene proximamente.",
-      priceLabel: "$1.990",
+      price: 1990,
       image: comboBaconLoversImg,
       imageAlt: "Aros de cebolla",
+      category: "acompanamientos",
       badge: "Proximamente",
     },
     {
-      name: "Nuggets",
+      id: "nuggets",
+      title: "Nuggets",
       description: "En promo porque se viene proximamente.",
-      priceLabel: "$2.490",
+      price: 2490,
       image: comboFamiliarImg,
       imageAlt: "Nuggets",
+      category: "acompanamientos",
       badge: "Proximamente",
     },
     {
-      name: "Empanadas de queso",
+      id: "empanadas-de-queso",
+      title: "Empanadas de queso",
       description: "En promo porque se viene proximamente.",
-      priceLabel: "$2.290",
+      price: 2290,
       image: comboClasicasFullImg,
       imageAlt: "Empanadas de queso",
+      category: "acompanamientos",
       badge: "Proximamente",
     },
   ];
 
-  const drinkMenu: MenuCategoryItem[] = [
+  const drinkItems: MenuItem[] = [
     {
-      name: "Bebida mediana",
-      description: "Formato mediano para acompanar combos o pedidos individuales.",
-      priceLabel: "$990",
+      id: "bebida-mediana",
+      title: "Bebida mediana",
+      description: "Vaso mediano. Elige tu sabor al confirmar por WhatsApp si quieres cambiarlo.",
+      price: 990,
       image: comboFamiliarImg,
       imageAlt: "Bebida mediana",
+      category: "bebidas",
     },
     {
-      name: "Bebida grande",
-      description: "Formato grande para quienes quieren mas bebida.",
-      priceLabel: "$1.290",
+      id: "bebida-grande",
+      title: "Bebida grande",
+      description: "Vaso grande para quienes quieren mas bebida.",
+      price: 1290,
       image: comboBaconLoversImg,
       imageAlt: "Bebida grande",
+      category: "bebidas",
     },
   ];
 
-  const sauceMenu: MenuCategoryItem[] = [
+  const sauceItems: MenuItem[] = [
     {
-      name: "Mayo casera",
+      id: "mayo-casera",
+      title: "Mayo casera",
       description: "Extra para acompanar tu pedido.",
-      priceLabel: "$300",
+      price: 300,
       image: comboClasicasFullImg,
       imageAlt: "Mayo casera",
+      category: "salsas",
     },
     {
-      name: "Ketchup",
+      id: "ketchup",
+      title: "Ketchup",
       description: "Extra para acompanar tu pedido.",
-      priceLabel: "$300",
+      price: 300,
       image: comboFamiliarImg,
       imageAlt: "Ketchup",
+      category: "salsas",
     },
     {
-      name: "Mostaza",
+      id: "mostaza",
+      title: "Mostaza",
       description: "Extra para acompanar tu pedido.",
-      priceLabel: "$300",
+      price: 300,
       image: comboBaconLoversImg,
       imageAlt: "Mostaza",
+      category: "salsas",
     },
     {
-      name: "BBQ",
+      id: "bbq",
+      title: "BBQ",
       description: "Extra para acompanar tu pedido.",
-      priceLabel: "$500",
+      price: 500,
       image: comboBaconLoversImg,
-      imageAlt: "Salsa BBQ",
+      imageAlt: "BBQ",
+      category: "salsas",
     },
     {
-      name: "Ajo",
+      id: "ajo",
+      title: "Ajo",
       description: "Extra para acompanar tu pedido.",
-      priceLabel: "$500",
+      price: 500,
       image: comboFamiliarImg,
-      imageAlt: "Salsa de ajo",
+      imageAlt: "Ajo",
+      category: "salsas",
     },
   ];
 
-  function confirmPromo(promo: MenuCombo) {
-    // build message for the promotion and open WhatsApp
-    const lines: string[] = [];
-    lines.push(`Quiero la promoción: ${promo.title}`);
-    lines.push(`Precio: ${promo.priceLabel}`);
-    lines.push("Incluye:");
-    if (promo.note) {
-      lines.push(`- ${promo.note}`);
-    }
-    promo.items?.forEach((it) => {
-      const prod = products.find((p) => p.slug === it.slug);
-      lines.push(`- ${prod ? prod.name : it.slug} x${it.qty}`);
-    });
-    const message = lines.join("\n");
-    const phone = "56945568889";
-    const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-    window.open(url, "_blank");
-    setPromoToConfirm(null);
-  }
-
-  const total = cartItems.reduce((s, it) => s + it.price * it.qty, 0);
-  const totalCount = cartItems.reduce((s, it) => s + it.qty, 0);
+  const total = cart.reduce((sum, item) => sum + item.item.price * item.qty, 0);
+  const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
   const menuTabs: { id: MenuTab; label: string }[] = [
     { id: "hamburguesas", label: "Hamburguesas" },
     { id: "acompanamientos", label: "Acompañamientos" },
@@ -254,62 +272,232 @@ export function MenuPage() {
     { id: "salsas", label: "Salsas" },
   ];
 
-  function renderCategoryCards(items: MenuCategoryItem[], columnsClassName = "grid-cols-2") {
+  function openProductModal(item: MenuItem) {
+    const defaults = Object.fromEntries(
+      (item.options ?? []).map((group) => [group.id, group.choices[0]])
+    );
+    setSelectedItem(item);
+    setSelectedQty(1);
+    setSelectedOptions(defaults);
+    setSelectedUnitOptions(item.category === "combo-individual" ? [defaults] : []);
+  }
+
+  function closeProductModal() {
+    setSelectedItem(null);
+    setSelectedQty(1);
+    setSelectedOptions({});
+    setSelectedUnitOptions([]);
+  }
+
+  function syncUnitOptions(nextQty: number) {
+    if (!selectedItem || selectedItem.category !== "combo-individual") return;
+
+    setSelectedUnitOptions((prev) => {
+      const base =
+        prev[0] ??
+        Object.fromEntries((selectedItem.options ?? []).map((group) => [group.id, group.choices[0]]));
+      return Array.from({ length: nextQty }, (_, index) => prev[index] ?? { ...base });
+    });
+  }
+
+  function addSelectedItemToCart() {
+    if (!selectedItem) return;
+    const normalizedSelections =
+      selectedItem.category === "combo-individual" ? {} : selectedOptions;
+    const normalizedUnitSelections =
+      selectedItem.category === "combo-individual" ? selectedUnitOptions.slice(0, selectedQty) : undefined;
+    const signature = buildCartSignature(
+      selectedItem.id,
+      selectedItem.category === "combo-individual"
+        ? Object.fromEntries(
+            (normalizedUnitSelections ?? []).map((selection, index) => [
+              `combo-${index + 1}`,
+              Object.entries(selection)
+                .sort(([a], [b]) => a.localeCompare(b))
+                .map(([key, value]) => `${key}:${value}`)
+                .join(","),
+            ])
+          )
+        : normalizedSelections
+    );
+    setCart((prev) => {
+      const existing = prev.find((item) => item.id === signature);
+      if (existing) {
+        return prev.map((item) =>
+          item.id === signature ? { ...item, qty: item.qty + selectedQty } : item
+        );
+      }
+
+      return [
+        ...prev,
+        {
+          id: signature,
+          item: selectedItem,
+          qty: selectedQty,
+          selections: normalizedSelections,
+          unitSelections: normalizedUnitSelections,
+        },
+      ];
+    });
+    closeProductModal();
+    setIsCartOpen(true);
+  }
+
+  function updateCartQty(cartId: string, nextQty: number) {
+    if (nextQty <= 0) {
+      setCart((prev) => prev.filter((item) => item.id !== cartId));
+      return;
+    }
+
+    setCart((prev) =>
+      prev.map((item) => {
+        if (item.id !== cartId) return item;
+
+        if (item.unitSelections?.length) {
+          const fallback = item.unitSelections[item.unitSelections.length - 1] ?? {};
+          const nextUnitSelections =
+            nextQty > item.unitSelections.length
+              ? [
+                  ...item.unitSelections,
+                  ...Array.from({ length: nextQty - item.unitSelections.length }, () => ({ ...fallback })),
+                ]
+              : item.unitSelections.slice(0, nextQty);
+
+          return { ...item, qty: nextQty, unitSelections: nextUnitSelections };
+        }
+
+        return { ...item, qty: nextQty };
+      })
+    );
+  }
+
+  function renderSelections(selections: Record<string, string>) {
+    const entries = Object.entries(selections);
+    if (entries.length === 0) return null;
+
+    return entries.map(([key, value]) => {
+      const label = key === "bebida" ? "Bebida" : key === "salsa" ? "Salsa" : key;
+      return (
+        <div key={key} className="text-xs text-slate-500">
+          {label}: {value}
+        </div>
+      );
+    });
+  }
+
+  function renderUnitSelections(unitSelections?: Record<string, string>[]) {
+    if (!unitSelections || unitSelections.length === 0) return null;
+
+    return unitSelections.map((selection, index) => (
+      <div key={`combo-${index + 1}`} className="mt-1 rounded-xl bg-slate-50 px-2 py-1">
+        <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+          Combo {index + 1}
+        </div>
+        {renderSelections(selection)}
+      </div>
+    ));
+  }
+
+  function renderMenuCards(items: MenuItem[], hideDescription = false, columnsClassName = "grid-cols-2") {
     return (
-      <div className={`grid gap-4 ${columnsClassName}`}>
+      <div className={`grid gap-3 ${columnsClassName}`}>
         {items.map((item) => (
-          <div key={item.name} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => openProductModal(item)}
+            className="overflow-hidden rounded-xl border border-slate-200 bg-white text-left shadow-sm transition-transform duration-200 hover:scale-[1.02]"
+          >
             <div className="relative aspect-square overflow-hidden">
               <img src={item.image} alt={item.imageAlt} className="h-full w-full object-cover" />
               {item.badge ? (
-                <span className="absolute right-3 top-3 rounded-full bg-amber-100 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-800">
+                <span className="absolute right-2 top-2 rounded-full bg-amber-100 px-1.5 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] text-amber-800">
                   {item.badge}
                 </span>
               ) : null}
+              {item.favorite ? (
+                <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-white/90 px-1.5 py-1 text-[9px] font-semibold text-slate-900">
+                  <StarIcon className="h-2.5 w-2.5 text-yellow-500" />
+                  Favorito
+                </span>
+              ) : null}
             </div>
-            <div className="p-4">
+            <div className="p-2.5">
               <div className="flex items-center justify-between gap-2">
-                <div className="text-sm font-semibold text-slate-900">{item.name}</div>
-                <div className="text-sm font-semibold text-red-700">{item.priceLabel}</div>
+                <div className="text-xs font-semibold leading-tight text-slate-900">{item.title}</div>
+                <div className="text-xs font-semibold text-red-700">${formatPrice(item.price)}</div>
               </div>
-              <p className="mt-2 text-sm text-slate-600">{item.description}</p>
+              {!hideDescription ? <p className="mt-1 text-xs leading-tight text-slate-600">{item.description}</p> : null}
             </div>
-          </div>
+          </button>
         ))}
       </div>
     );
   }
 
+  function sendOrderToWhatsApp() {
+    const lines = ["Quiero hacer un pedido:"];
+    lines.push(`Tipo: ${orderType === "delivery" ? "*Delivery*" : "*Retiro en local*"}`);
+    if (orderType === "delivery") {
+      lines.push(`Direccion: *${address}*`);
+      lines.push("_Falta agregar el valor del envio/delivery_");
+    }
+
+    cart.forEach((cartItem) => {
+      lines.push(`- ${cartItem.item.title} x *${cartItem.qty}* -- $${formatPrice(cartItem.item.price * cartItem.qty)}`);
+      if (cartItem.unitSelections?.length) {
+        cartItem.unitSelections.forEach((selection, index) => {
+          lines.push(`  Combo ${index + 1}:`);
+          Object.entries(selection).forEach(([key, value]) => {
+            const label = key === "bebida" ? "Bebida" : key === "salsa" ? "Salsa" : key;
+            lines.push(`  - ${label}: ${value}`);
+          });
+        });
+      } else {
+        Object.entries(cartItem.selections).forEach(([key, value]) => {
+          const label = key === "bebida" ? "Bebida" : key === "salsa" ? "Salsa" : key;
+          lines.push(`  ${label}: ${value}`);
+        });
+      }
+    });
+
+    lines.push(`Total: *$${formatPrice(total)}*`);
+    const message = lines.join("\n");
+    const phone = "56945568889";
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, "_blank");
+  }
+
   return (
-    <section className="space-y-6">
-      <div className="grid gap-2 text-center">
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-red-700">Menú completo</p>
-        <h3 className="text-3xl font-bold text-slate-900">Todos nuestros productos</h3>
-        <p className="text-base text-slate-600">Explora el menú completo con el nuevo orden de categorías y los combos destacados en carrusel.</p>
+    <section className="space-y-4">
+      <div className="grid gap-1.5 text-center">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-red-700">Menu completo</p>
+        <h3 className="text-2xl font-bold text-slate-900">Todos nuestros productos</h3>
+        <p className="text-sm text-slate-600">Presiona cualquier producto para configurarlo y agregarlo al carrito.</p>
       </div>
 
-      <section className="space-y-3">
+      <section className="space-y-2">
         <div className="flex items-center justify-between">
-          <h4 className="text-lg font-semibold text-slate-900">Combos Individuales</h4>
-          <span className="text-sm text-slate-500">Hamburguesa + Papitas + Bebida + Salsa</span>
+          <h4 className="text-base font-semibold text-slate-900">Combos Individuales</h4>
+          <span className="text-xs text-slate-500">Hamburguesa + Papitas + Bebida + Salsa</span>
         </div>
-        <div className="-mx-4 overflow-x-auto px-4 pb-2">
-          <div className="flex gap-4 snap-x snap-mandatory">
+        <div className="-mx-3 overflow-x-auto px-3 pb-1">
+          <div className="flex gap-3 snap-x snap-mandatory">
             {individualCombos.map((combo) => (
-              <div key={combo.id} className="flex flex-col items-start min-w-[200px]">
-                <article
-                  onClick={() => setPromoToConfirm(combo)}
-                  className={`w-full aspect-square snap-start rounded-2xl overflow-hidden bg-white shadow-md transition hover:scale-105 flex items-center justify-center cursor-pointer ${combo.favorite ? 'border-2 border-yellow-400' : ''}`}
+              <div key={combo.id} className="flex min-w-[160px] flex-col items-start">
+                <button
+                  type="button"
+                  onClick={() => openProductModal(combo)}
+                  className={`w-full aspect-square snap-start overflow-hidden rounded-xl bg-white shadow-md transition hover:scale-105 ${combo.favorite ? "border-2 border-yellow-400" : ""}`}
                 >
-                  <img src={combo.image} alt={combo.title} className="h-full w-full object-cover" />
-                </article>
-                <div className="mt-2 w-full">
-                  <div className="text-base font-semibold text-slate-900 flex items-center gap-1">
+                  <img src={combo.image} alt={combo.imageAlt} className="h-full w-full object-cover" />
+                </button>
+                <div className="mt-1.5 w-full">
+                  <div className="flex items-center gap-1 text-sm font-semibold text-slate-900">
                     {combo.title}
-                    {combo.favorite && <StarIcon className="w-4 h-4 text-yellow-400" />}
+                    {combo.favorite ? <StarIcon className="h-3.5 w-3.5 text-yellow-400" /> : null}
                   </div>
-                  <div className="text-xs text-slate-500">{combo.description}</div>
-                  <div className="mt-1 text-lg font-bold text-slate-900">{combo.priceLabel}</div>
+                  <div className="text-[11px] leading-tight text-slate-500">{combo.description}</div>
+                  <div className="mt-0.5 text-base font-bold text-slate-900">${formatPrice(combo.price)}</div>
                 </div>
               </div>
             ))}
@@ -317,51 +505,50 @@ export function MenuPage() {
         </div>
       </section>
 
-      <div className="space-y-3">
+      <section className="space-y-2">
         <div className="flex items-center justify-between">
-          <h4 className="text-lg font-semibold text-slate-900">Combos Familiares</h4>
-          <span className="text-sm text-slate-500">Ideales para compartir</span>
+          <h4 className="text-base font-semibold text-slate-900">Combos Familiares</h4>
+          <span className="text-xs text-slate-500">Ideales para compartir</span>
         </div>
-        <div className="-mx-4 overflow-x-auto px-4 pb-2">
-          <div className="flex gap-4 snap-x snap-mandatory">
+        <div className="-mx-3 overflow-x-auto px-3 pb-1">
+          <div className="flex gap-3 snap-x snap-mandatory">
             {familyCombos.map((combo) => (
-              <div key={combo.id} className="flex flex-col items-start min-w-[200px]">
-                <article
-                  onClick={() => setPromoToConfirm(combo)}
-                  className={`w-full aspect-square snap-start rounded-2xl overflow-hidden bg-white shadow-md transition hover:scale-105 flex items-center justify-center cursor-pointer ${combo.favorite ? 'border-2 border-yellow-400' : ''}`}
+              <div key={combo.id} className="flex min-w-[160px] flex-col items-start">
+                <button
+                  type="button"
+                  onClick={() => openProductModal(combo)}
+                  className={`w-full aspect-square snap-start overflow-hidden rounded-xl bg-white shadow-md transition hover:scale-105 ${combo.favorite ? "border-2 border-yellow-400" : ""}`}
                 >
-                  <img src={combo.image} alt={combo.title} className="h-full w-full object-cover" />
-                </article>
-                <div className="mt-2 w-full">
-                  <div className="text-base font-semibold text-slate-900 flex items-center gap-1">
+                  <img src={combo.image} alt={combo.imageAlt} className="h-full w-full object-cover" />
+                </button>
+                <div className="mt-1.5 w-full">
+                  <div className="flex items-center gap-1 text-sm font-semibold text-slate-900">
                     {combo.title}
-                    {combo.favorite && <StarIcon className="w-4 h-4 text-yellow-400" />}
+                    {combo.favorite ? <StarIcon className="h-3.5 w-3.5 text-yellow-400" /> : null}
                   </div>
-                  <div className="text-xs text-slate-500">{combo.description}</div>
-                  <div className="mt-1 text-lg font-bold text-slate-900">{combo.priceLabel}</div>
+                  <div className="text-[11px] leading-tight text-slate-500">{combo.description}</div>
+                  <div className="mt-0.5 text-base font-bold text-slate-900">${formatPrice(combo.price)}</div>
                 </div>
               </div>
             ))}
           </div>
         </div>
-      </div>
+      </section>
 
-      <section className="space-y-4">
+      <section className="space-y-3">
         <div className="flex items-center justify-between">
-          <h4 className="text-lg font-semibold text-slate-900">Explora por categoria</h4>
-          <span className="text-sm text-slate-500">Contenido dinamico segun el boton</span>
+          <h4 className="text-base font-semibold text-slate-900">Explora por categoria</h4>
+          <span className="text-xs text-slate-500">Contenido dinamico segun el boton</span>
         </div>
-        <div className="-mx-4 overflow-x-auto px-4 pb-2">
-          <div className="flex w-max gap-3">
+        <div className="-mx-3 overflow-x-auto px-3 pb-1">
+          <div className="flex w-max gap-2">
             {menuTabs.map((tab) => (
               <button
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveMenuTab(tab.id)}
-                className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-                  activeMenuTab === tab.id
-                    ? "bg-red-700 text-white shadow-md"
-                    : "bg-white text-slate-700 ring-1 ring-slate-200"
+                className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+                  activeMenuTab === tab.id ? "bg-red-700 text-white shadow-md" : "bg-white text-slate-700 ring-1 ring-slate-200"
                 }`}
               >
                 {tab.label}
@@ -371,76 +558,48 @@ export function MenuPage() {
         </div>
 
         {activeMenuTab === "hamburguesas" ? (
-          <div className="space-y-3">
+          <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <h5 className="text-base font-semibold text-slate-900">Hamburguesas Solas</h5>
-              <span className="text-sm text-slate-500">Las 5 hamburguesas del menu anterior</span>
+              <h5 className="text-sm font-semibold text-slate-900">Hamburguesas Solas</h5>
+              <span className="text-xs text-slate-500">Las 5 hamburguesas del menu anterior</span>
             </div>
-            <div className="grid gap-4 grid-cols-2">
-              {products.map((product) => (
-                <div
-                  key={product.slug}
-                  className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg transition-transform duration-200 hover:scale-105"
-                >
-                  <div className="relative aspect-square overflow-hidden">
-                    <img
-                      src={product.image}
-                      alt={product.imageAlt}
-                      className="h-full w-full object-cover transition duration-200"
-                    />
-                    {(product.mostOrdered || product.tag === "Top ventas") && (
-                      <div className="absolute left-3 top-3 inline-flex items-center gap-2 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800 ring-1 ring-amber-200">
-                        <StarIcon className="h-3 w-3" aria-hidden />
-                        {product.tag}
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-3">
-                    <div className="flex items-baseline justify-between gap-2">
-                      <h4 className="text-sm font-semibold text-slate-900">{product.name}</h4>
-                      <span className="text-sm font-semibold text-red-700">{product.price}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            {renderMenuCards(burgerItems, true)}
           </div>
         ) : null}
 
         {activeMenuTab === "acompanamientos" ? (
-          <div className="space-y-3">
+          <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <h5 className="text-base font-semibold text-slate-900">Acompañamientos</h5>
-              <span className="text-sm text-slate-500">Para complementar tu pedido</span>
+              <h5 className="text-sm font-semibold text-slate-900">Acompañamientos</h5>
+              <span className="text-xs text-slate-500">Para complementar tu pedido</span>
             </div>
-            {renderCategoryCards(sideMenu)}
+            {renderMenuCards(sideItems)}
           </div>
         ) : null}
 
         {activeMenuTab === "bebidas" ? (
-          <div className="space-y-3">
+          <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <h5 className="text-base font-semibold text-slate-900">Bebidas</h5>
-              <span className="text-sm text-slate-500">Formatos disponibles</span>
+              <h5 className="text-sm font-semibold text-slate-900">Bebidas</h5>
+              <span className="text-xs text-slate-500">Formatos disponibles</span>
             </div>
-            {renderCategoryCards(drinkMenu)}
+            {renderMenuCards(drinkItems)}
           </div>
         ) : null}
 
         {activeMenuTab === "salsas" ? (
-          <div className="space-y-3">
+          <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <h5 className="text-base font-semibold text-slate-900">Salsas Extra</h5>
-              <span className="text-sm text-slate-500">Elige tu favorita</span>
+              <h5 className="text-sm font-semibold text-slate-900">Salsas Extra</h5>
+              <span className="text-xs text-slate-500">Elige tu favorita</span>
             </div>
-            {renderCategoryCards(sauceMenu)}
+            {renderMenuCards(sauceItems)}
           </div>
         ) : null}
       </section>
 
-      {/* Floating CTA (centered, small float animation). Hidden when modal open */}
-      {!isOpen && (
-        <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2">
+      {!isCartOpen ? (
+        <div className="fixed bottom-6 right-4 z-50 sm:right-6">
           <style>{`
             @keyframes floatY{0%{transform:translateY(0)}50%{transform:translateY(-6px)}100%{transform:translateY(0)}}
             @keyframes shine {
@@ -454,14 +613,11 @@ export function MenuPage() {
           `}</style>
           <button
             aria-label="Abrir carrito"
-            onClick={() => setIsOpen(true)}
-            style={{
-              animation: "floatY 3s ease-in-out infinite",
-              boxShadow: "0 0 12px 2px rgba(255,255,255,0.25)"
-            }}
-            className="inline-flex items-center gap-3 rounded-full bg-red-700 px-4 py-3 text-white shadow-2xl relative overflow-hidden"
+            onClick={() => setIsCartOpen(true)}
+            style={{ animation: "floatY 3s ease-in-out infinite", boxShadow: "0 0 12px 2px rgba(255,255,255,0.25)" }}
+            className="relative inline-flex h-16 w-16 items-center justify-center rounded-full bg-red-700 text-white shadow-2xl"
           >
-            <span className="relative z-10">Pedir ahora</span>
+            <ShoppingCartIcon className="relative z-10 h-7 w-7" />
             <span
               className="absolute inset-0 pointer-events-none"
               style={{
@@ -469,235 +625,261 @@ export function MenuPage() {
                 backgroundImage: "linear-gradient(120deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,0) 100%)",
                 backgroundSize: "240px 100%",
                 backgroundRepeat: "no-repeat",
-                opacity: 0
+                opacity: 0,
               }}
-            ></span>
+            />
             {totalCount > 0 ? (
-              <span className="ml-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/20 text-xs font-bold relative z-10">{totalCount}</span>
+              <span className="absolute -right-2 -top-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-white px-1 text-[10px] font-bold leading-none text-red-700 ring-2 ring-red-700">
+                {totalCount}
+              </span>
             ) : null}
           </button>
         </div>
-      )}
+      ) : null}
 
-      {/* Modal */}
-      {isOpen ? (
-        <div className="fixed inset-0 z-40 flex items-end justify-center">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setIsOpen(false)} />
-          <div className="relative w-full max-w-md rounded-t-2xl bg-white p-4 shadow-2xl">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold">Selecciona productos</h3>
-              <button className="text-sm text-slate-500" onClick={() => setIsOpen(false)}>Cerrar</button>
-            </div>
+      {selectedItem ? (
+        <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center">
+          <div className="absolute inset-0 bg-black/50" onClick={closeProductModal} />
+          <div className="relative w-full max-w-lg rounded-t-3xl bg-white p-5 shadow-2xl sm:rounded-3xl">
+            <button
+              type="button"
+              onClick={closeProductModal}
+              className="absolute right-4 top-4 rounded-full bg-slate-100 p-2 text-slate-500"
+            >
+              <XMarkIcon className="h-5 w-5" />
+            </button>
 
-            <div className="mt-4 grid grid-cols-4 gap-3">
-              {products.map((product) => {
-                const qty = cart[product.slug]?.qty ?? 0;
-                return (
-                  <button
-                    key={product.slug}
-                    onClick={() => addToCart(product.slug)}
-                    className="relative flex flex-col items-center gap-2"
-                  >
-                    <img src={product.image} alt={product.imageAlt} className="h-16 w-16 rounded-md object-cover" />
-                    {qty > 0 ? (
-                      <span className="absolute -right-1 -top-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-[10px] font-bold text-white">{qty}</span>
-                    ) : null}
-                    <span className="text-xs text-center">{product.name}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            <div className="mt-4 border-t pt-3">
-              <div className="mb-3">
-                <div className="text-sm font-medium">¿Cómo quieres tu pedido?</div>
-                <div className="mt-2 flex items-center gap-4">
-                  <label className="inline-flex items-center gap-2 text-sm">
-                    <input
-                      type="radio"
-                      name="orderType"
-                      value="pickup"
-                      checked={orderType === 'pickup'}
-                      onChange={() => setOrderType('pickup')}
-                      className="h-4 w-4"
-                    />
-                    <span>Retiro en local</span>
-                  </label>
-                  <label className="inline-flex items-center gap-2 text-sm">
-                    <input
-                      type="radio"
-                      name="orderType"
-                      value="delivery"
-                      checked={orderType === 'delivery'}
-                      onChange={() => setOrderType('delivery')}
-                      className="h-4 w-4"
-                    />
-                    <span>Delivery</span>
-                  </label>
+            <div className="grid gap-4 sm:grid-cols-[180px_1fr]">
+              <div className="overflow-hidden rounded-2xl">
+                <img src={selectedItem.image} alt={selectedItem.imageAlt} className="h-full w-full object-cover" />
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <div className="text-sm font-semibold uppercase tracking-[0.16em] text-red-700">
+                    {selectedItem.category === "combo-individual" ? "Combo individual" : selectedItem.category === "combo-familiar" ? "Combo familiar" : "Producto"}
+                  </div>
+                  <h3 className="mt-1 text-2xl font-bold text-slate-900">{selectedItem.title}</h3>
+                  <p className="mt-2 text-sm text-slate-600">{selectedItem.description}</p>
+                  <div className="mt-3 text-xl font-bold text-slate-900">${formatPrice(selectedItem.price)}</div>
                 </div>
 
-                {orderType === 'delivery' ? (
-                  <div className="mt-3">
-                    <label className="text-xs text-slate-600">Dirección de entrega</label>
-                    <input
-                      value={address}
-                      onChange={(e) => setAddress(e.target.value)}
-                      placeholder="Calle, número, referencia"
-                      className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
-                    />
+                <div className="flex items-center justify-between rounded-2xl bg-slate-50 p-3">
+                  <span className="text-sm font-semibold text-slate-900">Cantidad</span>
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setSelectedQty((qty) => {
+                          const nextQty = Math.max(1, qty - 1);
+                          syncUnitOptions(nextQty);
+                          return nextQty;
+                        })
+                      }
+                      className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-lg font-bold text-red-700 shadow-sm ring-1 ring-slate-200"
+                    >
+                      -
+                    </button>
+                    <span className="min-w-8 text-center text-lg font-bold text-slate-900">{selectedQty}</span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setSelectedQty((qty) => {
+                          const nextQty = qty + 1;
+                          syncUnitOptions(nextQty);
+                          return nextQty;
+                        })
+                      }
+                      className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-lg font-bold text-green-700 shadow-sm ring-1 ring-slate-200"
+                    >
+                      +
+                    </button>
                   </div>
-                ) : null}
-              </div>
-              <h4 className="text-sm font-semibold">Tu carrito</h4>
-              <div className="mt-2 max-h-40 overflow-y-auto">
-                  {cartItems.length === 0 ? (
-                    <p className="text-sm text-slate-500">No hay productos seleccionados.</p>
-                  ) : (
-                    cartItems.map((it) => (
-                      <div key={it.product.slug} className="py-2">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <img src={it.product.image} alt={it.product.imageAlt} className="h-10 w-10 rounded-md object-cover" />
-                            <div>
-                              <div className="text-sm font-medium">{it.product.name}</div>
-                              <div className="text-xs text-slate-500">{it.qty} x ${formatPrice(it.price)}</div>
+                </div>
+
+                {selectedItem.category === "combo-individual" ? (
+                  <div className="max-h-72 space-y-3 overflow-y-auto pr-1">
+                    {Array.from({ length: selectedQty }).map((_, comboIndex) => (
+                      <div key={`combo-config-${comboIndex + 1}`} className="rounded-2xl border border-slate-200 p-3">
+                        <div className="mb-2 text-sm font-semibold text-slate-900">Combo {comboIndex + 1}</div>
+                        {(selectedItem.options ?? []).map((group) => (
+                          <div key={`${group.id}-${comboIndex}`} className="mt-3 space-y-2 first:mt-0">
+                            <div className="text-sm font-medium text-slate-800">{group.label}</div>
+                            <div className="flex flex-wrap gap-2">
+                              {group.choices.map((choice) => (
+                                <button
+                                  key={`${choice}-${comboIndex}`}
+                                  type="button"
+                                  onClick={() =>
+                                    setSelectedUnitOptions((prev) =>
+                                      prev.map((selection, index) =>
+                                        index === comboIndex ? { ...selection, [group.id]: choice } : selection
+                                      )
+                                    )
+                                  }
+                                  className={`rounded-full px-3 py-2 text-sm font-medium transition ${
+                                    selectedUnitOptions[comboIndex]?.[group.id] === choice
+                                      ? "bg-red-700 text-white"
+                                      : "bg-slate-100 text-slate-700"
+                                  }`}
+                                >
+                                  {choice}
+                                </button>
+                              ))}
                             </div>
                           </div>
-                          <div className="flex items-center gap-2">
-                              <div className="relative">
-                                <button
-                                  onClick={() => toggleNoteEditor(it.product.slug)}
-                                  className="text-sm text-slate-600"
-                                  aria-label={`Agregar nota a ${it.product.name}`}
-                                  style={tagHint === it.product.slug ? { animation: 'pulseHighlight 6s forwards' } : undefined}
-                                >
-                                  <TagIcon
-                                    className={`h-4 w-4 ${it.note ? 'text-amber-600' : tagHint === it.product.slug ? 'text-amber-400' : 'text-slate-600'}`}
-                                    style={tagHint === it.product.slug ? { animation: 'tagColor 6s forwards' } : undefined}
-                                  />
-                                </button>
-                                {/* tooltip moved to a fixed top-level element so it stacks above everything */}
-                              </div>
-                              <button onClick={() => removeFromCart(it.product.slug)} className="text-sm text-red-600">-</button>
-                              <div className="text-sm font-semibold">{it.qty}</div>
-                              <button onClick={() => addToCart(it.product.slug)} className="text-sm text-green-600">+</button>
-                            </div>
-                        </div>
-                        <div className="mt-2">
-                          {showNoteEditor[it.product.slug] ? (
-                            <div>
-                              <label className="text-xs text-slate-500">Detalles (ej. sin cebolla)</label>
-                              <div className="mt-1 flex gap-2">
-                                <input
-                                  value={it.note ?? ""}
-                                  onChange={(e) => {
-                                    const note = e.target.value;
-                                    setCart((prev) => ({
-                                      ...prev,
-                                      [it.product.slug]: { ...(prev[it.product.slug] || { qty: it.qty }), note },
-                                    }));
-                                  }}
-                                  placeholder="Agregar detalle para este producto"
-                                  className="w-full rounded-md border px-2 py-1 text-sm"
-                                />
-                                <button
-                                  className="rounded-md bg-slate-100 px-3 text-sm"
-                                  onClick={() => toggleNoteEditor(it.product.slug)}
-                                >
-                                  Hecho
-                                </button>
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="flex items-center justify-between">
-                              <div className="text-xs text-slate-500">{it.note ? it.note : ''}</div>
-                            </div>
-                          )}
-                        </div>
+                        ))}
                       </div>
-                    ))
-                  )}
-                </div>
+                    ))}
+                  </div>
+                ) : (
+                  (selectedItem.options ?? []).map((group) => (
+                    <div key={group.id} className="space-y-2">
+                      <div className="text-sm font-semibold text-slate-900">{group.label}</div>
+                      <div className="flex flex-wrap gap-2">
+                        {group.choices.map((choice) => (
+                          <button
+                            key={choice}
+                            type="button"
+                            onClick={() => setSelectedOptions((prev) => ({ ...prev, [group.id]: choice }))}
+                            className={`rounded-full px-3 py-2 text-sm font-medium transition ${
+                              selectedOptions[group.id] === choice ? "bg-red-700 text-white" : "bg-slate-100 text-slate-700"
+                            }`}
+                          >
+                            {choice}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
 
-                <div className="mt-3 flex items-center justify-between">
-                  <div className="text-sm text-slate-700">Total</div>
-                  <div className="text-lg font-bold text-slate-900">${formatPrice(total)}</div>
-                </div>
-
-                <div className="mt-4">
-                  <button
-                    disabled={
-                      cartItems.length === 0 || (orderType === 'delivery' && address.trim() === '')
-                    }
-                    onClick={() => {
-                      // build message
-                      const lines = ["Quiero hacer un pedido:"];
-                      lines.push(`Tipo: ${orderType === 'delivery' ? '*Delivery*' : '*Retiro en local*'}`);
-                      if (orderType === 'delivery') {
-                        lines.push(`Dirección: *${address}*`);
-                        lines.push(`_Falta agregar el valor del envío/delivery_`);
-                      }
-                      cartItems.forEach((it) => {
-                        const notePart = it.note ? ` (${it.note})` : "";
-                        lines.push(`- ${it.product.name} x *${it.qty}* -- $${formatPrice(it.price * it.qty)}${notePart}`);
-                      });
-                      lines.push(`Total: *$${formatPrice(total)}*`);
-                      const message = lines.join("\n");
-                      const phone = "56945568889";
-                      const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-                      window.open(url, "_blank");
-                    }}
-                    className="w-full rounded-full bg-green-600 px-4 py-2 text-white disabled:opacity-50"
-                  >
-                    Pedir por WhatsApp
-                  </button>
-                </div>
+            <div className="mt-5 flex justify-end">
+              <button
+                type="button"
+                onClick={addSelectedItemToCart}
+                className="rounded-full bg-red-700 px-5 py-3 text-sm font-semibold text-white shadow-lg"
+              >
+                Agregar al carrito
+              </button>
             </div>
           </div>
         </div>
       ) : null}
-      {/* Fixed global hint so it is always visible above other elements */}
-      {tagHint ? (
-        <div className="fixed left-1/2 bottom-24 z-[9999] -translate-x-1/2 pointer-events-none">
-          <style>{`
-            @keyframes hintAnimGlobal {
-              0% { opacity: 0; transform: translateY(0); }
-              10% { opacity: 1; transform: translateY(-6px); }
-              90% { opacity: 1; transform: translateY(-6px); }
-              100% { opacity: 0; transform: translateY(0); }
-            }
-            @keyframes pulseHighlight {
-              0% { transform: scale(1); box-shadow: none; }
-              10% { transform: scale(1.06); box-shadow: 0 6px 20px rgba(250,204,21,0.12); }
-              50% { transform: scale(1.06); box-shadow: 0 10px 30px rgba(250,204,21,0.18); }
-              90% { transform: scale(1.06); box-shadow: 0 6px 20px rgba(250,204,21,0.12); }
-              100% { transform: scale(1); box-shadow: none; }
-            }
-            @keyframes tagColor {
-              0% { color: #facc15; }
-              60% { color: #f87171; }
-              100% { color: #dc2626; }
-            }
-          `}</style>
-          <div
-            role="status"
-            className="mx-auto rounded-md bg-black/90 px-3 py-2 text-xs text-white shadow text-center"
-            style={{ animation: "hintAnimGlobal 6s forwards", width: "50vw" }}
-          >
-            Si aprietas el boton senalando la etiqueta puedes agregar un detalle
-          </div>
-        </div>
-      ) : null}
-      {/* Promo confirmation modal */}
-      {promoToConfirm ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setPromoToConfirm(null)} />
-          <div className="relative w-full max-w-sm rounded-xl bg-white p-6 shadow-2xl">
-            <h3 className="text-lg font-semibold">Confirmar promocion</h3>
-            <p className="mt-2 text-sm text-slate-600">¿Deseas realizar el pedido de "{promoToConfirm.title}" por {promoToConfirm.priceLabel}?</p>
-            <div className="mt-4 flex items-center justify-end gap-3">
-              <button className="rounded-md px-3 py-2 text-sm" onClick={() => setPromoToConfirm(null)}>Cancelar</button>
-              <button className="rounded-full bg-red-700 px-4 py-2 text-sm text-white" onClick={() => confirmPromo(promoToConfirm)}>Realizar el pedido</button>
+
+      {isCartOpen ? (
+        <div className="fixed inset-0 z-50 flex items-end justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setIsCartOpen(false)} />
+          <div className="relative w-full max-w-md rounded-t-3xl bg-white p-4 shadow-2xl">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-slate-900">Tu carrito</h3>
+                <p className="text-sm text-slate-500">Revisa lo que ya agregaste antes de pedir.</p>
+              </div>
+              <button className="text-sm text-slate-500" onClick={() => setIsCartOpen(false)}>Cerrar</button>
+            </div>
+
+            <div className="mt-4 max-h-56 space-y-3 overflow-y-auto">
+              {cart.length === 0 ? (
+                <div className="rounded-2xl border border-dashed border-slate-200 p-4 text-sm text-slate-500">
+                  Tu carrito esta vacio.
+                </div>
+              ) : (
+                cart.map((cartItem) => (
+                  <div key={cartItem.id} className="rounded-2xl border border-slate-200 p-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-start gap-3">
+                        <img src={cartItem.item.image} alt={cartItem.item.imageAlt} className="h-14 w-14 rounded-xl object-cover" />
+                        <div>
+                          <div className="text-sm font-semibold text-slate-900">{cartItem.item.title}</div>
+                          <div className="text-xs text-slate-500">
+                            {cartItem.qty} x ${formatPrice(cartItem.item.price)}
+                          </div>
+                          <div className="mt-1 space-y-1">
+                            {cartItem.unitSelections?.length
+                              ? renderUnitSelections(cartItem.unitSelections)
+                              : renderSelections(cartItem.selections)}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => updateCartQty(cartItem.id, cartItem.qty - 1)}
+                          className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-red-700"
+                        >
+                          -
+                        </button>
+                        <span className="min-w-5 text-center text-sm font-semibold">{cartItem.qty}</span>
+                        <button
+                          type="button"
+                          onClick={() => updateCartQty(cartItem.id, cartItem.qty + 1)}
+                          className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-green-700"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            <div className="mt-4 border-t pt-4">
+              <div className="text-sm font-medium text-slate-900">¿Como quieres tu pedido?</div>
+              <div className="mt-2 flex items-center gap-4">
+                <label className="inline-flex items-center gap-2 text-sm">
+                  <input
+                    type="radio"
+                    name="orderType"
+                    value="pickup"
+                    checked={orderType === "pickup"}
+                    onChange={() => setOrderType("pickup")}
+                    className="h-4 w-4"
+                  />
+                  <span>Retiro en local</span>
+                </label>
+                <label className="inline-flex items-center gap-2 text-sm">
+                  <input
+                    type="radio"
+                    name="orderType"
+                    value="delivery"
+                    checked={orderType === "delivery"}
+                    onChange={() => setOrderType("delivery")}
+                    className="h-4 w-4"
+                  />
+                  <span>Delivery</span>
+                </label>
+              </div>
+
+              {orderType === "delivery" ? (
+                <div className="mt-3">
+                  <label className="text-xs text-slate-600">Direccion de entrega</label>
+                  <input
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    placeholder="Calle, numero, referencia"
+                    className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
+                  />
+                </div>
+              ) : null}
+            </div>
+
+            <div className="mt-4 flex items-center justify-between">
+              <div className="text-sm text-slate-700">Total</div>
+              <div className="text-lg font-bold text-slate-900">${formatPrice(total)}</div>
+            </div>
+
+            <div className="mt-4">
+              <button
+                type="button"
+                disabled={cart.length === 0 || (orderType === "delivery" && address.trim() === "")}
+                onClick={sendOrderToWhatsApp}
+                className="w-full rounded-full bg-green-600 px-4 py-3 text-white disabled:opacity-50"
+              >
+                Pedir por WhatsApp
+              </button>
             </div>
           </div>
         </div>
