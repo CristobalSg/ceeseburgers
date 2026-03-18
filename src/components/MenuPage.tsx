@@ -1,5 +1,5 @@
 import { ShoppingCartIcon, StarIcon, XMarkIcon } from "@heroicons/react/24/solid";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { products } from "./Products";
 import comboFamiliarImg from "../../img/combos/combo-familiar.png";
 import comboClasicasFullImg from "../../img/combos/combo-clasicas-full.png";
@@ -25,6 +25,7 @@ type MenuItem = {
   badge?: string;
   favorite?: boolean;
   options?: MenuOptionGroup[];
+  removableIngredients?: string[];
 };
 
 type CartItem = {
@@ -33,6 +34,8 @@ type CartItem = {
   qty: number;
   selections: Record<string, string>;
   unitSelections?: Record<string, string>[];
+  removals?: string[];
+  unitRemovals?: string[][];
 };
 
 const comboDrinkOptions = ["Sprite", "Coca-Cola", "Fanta"];
@@ -55,16 +58,47 @@ function buildCartSignature(itemId: string, selections: Record<string, string>) 
   return `${itemId}::${selectionKey}`;
 }
 
+function usesPerUnitRemovals(item: MenuItem) {
+  return item.category === "combo-individual" || item.category === "hamburguesas";
+}
+
 export function MenuPage() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [selectedQty, setSelectedQty] = useState(1);
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
   const [selectedUnitOptions, setSelectedUnitOptions] = useState<Record<string, string>[]>([]);
+  const [selectedRemovals, setSelectedRemovals] = useState<string[]>([]);
+  const [selectedUnitRemovals, setSelectedUnitRemovals] = useState<string[][]>([]);
+  const [editingCartItemId, setEditingCartItemId] = useState<string | null>(null);
+  const [cartFeedback, setCartFeedback] = useState<{ title: string; mode: "added" | "edited" } | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [orderType, setOrderType] = useState<"pickup" | "delivery">("pickup");
   const [address, setAddress] = useState("");
   const [activeMenuTab, setActiveMenuTab] = useState<MenuTab>("hamburguesas");
+
+  useEffect(() => {
+    const hasOpenModal = isCartOpen || selectedItem !== null;
+    const previousOverflow = document.body.style.overflow;
+
+    if (hasOpenModal) {
+      document.body.style.overflow = "hidden";
+    }
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isCartOpen, selectedItem]);
+
+  useEffect(() => {
+    if (!cartFeedback) return;
+
+    const timeoutId = window.setTimeout(() => {
+      setCartFeedback(null);
+    }, 1800);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [cartFeedback]);
 
   const individualCombos: MenuItem[] = [
     {
@@ -76,6 +110,7 @@ export function MenuPage() {
       imageAlt: "Combo clasico",
       category: "combo-individual",
       favorite: true,
+      removableIngredients: ["Salsa", "Tomate", "Lechuga", "Queso"],
       options: [
         { id: "bebida", label: "Sabor de bebida", choices: comboDrinkOptions },
         { id: "salsa", label: "Salsa para las papas", choices: friesSauceOptions },
@@ -89,6 +124,7 @@ export function MenuPage() {
       image: comboBaconLoversImg,
       imageAlt: "Combo bacon",
       category: "combo-individual",
+      removableIngredients: ["Salsa", "Tocino", "Queso", "Cebolla caramelizada"],
       options: [
         { id: "bebida", label: "Sabor de bebida", choices: comboDrinkOptions },
         { id: "salsa", label: "Salsa para las papas", choices: friesSauceOptions },
@@ -102,6 +138,7 @@ export function MenuPage() {
       image: comboFamiliarImg,
       imageAlt: "Combo doble",
       category: "combo-individual",
+      removableIngredients: ["Salsa", "Queso", "Tomate", "Lechuga"],
       options: [
         { id: "bebida", label: "Sabor de bebida", choices: comboDrinkOptions },
         { id: "salsa", label: "Salsa para las papas", choices: friesSauceOptions },
@@ -150,6 +187,16 @@ export function MenuPage() {
     category: "hamburguesas",
     badge: product.mostOrdered || product.tag === "Top ventas" ? product.tag : undefined,
     favorite: product.mostOrdered,
+    removableIngredients:
+      product.slug === "cs-bacon"
+        ? ["Tocino", "Salsa BBQ", "Cebolla caramelizada", "Queso cheddar"]
+        : product.slug === "cs-romp-ii"
+          ? ["Huevo frito", "Tocino", "Cebolla caramelizada", "Salsa BBQ", "Queso cheddar"]
+          : product.slug === "cs-clasica"
+            ? ["Tomate", "Lechuga", "Aderezo", "Queso cheddar"]
+            : product.slug === "cs-italiana"
+              ? ["Palta", "Tomate", "Mayonesa", "Queso cheddar"]
+              : ["Tocino", "Lechuga", "Tomate", "Cebolla morada", "Salsa", "Queso cheddar"],
   }));
 
   const sideItems: MenuItem[] = [
@@ -274,12 +321,31 @@ export function MenuPage() {
 
   function openProductModal(item: MenuItem) {
     const defaults = Object.fromEntries(
-      (item.options ?? []).map((group) => [group.id, group.choices[0]])
+      (item.options ?? []).map((group) => [group.id, ""])
     );
     setSelectedItem(item);
     setSelectedQty(1);
     setSelectedOptions(defaults);
     setSelectedUnitOptions(item.category === "combo-individual" ? [defaults] : []);
+    setSelectedRemovals([]);
+    setSelectedUnitRemovals(usesPerUnitRemovals(item) ? [[]] : []);
+    setEditingCartItemId(null);
+  }
+
+  function openCartItemEditor(cartItem: CartItem) {
+    const defaults = Object.fromEntries((cartItem.item.options ?? []).map((group) => [group.id, ""]));
+    setSelectedItem(cartItem.item);
+    setSelectedQty(cartItem.qty);
+    setSelectedOptions(
+      Object.keys(cartItem.selections).length ? cartItem.selections : defaults
+    );
+    setSelectedUnitOptions(cartItem.unitSelections ?? Array.from({ length: cartItem.qty }, () => ({ ...defaults })));
+    setSelectedRemovals(cartItem.removals ?? []);
+    setSelectedUnitRemovals(
+      cartItem.unitRemovals ?? (usesPerUnitRemovals(cartItem.item) ? Array.from({ length: cartItem.qty }, () => []) : [])
+    );
+    setEditingCartItemId(cartItem.id);
+    setIsCartOpen(false);
   }
 
   function closeProductModal() {
@@ -287,40 +353,89 @@ export function MenuPage() {
     setSelectedQty(1);
     setSelectedOptions({});
     setSelectedUnitOptions([]);
+    setSelectedRemovals([]);
+    setSelectedUnitRemovals([]);
+    setEditingCartItemId(null);
   }
 
   function syncUnitOptions(nextQty: number) {
-    if (!selectedItem || selectedItem.category !== "combo-individual") return;
+    if (!selectedItem) return;
 
-    setSelectedUnitOptions((prev) => {
-      const base =
-        prev[0] ??
-        Object.fromEntries((selectedItem.options ?? []).map((group) => [group.id, group.choices[0]]));
-      return Array.from({ length: nextQty }, (_, index) => prev[index] ?? { ...base });
-    });
+    if (selectedItem.category === "combo-individual") {
+      setSelectedUnitOptions((prev) => {
+        const base =
+          prev[0] ??
+          Object.fromEntries((selectedItem.options ?? []).map((group) => [group.id, ""]));
+        return Array.from({ length: nextQty }, (_, index) => prev[index] ?? { ...base });
+      });
+    }
+
+    if (usesPerUnitRemovals(selectedItem)) {
+      setSelectedUnitRemovals((prev) =>
+        Array.from({ length: nextQty }, (_, index) => prev[index] ?? [])
+      );
+    }
   }
 
   function addSelectedItemToCart() {
     if (!selectedItem) return;
+    const perUnitRemovalsEnabled = usesPerUnitRemovals(selectedItem);
     const normalizedSelections =
       selectedItem.category === "combo-individual" ? {} : selectedOptions;
     const normalizedUnitSelections =
       selectedItem.category === "combo-individual" ? selectedUnitOptions.slice(0, selectedQty) : undefined;
+    const normalizedRemovals =
+      perUnitRemovalsEnabled ? [] : selectedRemovals;
+    const normalizedUnitRemovals =
+      perUnitRemovalsEnabled ? selectedUnitRemovals.slice(0, selectedQty) : undefined;
     const signature = buildCartSignature(
       selectedItem.id,
-      selectedItem.category === "combo-individual"
+      selectedItem.category === "combo-individual" || selectedItem.category === "hamburguesas"
         ? Object.fromEntries(
-            (normalizedUnitSelections ?? []).map((selection, index) => [
-              `combo-${index + 1}`,
-              Object.entries(selection)
-                .sort(([a], [b]) => a.localeCompare(b))
-                .map(([key, value]) => `${key}:${value}`)
-                .join(","),
+            Array.from({ length: selectedQty }, (_, index) => [
+              `${selectedItem.category === "combo-individual" ? "combo" : "hamb"}-${index + 1}`,
+              [
+                ...(selectedItem.category === "combo-individual"
+                  ? [
+                      Object.entries(normalizedUnitSelections?.[index] ?? {})
+                        .sort(([a], [b]) => a.localeCompare(b))
+                        .map(([key, value]) => `${key}:${value}`)
+                        .join(","),
+                    ]
+                  : []),
+                `sin:${(normalizedUnitRemovals?.[index] ?? []).join("/")}`,
+              ].join(","),
             ])
           )
-        : normalizedSelections
+        : {
+            ...normalizedSelections,
+            sin: normalizedRemovals.join("/"),
+          }
     );
     setCart((prev) => {
+      if (editingCartItemId) {
+        const withoutEditingItem = prev.filter((item) => item.id !== editingCartItemId);
+        const mergeTarget = withoutEditingItem.find((item) => item.id === signature);
+        if (mergeTarget) {
+          return withoutEditingItem.map((item) =>
+            item.id === signature ? { ...item, qty: item.qty + selectedQty } : item
+          );
+        }
+
+        return [
+          ...withoutEditingItem,
+          {
+            id: signature,
+            item: selectedItem,
+            qty: selectedQty,
+            selections: normalizedSelections,
+            unitSelections: normalizedUnitSelections,
+            removals: normalizedRemovals,
+            unitRemovals: normalizedUnitRemovals,
+          },
+        ];
+      }
+
       const existing = prev.find((item) => item.id === signature);
       if (existing) {
         return prev.map((item) =>
@@ -336,11 +451,16 @@ export function MenuPage() {
           qty: selectedQty,
           selections: normalizedSelections,
           unitSelections: normalizedUnitSelections,
+          removals: normalizedRemovals,
+          unitRemovals: normalizedUnitRemovals,
         },
       ];
     });
+    setCartFeedback({
+      title: selectedItem.title,
+      mode: editingCartItemId ? "edited" : "added",
+    });
     closeProductModal();
-    setIsCartOpen(true);
   }
 
   function updateCartQty(cartId: string, nextQty: number) {
@@ -362,8 +482,29 @@ export function MenuPage() {
                   ...Array.from({ length: nextQty - item.unitSelections.length }, () => ({ ...fallback })),
                 ]
               : item.unitSelections.slice(0, nextQty);
+          const fallbackRemovals = item.unitRemovals?.[item.unitRemovals.length - 1] ?? [];
+          const nextUnitRemovals =
+            nextQty > (item.unitRemovals?.length ?? 0)
+              ? [
+                  ...(item.unitRemovals ?? []),
+                  ...Array.from({ length: nextQty - (item.unitRemovals?.length ?? 0) }, () => [...fallbackRemovals]),
+                ]
+              : item.unitRemovals?.slice(0, nextQty);
 
-          return { ...item, qty: nextQty, unitSelections: nextUnitSelections };
+          return { ...item, qty: nextQty, unitSelections: nextUnitSelections, unitRemovals: nextUnitRemovals };
+        }
+
+        if (item.unitRemovals?.length) {
+          const fallbackRemovals = item.unitRemovals[item.unitRemovals.length - 1] ?? [];
+          const nextUnitRemovals =
+            nextQty > item.unitRemovals.length
+              ? [
+                  ...item.unitRemovals,
+                  ...Array.from({ length: nextQty - item.unitRemovals.length }, () => [...fallbackRemovals]),
+                ]
+              : item.unitRemovals.slice(0, nextQty);
+
+          return { ...item, qty: nextQty, unitRemovals: nextUnitRemovals };
         }
 
         return { ...item, qty: nextQty };
@@ -372,7 +513,7 @@ export function MenuPage() {
   }
 
   function renderSelections(selections: Record<string, string>) {
-    const entries = Object.entries(selections);
+    const entries = Object.entries(selections).filter(([, value]) => value);
     if (entries.length === 0) return null;
 
     return entries.map(([key, value]) => {
@@ -396,6 +537,46 @@ export function MenuPage() {
         {renderSelections(selection)}
       </div>
     ));
+  }
+
+  function renderUnitRemovals(unitRemovals: string[][] | undefined, label: string) {
+    if (!unitRemovals?.length) return null;
+
+    return unitRemovals.map((removals, index) =>
+      removals.length ? (
+        <div key={`${label}-removals-${index}`} className="text-xs text-slate-500">
+          {label} {index + 1} sin: {removals.join(", ")}
+        </div>
+      ) : null
+    );
+  }
+
+  function renderRemovals(removals?: string[]) {
+    if (!removals || removals.length === 0) return null;
+    return <div className="text-xs text-slate-500">Sin: {removals.join(", ")}</div>;
+  }
+
+  function toggleRemoval(removals: string[], ingredient: string) {
+    return removals.includes(ingredient)
+      ? removals.filter((item) => item !== ingredient)
+      : [...removals, ingredient];
+  }
+
+  function hasAllRequiredSelections() {
+    if (!selectedItem?.options?.length) return true;
+
+    if (selectedItem.category === "combo-individual") {
+      return selectedUnitOptions.length === selectedQty
+        && selectedUnitOptions.every((selection) =>
+          selectedItem.options?.every((group) => Boolean(selection[group.id]))
+        );
+    }
+
+    return selectedItem.options.every((group) => Boolean(selectedOptions[group.id]));
+  }
+
+  function canEditCartItem(cartItem: CartItem) {
+    return Boolean(cartItem.item.options?.length || cartItem.item.removableIngredients?.length);
   }
 
   function renderMenuCards(items: MenuItem[], hideDescription = false, columnsClassName = "grid-cols-2") {
@@ -452,12 +633,24 @@ export function MenuPage() {
             const label = key === "bebida" ? "Bebida" : key === "salsa" ? "Salsa" : key;
             lines.push(`  - ${label}: ${value}`);
           });
+          if (cartItem.unitRemovals?.[index]?.length) {
+            lines.push(`  - Sin: ${cartItem.unitRemovals[index].join(", ")}`);
+          }
+        });
+      } else if (cartItem.item.category === "hamburguesas" && cartItem.unitRemovals?.length) {
+        cartItem.unitRemovals.forEach((removals, index) => {
+          if (removals.length) {
+            lines.push(`  Hamburguesa ${index + 1} sin: ${removals.join(", ")}`);
+          }
         });
       } else {
         Object.entries(cartItem.selections).forEach(([key, value]) => {
           const label = key === "bebida" ? "Bebida" : key === "salsa" ? "Salsa" : key;
           lines.push(`  ${label}: ${value}`);
         });
+        if (cartItem.removals?.length) {
+          lines.push(`  Sin: ${cartItem.removals.join(", ")}`);
+        }
       }
     });
 
@@ -536,10 +729,6 @@ export function MenuPage() {
       </section>
 
       <section className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h4 className="text-base font-semibold text-slate-900">Explora por categoria</h4>
-          <span className="text-xs text-slate-500">Contenido dinamico segun el boton</span>
-        </div>
         <div className="-mx-3 overflow-x-auto px-3 pb-1">
           <div className="flex w-max gap-2">
             {menuTabs.map((tab) => (
@@ -610,11 +799,35 @@ export function MenuPage() {
               90% { opacity: 0; background-position: 120px 0; }
               100% { opacity: 0; background-position: 120px 0; }
             }
+            @keyframes cartPop {
+              0% { transform: scale(1); }
+              30% { transform: scale(1.12); }
+              60% { transform: scale(0.96); }
+              100% { transform: scale(1); }
+            }
+            @keyframes feedbackIn {
+              0% { opacity: 0; transform: translateY(8px) scale(0.96); }
+              15% { opacity: 1; transform: translateY(0) scale(1); }
+              85% { opacity: 1; transform: translateY(0) scale(1); }
+              100% { opacity: 0; transform: translateY(4px) scale(0.98); }
+            }
           `}</style>
+          {cartFeedback ? (
+            <div
+              className="mb-3 ml-auto w-max max-w-[220px] rounded-2xl bg-slate-900 px-3 py-2 text-right text-xs text-white shadow-xl"
+              style={{ animation: "feedbackIn 1.8s ease forwards" }}
+            >
+              {cartFeedback.mode === "edited" ? "Producto actualizado" : "Producto agregado"}
+              <div className="mt-0.5 truncate text-[11px] text-white/75">{cartFeedback.title}</div>
+            </div>
+          ) : null}
           <button
             aria-label="Abrir carrito"
             onClick={() => setIsCartOpen(true)}
-            style={{ animation: "floatY 3s ease-in-out infinite", boxShadow: "0 0 12px 2px rgba(255,255,255,0.25)" }}
+            style={{
+              animation: cartFeedback ? "cartPop 420ms ease-out 1" : "floatY 3s ease-in-out infinite",
+              boxShadow: "0 0 12px 2px rgba(255,255,255,0.25)",
+            }}
             className="relative inline-flex h-16 w-16 items-center justify-center rounded-full bg-red-700 text-white shadow-2xl"
           >
             <ShoppingCartIcon className="relative z-10 h-7 w-7" />
@@ -629,7 +842,7 @@ export function MenuPage() {
               }}
             />
             {totalCount > 0 ? (
-              <span className="absolute -right-2 -top-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-white px-1 text-[10px] font-bold leading-none text-red-700 ring-2 ring-red-700">
+              <span className="absolute right-1 top-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-white px-1 text-[10px] font-bold leading-none text-red-700 ring-2 ring-red-700">
                 {totalCount}
               </span>
             ) : null}
@@ -640,7 +853,7 @@ export function MenuPage() {
       {selectedItem ? (
         <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center">
           <div className="absolute inset-0 bg-black/50" onClick={closeProductModal} />
-          <div className="relative w-full max-w-lg rounded-t-3xl bg-white p-5 shadow-2xl sm:rounded-3xl">
+          <div className="relative flex max-h-[92vh] w-full max-w-lg flex-col rounded-t-3xl bg-white p-5 shadow-2xl sm:rounded-3xl">
             <button
               type="button"
               onClick={closeProductModal}
@@ -649,6 +862,7 @@ export function MenuPage() {
               <XMarkIcon className="h-5 w-5" />
             </button>
 
+            <div className="overflow-y-auto pr-1">
             <div className="grid gap-4 sm:grid-cols-[180px_1fr]">
               <div className="overflow-hidden rounded-2xl">
                 <img src={selectedItem.image} alt={selectedItem.imageAlt} className="h-full w-full object-cover" />
@@ -726,42 +940,136 @@ export function MenuPage() {
                                 </button>
                               ))}
                             </div>
+                            {!selectedUnitOptions[comboIndex]?.[group.id] ? (
+                              <div className="text-xs text-red-600">Debes elegir una opcion.</div>
+                            ) : null}
                           </div>
                         ))}
+                        {selectedItem.removableIngredients?.length ? (
+                          <div className="mt-3 space-y-2">
+                            <div className="text-sm font-medium text-slate-800">Quitar ingredientes</div>
+                            <div className="flex flex-wrap gap-2">
+                              {selectedItem.removableIngredients.map((ingredient) => (
+                                <button
+                                  key={`${ingredient}-${comboIndex}`}
+                                  type="button"
+                                  onClick={() =>
+                                    setSelectedUnitRemovals((prev) =>
+                                      prev.map((removals, index) =>
+                                        index === comboIndex ? toggleRemoval(removals, ingredient) : removals
+                                      )
+                                    )
+                                  }
+                                  className={`inline-flex items-center gap-1 rounded-full px-3 py-2 text-sm font-medium transition ${
+                                    selectedUnitRemovals[comboIndex]?.includes(ingredient)
+                                      ? "bg-slate-900 text-white"
+                                      : "bg-slate-100 text-slate-700"
+                                  }`}
+                                >
+                                  <XMarkIcon className="h-3.5 w-3.5" />
+                                  Sin {ingredient}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        ) : null}
+                      </div>
+                    ))}
+                  </div>
+                ) : selectedItem.category === "hamburguesas" && selectedItem.removableIngredients?.length ? (
+                  <div className="max-h-72 space-y-3 overflow-y-auto pr-1">
+                    {Array.from({ length: selectedQty }).map((_, burgerIndex) => (
+                      <div key={`burger-config-${burgerIndex + 1}`} className="rounded-2xl border border-slate-200 p-3">
+                        <div className="mb-2 text-sm font-semibold text-slate-900">Hamburguesa {burgerIndex + 1}</div>
+                        <div className="space-y-2">
+                          <div className="text-sm font-medium text-slate-800">Quitar ingredientes</div>
+                          <div className="flex flex-wrap gap-2">
+                            {(selectedItem.removableIngredients ?? []).map((ingredient) => (
+                              <button
+                                key={`${ingredient}-${burgerIndex}`}
+                                type="button"
+                                onClick={() =>
+                                  setSelectedUnitRemovals((prev) =>
+                                    prev.map((removals, index) =>
+                                      index === burgerIndex ? toggleRemoval(removals, ingredient) : removals
+                                    )
+                                  )
+                                }
+                                className={`inline-flex items-center gap-1 rounded-full px-3 py-2 text-sm font-medium transition ${
+                                  selectedUnitRemovals[burgerIndex]?.includes(ingredient)
+                                    ? "bg-slate-900 text-white"
+                                    : "bg-slate-100 text-slate-700"
+                                }`}
+                              >
+                                <XMarkIcon className="h-3.5 w-3.5" />
+                                Sin {ingredient}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  (selectedItem.options ?? []).map((group) => (
-                    <div key={group.id} className="space-y-2">
-                      <div className="text-sm font-semibold text-slate-900">{group.label}</div>
-                      <div className="flex flex-wrap gap-2">
+                  <>
+                    {(selectedItem.options ?? []).map((group) => (
+                      <div key={group.id} className="space-y-2">
+                        <div className="text-sm font-semibold text-slate-900">{group.label}</div>
+                        <div className="flex flex-wrap gap-2">
                         {group.choices.map((choice) => (
                           <button
                             key={choice}
                             type="button"
                             onClick={() => setSelectedOptions((prev) => ({ ...prev, [group.id]: choice }))}
-                            className={`rounded-full px-3 py-2 text-sm font-medium transition ${
-                              selectedOptions[group.id] === choice ? "bg-red-700 text-white" : "bg-slate-100 text-slate-700"
-                            }`}
+                              className={`rounded-full px-3 py-2 text-sm font-medium transition ${
+                                selectedOptions[group.id] === choice ? "bg-red-700 text-white" : "bg-slate-100 text-slate-700"
+                              }`}
                           >
                             {choice}
                           </button>
                         ))}
                       </div>
+                      {!selectedOptions[group.id] ? (
+                        <div className="text-xs text-red-600">Debes elegir una opcion.</div>
+                      ) : null}
                     </div>
-                  ))
+                  ))}
+                  {selectedItem.removableIngredients?.length ? (
+                    <div className="space-y-2">
+                      <div className="text-sm font-semibold text-slate-900">Quitar ingredientes</div>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedItem.removableIngredients.map((ingredient) => (
+                            <button
+                              key={ingredient}
+                          type="button"
+                          onClick={() => setSelectedRemovals((prev) => toggleRemoval(prev, ingredient))}
+                          className={`inline-flex items-center gap-1 rounded-full px-3 py-2 text-sm font-medium transition ${
+                            selectedRemovals.includes(ingredient)
+                              ? "bg-slate-900 text-white"
+                              : "bg-slate-100 text-slate-700"
+                          }`}
+                        >
+                          <XMarkIcon className="h-3.5 w-3.5" />
+                          Sin {ingredient}
+                        </button>
+                      ))}
+                        </div>
+                      </div>
+                    ) : null}
+                  </>
                 )}
               </div>
             </div>
+            </div>
 
-            <div className="mt-5 flex justify-end">
+            <div className="mt-4 flex justify-end border-t border-slate-100 pt-4">
               <button
                 type="button"
                 onClick={addSelectedItemToCart}
-                className="rounded-full bg-red-700 px-5 py-3 text-sm font-semibold text-white shadow-lg"
+                disabled={!hasAllRequiredSelections()}
+                className="rounded-full bg-red-700 px-5 py-3 text-sm font-semibold text-white shadow-lg disabled:opacity-50"
               >
-                Agregar al carrito
+                {editingCartItemId ? "Guardar cambios" : "Agregar al carrito"}
               </button>
             </div>
           </div>
@@ -789,20 +1097,55 @@ export function MenuPage() {
                 cart.map((cartItem) => (
                   <div key={cartItem.id} className="rounded-2xl border border-slate-200 p-3">
                     <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-start gap-3">
-                        <img src={cartItem.item.image} alt={cartItem.item.imageAlt} className="h-14 w-14 rounded-xl object-cover" />
-                        <div>
-                          <div className="text-sm font-semibold text-slate-900">{cartItem.item.title}</div>
-                          <div className="text-xs text-slate-500">
-                            {cartItem.qty} x ${formatPrice(cartItem.item.price)}
-                          </div>
-                          <div className="mt-1 space-y-1">
+                      {canEditCartItem(cartItem) ? (
+                        <button
+                          type="button"
+                          onClick={() => openCartItemEditor(cartItem)}
+                          className="flex items-start gap-3 text-left"
+                        >
+                          <img src={cartItem.item.image} alt={cartItem.item.imageAlt} className="h-14 w-14 rounded-xl object-cover" />
+                          <div>
+                            <div className="text-sm font-semibold text-slate-900">{cartItem.item.title}</div>
+                            <div className="text-xs text-slate-500">
+                              {cartItem.qty} x ${formatPrice(cartItem.item.price)}
+                            </div>
+                            <div className="mt-1 space-y-1">
                             {cartItem.unitSelections?.length
                               ? renderUnitSelections(cartItem.unitSelections)
                               : renderSelections(cartItem.selections)}
+                            {cartItem.unitSelections?.length
+                              ? renderUnitRemovals(cartItem.unitRemovals, "Combo")
+                              : cartItem.item.category === "hamburguesas" && cartItem.unitRemovals?.length
+                                ? renderUnitRemovals(cartItem.unitRemovals, "Hamburguesa")
+                                : renderRemovals(cartItem.removals)}
                           </div>
                         </div>
-                      </div>
+                        </button>
+                      ) : (
+                        <div className="flex items-start gap-3">
+                          <img src={cartItem.item.image} alt={cartItem.item.imageAlt} className="h-14 w-14 rounded-xl object-cover" />
+                          <div>
+                            <div className="text-sm font-semibold text-slate-900">{cartItem.item.title}</div>
+                            <div className="text-xs text-slate-500">
+                              {cartItem.qty} x ${formatPrice(cartItem.item.price)}
+                            </div>
+                            <div className="mt-1 space-y-1">
+                              {cartItem.unitSelections?.length
+                                ? renderUnitSelections(cartItem.unitSelections)
+                                : renderSelections(cartItem.selections)}
+                              {cartItem.unitSelections?.length
+                                ? cartItem.unitRemovals?.map((removals, index) =>
+                                    removals.length ? (
+                                      <div key={`unit-removals-${index}`} className="text-xs text-slate-500">
+                                        Combo {index + 1} sin: {removals.join(", ")}
+                                      </div>
+                                    ) : null
+                                  )
+                                : renderRemovals(cartItem.removals)}
+                            </div>
+                          </div>
+                        </div>
+                      )}
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
