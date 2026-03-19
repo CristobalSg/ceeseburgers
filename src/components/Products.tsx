@@ -28,7 +28,7 @@ export type Product = {
 export const products: Product[] = [
   {
     name: "Cs-Bacon",
-    price: "$2.390",
+    price: "$2.490",
     description: "Pan de hamburguesa, 90g de hamburguesa, cheddar, tocino ahumado, cebolla caramelizada y salsa BBQ.",
     spec: "Gancho estrella · lista en 14–17 min",
     tag: "Top ventas",
@@ -51,7 +51,7 @@ export const products: Product[] = [
   },
   {
     name: "Cs-Romp II",
-    price: "$2.990",
+    price: "$3.190",
     description: "Pan artesanal, hamburguesa de 90g, doble cheddar, doble tocino ahumado, huevo frito, cebolla caramelizada y salsa BBQ.",
     spec: "Cargada de sabor · ideal fin de semana",
     tag: "Top ventas",
@@ -62,7 +62,7 @@ export const products: Product[] = [
   },
   {
     name: "Cs-Clásica",
-    price: "$1.990",
+    price: "$2.090",
     description: "Pan de hamburguesa, hamburguesa de 90g, cheddar, tomate, lechuga y aderezo tipo Big Mac.",
     spec: "Opción conveniente para el día a día",
     tag: "Clásica",
@@ -72,7 +72,7 @@ export const products: Product[] = [
   },
   {
     name: "Cs-Italiana",
-    price: "$2.190",
+    price: "$2.290",
     description: "Pan de hamburguesa, 90g de hamburguesa, cheddar, mayonesa, tomate y palta.",
     spec: "Frescura y cremosidad",
     tag: "Italiana",
@@ -81,14 +81,14 @@ export const products: Product[] = [
     imageAlt: "Hamburguesa Cs-Italiana con cheddar, tomate y palta",
   },
   {
-    name: "Cs-Nueva",
-    price: "$2.890",
+    name: "Rompedieta I",
+    price: "$3.190",
     description: "Pan brioche, hamburguesa de 90g, doble queso cheddar, tocino, lechuga, tomate, cebolla morada y salsa Chick-fil-A.",
-    spec: "Nueva incorporación al menú",
-    tag: "Nueva",
+    spec: "Version rompe dieta cargada de sabor",
+    tag: "Rompedieta I",
     slug: "cs-nueva",
     image: csNuevaImage,
-    imageAlt: "Hamburguesa Cs-Nueva",
+    imageAlt: "Hamburguesa Rompedieta I",
   },
 ];
 

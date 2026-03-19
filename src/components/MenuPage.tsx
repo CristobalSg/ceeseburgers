@@ -4,8 +4,15 @@ import { products } from "./Products";
 import comboFamiliarImg from "../../img/combos/combo-familiar.png";
 import comboClasicasFullImg from "../../img/combos/combo-clasicas-full.png";
 import comboBaconLoversImg from "../../img/combos/combo-bacon-lovers.png";
+import comboClasicaIndividualImg from "../../img/combos-individual/Clasica.webp";
+import comboBaconIndividualImg from "../../img/combos-individual/bacon.webp";
+import comboItalianaIndividualImg from "../../img/combos-individual/italiana.webp";
+import comboRompedietaDosIndividualImg from "../../img/combos-individual/rompedieta-dos.webp";
+import friesImage from "../../img/acompaniamiento/papas.png";
+import drinkImage from "../../img/acompaniamiento/coca-cola.png";
+import sauceImage from "../../img/salsas/ketchup.png";
 
-type MenuTab = "hamburguesas" | "acompanamientos" | "bebidas" | "salsas";
+type MenuTab = "hamburguesas" | "acompanamientos" | "salsas";
 type MenuCategory = "combo-individual" | "combo-familiar" | "hamburguesas" | "acompanamientos" | "bebidas" | "salsas";
 
 type MenuOptionGroup = {
@@ -19,8 +26,8 @@ type MenuItem = {
   title: string;
   description: string;
   price: number;
-  image: string;
-  imageAlt: string;
+  image?: string;
+  imageAlt?: string;
   category: MenuCategory;
   badge?: string;
   favorite?: boolean;
@@ -105,8 +112,8 @@ export function MenuPage() {
       id: "combo-clasico",
       title: "Combo Clasico",
       description: "Hamburguesa clasica + papitas + bebida + salsa",
-      price: 3990,
-      image: comboClasicasFullImg,
+      price: 4490,
+      image: comboClasicaIndividualImg,
       imageAlt: "Combo clasico",
       category: "combo-individual",
       favorite: true,
@@ -120,8 +127,8 @@ export function MenuPage() {
       id: "combo-bacon",
       title: "Combo Bacon",
       description: "Hamburguesa bacon + papitas + bebida + salsa",
-      price: 4490,
-      image: comboBaconLoversImg,
+      price: 4890,
+      image: comboBaconIndividualImg,
       imageAlt: "Combo bacon",
       category: "combo-individual",
       removableIngredients: ["Salsa", "Tocino", "Queso", "Cebolla caramelizada"],
@@ -131,14 +138,28 @@ export function MenuPage() {
       ],
     },
     {
-      id: "combo-doble",
-      title: "Combo Doble",
-      description: "Hamburguesa doble + papitas + bebida + salsa",
-      price: 4990,
-      image: comboFamiliarImg,
-      imageAlt: "Combo doble",
+      id: "combo-italiana",
+      title: "Combo Italiana",
+      description: "Hamburguesa italiana + papitas + bebida + salsa",
+      price: 4690,
+      image: comboItalianaIndividualImg,
+      imageAlt: "Combo italiana",
       category: "combo-individual",
-      removableIngredients: ["Salsa", "Queso", "Tomate", "Lechuga"],
+      removableIngredients: ["Mayonesa", "Palta", "Tomate", "Queso"],
+      options: [
+        { id: "bebida", label: "Sabor de bebida", choices: comboDrinkOptions },
+        { id: "salsa", label: "Salsa para las papas", choices: friesSauceOptions },
+      ],
+    },
+    {
+      id: "combo-rompedieta-ii",
+      title: "Combo Rompedieta II",
+      description: "Hamburguesa Rompedieta II + papitas + bebida + salsa",
+      price: 5590,
+      image: comboRompedietaDosIndividualImg,
+      imageAlt: "Combo Rompedieta II",
+      category: "combo-individual",
+      removableIngredients: ["Salsa BBQ", "Huevo frito", "Tocino", "Queso cheddar", "Cebolla caramelizada"],
       options: [
         { id: "bebida", label: "Sabor de bebida", choices: comboDrinkOptions },
         { id: "salsa", label: "Salsa para las papas", choices: friesSauceOptions },
@@ -148,31 +169,31 @@ export function MenuPage() {
 
   const familyCombos: MenuItem[] = [
     {
-      id: "combo-familiar-clasico",
-      title: "Combo Familiar Clasico",
+      id: "combo-familiar",
+      title: "Combo Familiar",
       description: "3 hamburguesas clasicas + 2 hamburguesas bacon",
-      price: 9990,
+      price: 10490,
       image: comboFamiliarImg,
       imageAlt: "Combo familiar clasico",
       category: "combo-familiar",
       favorite: true,
     },
     {
-      id: "combo-familiar-bacon",
-      title: "Combo Familiar Bacon",
+      id: "combo-full-bacon",
+      title: "Full Bacon",
       description: "5 hamburguesas bacon",
-      price: 10990,
+      price: 11490,
       image: comboBaconLoversImg,
       imageAlt: "Combo familiar bacon",
       category: "combo-familiar",
     },
     {
-      id: "combo-familiar-mix",
-      title: "Combo Familiar Mix",
-      description: "2 clasicas + 2 bacon + papas grandes",
-      price: 10490,
+      id: "combo-full-clasicas",
+      title: "Full Clasicas",
+      description: "5 hamburguesas clasicas",
+      price: 9490,
       image: comboClasicasFullImg,
-      imageAlt: "Combo familiar mix",
+      imageAlt: "Combo full clasicas",
       category: "combo-familiar",
     },
   ];
@@ -204,18 +225,25 @@ export function MenuPage() {
       id: "papitas-fritas",
       title: "Papitas fritas",
       description: "El acompanamiento clasico para cualquier pedido.",
-      price: 1490,
-      image: comboClasicasFullImg,
+      price: 1300,
+      image: friesImage,
       imageAlt: "Papitas fritas",
+      category: "acompanamientos",
+    },
+    {
+      id: "bebida",
+      title: "Bebida",
+      description: "Acompanamiento para tu pedido.",
+      price: 1000,
+      image: drinkImage,
+      imageAlt: "Bebida",
       category: "acompanamientos",
     },
     {
       id: "aros-de-cebolla",
       title: "Aros de cebolla",
       description: "En promo porque se viene proximamente.",
-      price: 1990,
-      image: comboBaconLoversImg,
-      imageAlt: "Aros de cebolla",
+      price: 0,
       category: "acompanamientos",
       badge: "Proximamente",
     },
@@ -223,9 +251,7 @@ export function MenuPage() {
       id: "nuggets",
       title: "Nuggets",
       description: "En promo porque se viene proximamente.",
-      price: 2490,
-      image: comboFamiliarImg,
-      imageAlt: "Nuggets",
+      price: 0,
       category: "acompanamientos",
       badge: "Proximamente",
     },
@@ -233,32 +259,9 @@ export function MenuPage() {
       id: "empanadas-de-queso",
       title: "Empanadas de queso",
       description: "En promo porque se viene proximamente.",
-      price: 2290,
-      image: comboClasicasFullImg,
-      imageAlt: "Empanadas de queso",
+      price: 0,
       category: "acompanamientos",
       badge: "Proximamente",
-    },
-  ];
-
-  const drinkItems: MenuItem[] = [
-    {
-      id: "bebida-mediana",
-      title: "Bebida mediana",
-      description: "Vaso mediano. Elige tu sabor al confirmar por WhatsApp si quieres cambiarlo.",
-      price: 990,
-      image: comboFamiliarImg,
-      imageAlt: "Bebida mediana",
-      category: "bebidas",
-    },
-    {
-      id: "bebida-grande",
-      title: "Bebida grande",
-      description: "Vaso grande para quienes quieren mas bebida.",
-      price: 1290,
-      image: comboBaconLoversImg,
-      imageAlt: "Bebida grande",
-      category: "bebidas",
     },
   ];
 
@@ -268,7 +271,7 @@ export function MenuPage() {
       title: "Mayo casera",
       description: "Extra para acompanar tu pedido.",
       price: 300,
-      image: comboClasicasFullImg,
+      image: sauceImage,
       imageAlt: "Mayo casera",
       category: "salsas",
     },
@@ -277,7 +280,7 @@ export function MenuPage() {
       title: "Ketchup",
       description: "Extra para acompanar tu pedido.",
       price: 300,
-      image: comboFamiliarImg,
+      image: sauceImage,
       imageAlt: "Ketchup",
       category: "salsas",
     },
@@ -286,7 +289,7 @@ export function MenuPage() {
       title: "Mostaza",
       description: "Extra para acompanar tu pedido.",
       price: 300,
-      image: comboBaconLoversImg,
+      image: sauceImage,
       imageAlt: "Mostaza",
       category: "salsas",
     },
@@ -295,7 +298,7 @@ export function MenuPage() {
       title: "BBQ",
       description: "Extra para acompanar tu pedido.",
       price: 500,
-      image: comboBaconLoversImg,
+      image: sauceImage,
       imageAlt: "BBQ",
       category: "salsas",
     },
@@ -304,7 +307,7 @@ export function MenuPage() {
       title: "Ajo",
       description: "Extra para acompanar tu pedido.",
       price: 500,
-      image: comboFamiliarImg,
+      image: sauceImage,
       imageAlt: "Ajo",
       category: "salsas",
     },
@@ -315,7 +318,6 @@ export function MenuPage() {
   const menuTabs: { id: MenuTab; label: string }[] = [
     { id: "hamburguesas", label: "Hamburguesas" },
     { id: "acompanamientos", label: "Acompañamientos" },
-    { id: "bebidas", label: "Bebidas" },
     { id: "salsas", label: "Salsas" },
   ];
 
@@ -586,27 +588,44 @@ export function MenuPage() {
           <button
             key={item.id}
             type="button"
-            onClick={() => openProductModal(item)}
-            className="overflow-hidden rounded-xl border border-slate-200 bg-white text-left shadow-sm transition-transform duration-200 hover:scale-[1.02]"
+            onClick={() => (item.badge === "Proximamente" ? undefined : openProductModal(item))}
+            disabled={item.badge === "Proximamente"}
+            className={`overflow-hidden rounded-xl border text-left shadow-sm transition-transform duration-200 ${
+              item.badge === "Proximamente"
+                ? "border-slate-300 bg-slate-100 text-slate-500 opacity-90 grayscale"
+                : "border-slate-200 bg-white hover:scale-[1.02]"
+            }`}
           >
-            <div className="relative aspect-square overflow-hidden">
-              <img src={item.image} alt={item.imageAlt} className="h-full w-full object-cover" />
-              {item.badge ? (
-                <span className="absolute right-2 top-2 rounded-full bg-amber-100 px-1.5 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] text-amber-800">
-                  {item.badge}
-                </span>
-              ) : null}
-              {item.favorite ? (
-                <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-white/90 px-1.5 py-1 text-[9px] font-semibold text-slate-900">
-                  <StarIcon className="h-2.5 w-2.5 text-yellow-500" />
-                  Favorito
-                </span>
-              ) : null}
-            </div>
+            {item.image ? (
+              <div className="relative aspect-square overflow-hidden">
+                <img src={item.image} alt={item.imageAlt} className="h-full w-full object-cover" />
+                {item.badge ? (
+                  <span className="absolute right-2 top-2 rounded-full bg-amber-100 px-1.5 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] text-amber-800">
+                    {item.badge}
+                  </span>
+                ) : null}
+                {item.favorite ? (
+                  <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-white/90 px-1.5 py-1 text-[9px] font-semibold text-slate-900">
+                    <StarIcon className="h-2.5 w-2.5 text-yellow-500" />
+                    Favorito
+                  </span>
+                ) : null}
+              </div>
+            ) : (
+              <div className="relative flex aspect-square items-center justify-center bg-slate-200">
+                {item.badge ? (
+                  <span className="rounded-full bg-slate-300 px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] text-slate-600">
+                    {item.badge}
+                  </span>
+                ) : null}
+              </div>
+            )}
             <div className="p-2.5">
               <div className="flex items-center justify-between gap-2">
                 <div className="text-xs font-semibold leading-tight text-slate-900">{item.title}</div>
-                <div className="text-xs font-semibold text-red-700">${formatPrice(item.price)}</div>
+                {item.price > 0 ? (
+                  <div className="text-xs font-semibold text-red-700">${formatPrice(item.price)}</div>
+                ) : null}
               </div>
               {!hideDescription ? <p className="mt-1 text-xs leading-tight text-slate-600">{item.description}</p> : null}
             </div>
@@ -763,16 +782,6 @@ export function MenuPage() {
               <span className="text-xs text-slate-500">Para complementar tu pedido</span>
             </div>
             {renderMenuCards(sideItems)}
-          </div>
-        ) : null}
-
-        {activeMenuTab === "bebidas" ? (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <h5 className="text-sm font-semibold text-slate-900">Bebidas</h5>
-              <span className="text-xs text-slate-500">Formatos disponibles</span>
-            </div>
-            {renderMenuCards(drinkItems)}
           </div>
         ) : null}
 
