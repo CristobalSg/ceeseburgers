@@ -45,8 +45,10 @@ type CartItem = {
   unitRemovals?: string[][];
 };
 
+type ProductModalStep = "quantity" | "options" | "removals";
+
 const comboDrinkOptions = ["Sprite", "Coca-Cola", "Fanta"];
-const friesSauceOptions = ["Mayo casera", "Ketchup", "Mostaza", "BBQ", "Ajo"];
+const friesSauceOptions = ["Mayonesa", "Ketchup", "Mostaza", "BBQ", "Chick Fill A"];
 
 function parsePrice(price: string) {
   const digits = price.replace(/\D/g, "");
@@ -78,6 +80,8 @@ export function MenuPage() {
   const [selectedRemovals, setSelectedRemovals] = useState<string[]>([]);
   const [selectedUnitRemovals, setSelectedUnitRemovals] = useState<string[][]>([]);
   const [editingCartItemId, setEditingCartItemId] = useState<string | null>(null);
+  const [productModalStep, setProductModalStep] = useState<ProductModalStep>("quantity");
+  const [activeComboOptionIndex, setActiveComboOptionIndex] = useState(0);
   const [cartFeedback, setCartFeedback] = useState<{ title: string; mode: "added" | "edited" } | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [orderType, setOrderType] = useState<"pickup" | "delivery">("pickup");
@@ -107,6 +111,13 @@ export function MenuPage() {
     return () => window.clearTimeout(timeoutId);
   }, [cartFeedback]);
 
+  useEffect(() => {
+    if (productModalStep !== "options" || selectedItem?.category !== "combo-individual") return;
+
+    const nextElement = document.getElementById(`combo-config-${activeComboOptionIndex + 1}`);
+    nextElement?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, [activeComboOptionIndex, productModalStep, selectedItem]);
+
   const individualCombos: MenuItem[] = [
     {
       id: "combo-clasico",
@@ -116,7 +127,6 @@ export function MenuPage() {
       image: comboClasicaIndividualImg,
       imageAlt: "Combo clasico",
       category: "combo-individual",
-      favorite: true,
       removableIngredients: ["Salsa", "Tomate", "Lechuga", "Queso"],
       options: [
         { id: "bebida", label: "Sabor de bebida", choices: comboDrinkOptions },
@@ -131,6 +141,7 @@ export function MenuPage() {
       image: comboBaconIndividualImg,
       imageAlt: "Combo bacon",
       category: "combo-individual",
+      favorite: true,
       removableIngredients: ["Salsa", "Tocino", "Queso", "Cebolla caramelizada"],
       options: [
         { id: "bebida", label: "Sabor de bebida", choices: comboDrinkOptions },
@@ -195,6 +206,41 @@ export function MenuPage() {
       image: comboClasicasFullImg,
       imageAlt: "Combo full clasicas",
       category: "combo-familiar",
+    },
+  ];
+
+  const paperoComingSoonItems: MenuItem[] = [
+    {
+      id: "combo-papero-cs-clasica",
+      title: "Combo Papero Cs-Clasica",
+      description: "Cs-Clasica + papitas + salsa a eleccion.",
+      price: 0,
+      category: "acompanamientos",
+      badge: "Proximamente",
+    },
+    {
+      id: "combo-papero-cs-italiana",
+      title: "Combo Papero Cs-Italiana",
+      description: "Cs-Italiana + papitas + salsa a eleccion.",
+      price: 0,
+      category: "acompanamientos",
+      badge: "Proximamente",
+    },
+    {
+      id: "combo-papero-cs-bacon",
+      title: "Combo Papero Cs-Bacon",
+      description: "Cs-Bacon + papitas + salsa a eleccion.",
+      price: 0,
+      category: "acompanamientos",
+      badge: "Proximamente",
+    },
+    {
+      id: "combo-papero-cs-rompedieta-ii",
+      title: "Combo Papero Cs-Rompedieta II",
+      description: "Cs-Rompedieta II + papitas + salsa a eleccion.",
+      price: 0,
+      category: "acompanamientos",
+      badge: "Proximamente",
     },
   ];
 
@@ -267,12 +313,12 @@ export function MenuPage() {
 
   const sauceItems: MenuItem[] = [
     {
-      id: "mayo-casera",
-      title: "Mayo casera",
+      id: "mayonesa",
+      title: "Mayonesa",
       description: "Extra para acompanar tu pedido.",
       price: 300,
       image: sauceImage,
-      imageAlt: "Mayo casera",
+      imageAlt: "Mayonesa",
       category: "salsas",
     },
     {
@@ -303,22 +349,30 @@ export function MenuPage() {
       category: "salsas",
     },
     {
-      id: "ajo",
-      title: "Ajo",
+      id: "chick-fill-a",
+      title: "Chick Fill A",
       description: "Extra para acompanar tu pedido.",
       price: 500,
       image: sauceImage,
-      imageAlt: "Ajo",
+      imageAlt: "Chick Fill A",
       category: "salsas",
+    },
+    {
+      id: "mayo-cilantro",
+      title: "Mayo cilantro",
+      description: "En promo porque se viene proximamente.",
+      price: 0,
+      category: "salsas",
+      badge: "Proximamente",
     },
   ];
 
   const total = cart.reduce((sum, item) => sum + item.item.price * item.qty, 0);
   const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
-  const menuTabs: { id: MenuTab; label: string }[] = [
-    { id: "hamburguesas", label: "Hamburguesas" },
-    { id: "acompanamientos", label: "Acompañamientos" },
-    { id: "salsas", label: "Salsas" },
+  const menuTabs: { id: MenuTab; label: string; icon: string; iconAlt: string }[] = [
+    { id: "hamburguesas", label: "Hamburguesas", icon: comboClasicaIndividualImg, iconAlt: "Hamburguesas" },
+    { id: "acompanamientos", label: "Acompañamientos", icon: friesImage, iconAlt: "Acompañamientos" },
+    { id: "salsas", label: "Salsas", icon: sauceImage, iconAlt: "Salsas" },
   ];
 
   function openProductModal(item: MenuItem) {
@@ -332,6 +386,8 @@ export function MenuPage() {
     setSelectedRemovals([]);
     setSelectedUnitRemovals(usesPerUnitRemovals(item) ? [[]] : []);
     setEditingCartItemId(null);
+    setProductModalStep("quantity");
+    setActiveComboOptionIndex(0);
   }
 
   function openCartItemEditor(cartItem: CartItem) {
@@ -347,6 +403,8 @@ export function MenuPage() {
       cartItem.unitRemovals ?? (usesPerUnitRemovals(cartItem.item) ? Array.from({ length: cartItem.qty }, () => []) : [])
     );
     setEditingCartItemId(cartItem.id);
+    setProductModalStep("quantity");
+    setActiveComboOptionIndex(0);
     setIsCartOpen(false);
   }
 
@@ -358,10 +416,14 @@ export function MenuPage() {
     setSelectedRemovals([]);
     setSelectedUnitRemovals([]);
     setEditingCartItemId(null);
+    setProductModalStep("quantity");
+    setActiveComboOptionIndex(0);
   }
 
   function syncUnitOptions(nextQty: number) {
     if (!selectedItem) return;
+
+    setActiveComboOptionIndex((prev) => Math.min(prev, Math.max(0, nextQty - 1)));
 
     if (selectedItem.category === "combo-individual") {
       setSelectedUnitOptions((prev) => {
@@ -577,8 +639,58 @@ export function MenuPage() {
     return selectedItem.options.every((group) => Boolean(selectedOptions[group.id]));
   }
 
+  function hasOptionsStep(item: MenuItem) {
+    return Boolean(item.options?.length);
+  }
+
+  function hasRemovalsStep(item: MenuItem) {
+    return Boolean(item.removableIngredients?.length);
+  }
+
+  function getProductModalSteps(item: MenuItem): ProductModalStep[] {
+    const steps: ProductModalStep[] = ["quantity"];
+    if (hasOptionsStep(item)) steps.push("options");
+    if (hasRemovalsStep(item)) steps.push("removals");
+    return steps;
+  }
+
+  function getNextProductStep(item: MenuItem, currentStep: ProductModalStep) {
+    const steps = getProductModalSteps(item);
+    const currentIndex = steps.indexOf(currentStep);
+    return steps[currentIndex + 1] ?? null;
+  }
+
+  function getPreviousProductStep(item: MenuItem, currentStep: ProductModalStep) {
+    const steps = getProductModalSteps(item);
+    const currentIndex = steps.indexOf(currentStep);
+    return steps[currentIndex - 1] ?? null;
+  }
+
   function canEditCartItem(cartItem: CartItem) {
     return Boolean(cartItem.item.options?.length || cartItem.item.removableIngredients?.length);
+  }
+
+  function isUnitSelectionComplete(item: MenuItem, selection: Record<string, string>) {
+    return (item.options ?? []).every((group) => Boolean(selection[group.id]));
+  }
+
+  function handleComboUnitOptionSelect(comboIndex: number, groupId: string, choice: string) {
+    if (!selectedItem || selectedItem.category !== "combo-individual") return;
+
+    setSelectedUnitOptions((prev) => {
+      const nextSelections = prev.map((selection, index) =>
+        index === comboIndex ? { ...selection, [groupId]: choice } : selection
+      );
+
+      if (
+        isUnitSelectionComplete(selectedItem, nextSelections[comboIndex] ?? {})
+        && comboIndex < selectedQty - 1
+      ) {
+        setActiveComboOptionIndex(comboIndex + 1);
+      }
+
+      return nextSelections;
+    });
   }
 
   function renderMenuCards(items: MenuItem[], hideDescription = false, columnsClassName = "grid-cols-2") {
@@ -755,10 +867,13 @@ export function MenuPage() {
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveMenuTab(tab.id)}
-                className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+                className={`inline-flex items-center gap-2 rounded-full px-2.5 py-1.5 text-xs font-semibold transition ${
                   activeMenuTab === tab.id ? "bg-red-700 text-white shadow-md" : "bg-white text-slate-700 ring-1 ring-slate-200"
                 }`}
               >
+                <span className="inline-flex h-6 w-6 overflow-hidden rounded-full ring-1 ring-black/5">
+                  <img src={tab.icon} alt={tab.iconAlt} className="h-full w-full object-cover" />
+                </span>
                 {tab.label}
               </button>
             ))}
@@ -794,6 +909,32 @@ export function MenuPage() {
             {renderMenuCards(sauceItems)}
           </div>
         ) : null}
+      </section>
+
+      <section className="space-y-2">
+        <div className="flex items-center justify-between">
+          <h4 className="text-base font-semibold text-slate-900">Combo Papero</h4>
+          <span className="text-xs text-slate-500">Proximamente en el menu</span>
+        </div>
+        <div className="-mx-3 overflow-x-auto px-3 pb-1">
+          <div className="flex gap-3 snap-x snap-mandatory">
+            {paperoComingSoonItems.map((combo) => (
+              <div key={combo.id} className="flex min-w-[160px] flex-col items-start opacity-90 grayscale">
+                <div className="relative w-full aspect-square snap-start overflow-hidden rounded-xl bg-slate-200 shadow-md">
+                  <div className="absolute inset-0 flex items-center justify-center bg-slate-200">
+                    <span className="rounded-full bg-slate-300 px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] text-slate-600">
+                      {combo.badge}
+                    </span>
+                  </div>
+                </div>
+                <div className="mt-1.5 w-full">
+                  <div className="text-sm font-semibold text-slate-900">{combo.title}</div>
+                  <div className="text-[11px] leading-tight text-slate-500">{combo.description}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       {!isCartOpen ? (
@@ -837,11 +978,11 @@ export function MenuPage() {
               animation: cartFeedback ? "cartPop 420ms ease-out 1" : "floatY 3s ease-in-out infinite",
               boxShadow: "0 0 12px 2px rgba(255,255,255,0.25)",
             }}
-            className="relative inline-flex h-16 w-16 items-center justify-center rounded-full bg-red-700 text-white shadow-2xl"
+            className="relative inline-flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-red-700 text-white shadow-2xl"
           >
             <ShoppingCartIcon className="relative z-10 h-7 w-7" />
             <span
-              className="absolute inset-0 pointer-events-none"
+              className="absolute inset-0 pointer-events-none rounded-full"
               style={{
                 animation: "shine 6s linear infinite",
                 backgroundImage: "linear-gradient(120deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,0) 100%)",
@@ -866,17 +1007,36 @@ export function MenuPage() {
             <button
               type="button"
               onClick={closeProductModal}
-              className="absolute right-4 top-4 rounded-full bg-slate-100 p-2 text-slate-500"
+              className="absolute right-4 top-4 z-20 rounded-full bg-white/95 p-2 text-slate-500 shadow-md ring-1 ring-slate-200 backdrop-blur"
             >
               <XMarkIcon className="h-5 w-5" />
             </button>
 
             <div className="overflow-y-auto pr-1">
-            <div className="grid gap-4 sm:grid-cols-[180px_1fr]">
-              <div className="overflow-hidden rounded-2xl">
-                <img src={selectedItem.image} alt={selectedItem.imageAlt} className="h-full w-full object-cover" />
+            <div className={`grid gap-4 transition-all duration-300 ease-out ${productModalStep === "quantity" ? "sm:grid-cols-[180px_1fr]" : "sm:grid-cols-[132px_1fr]"}`}>
+              <div
+                className={`overflow-hidden rounded-2xl transition-all duration-300 ease-out ${
+                  productModalStep === "quantity" ? "aspect-square" : "aspect-[4/3] sm:aspect-square"
+                }`}
+              >
+                <img
+                  src={selectedItem.image}
+                  alt={selectedItem.imageAlt}
+                  className={`h-full w-full object-cover transition-transform duration-300 ease-out ${
+                    productModalStep === "quantity" ? "scale-100" : "scale-[0.96]"
+                  }`}
+                />
               </div>
               <div className="space-y-4">
+                {(() => {
+                  const steps = getProductModalSteps(selectedItem);
+                  const currentStepIndex = steps.indexOf(productModalStep);
+                  const currentStepNumber = currentStepIndex + 1;
+                  const nextStep = getNextProductStep(selectedItem, productModalStep);
+                  const previousStep = getPreviousProductStep(selectedItem, productModalStep);
+
+                  return (
+                    <>
                 <div>
                   <div className="text-sm font-semibold uppercase tracking-[0.16em] text-red-700">
                     {selectedItem.category === "combo-individual" ? "Combo individual" : selectedItem.category === "combo-familiar" ? "Combo familiar" : "Producto"}
@@ -886,7 +1046,35 @@ export function MenuPage() {
                   <div className="mt-3 text-xl font-bold text-slate-900">${formatPrice(selectedItem.price)}</div>
                 </div>
 
-                <div className="flex items-center justify-between rounded-2xl bg-slate-50 p-3">
+                <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <div className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                        Paso {currentStepNumber} de {steps.length}
+                      </div>
+                      <div className="text-sm font-semibold text-slate-900">
+                        {productModalStep === "quantity"
+                          ? "Selecciona la cantidad"
+                          : productModalStep === "options"
+                            ? "Elige bebida y salsa"
+                            : "Quita ingredientes si quieres"}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      {steps.map((step) => (
+                        <span
+                          key={step}
+                          className={`h-2.5 w-2.5 rounded-full ${
+                            steps.indexOf(step) <= currentStepIndex ? "bg-red-700" : "bg-slate-300"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {productModalStep === "quantity" ? (
+                  <div className="flex items-center justify-between rounded-2xl bg-slate-50 p-3">
                   <span className="text-sm font-semibold text-slate-900">Cantidad</span>
                   <div className="flex items-center gap-3">
                     <button
@@ -918,12 +1106,28 @@ export function MenuPage() {
                     </button>
                   </div>
                 </div>
+                ) : null}
 
-                {selectedItem.category === "combo-individual" ? (
+                {productModalStep === "options" && selectedItem.category === "combo-individual" ? (
                   <div className="max-h-72 space-y-3 overflow-y-auto pr-1">
                     {Array.from({ length: selectedQty }).map((_, comboIndex) => (
-                      <div key={`combo-config-${comboIndex + 1}`} className="rounded-2xl border border-slate-200 p-3">
-                        <div className="mb-2 text-sm font-semibold text-slate-900">Combo {comboIndex + 1}</div>
+                      <div
+                        id={`combo-config-${comboIndex + 1}`}
+                        key={`combo-config-${comboIndex + 1}`}
+                        className={`rounded-2xl border p-3 transition-all duration-300 ${
+                          activeComboOptionIndex === comboIndex
+                            ? "border-red-300 bg-red-50/40 shadow-sm"
+                            : "border-slate-200"
+                        }`}
+                      >
+                        <div className="mb-2 flex items-center justify-between gap-2">
+                          <div className="text-sm font-semibold text-slate-900">Combo {comboIndex + 1}</div>
+                          {activeComboOptionIndex === comboIndex ? (
+                            <span className="rounded-full bg-red-100 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-red-700">
+                              En curso
+                            </span>
+                          ) : null}
+                        </div>
                         {(selectedItem.options ?? []).map((group) => (
                           <div key={`${group.id}-${comboIndex}`} className="mt-3 space-y-2 first:mt-0">
                             <div className="text-sm font-medium text-slate-800">{group.label}</div>
@@ -932,13 +1136,7 @@ export function MenuPage() {
                                 <button
                                   key={`${choice}-${comboIndex}`}
                                   type="button"
-                                  onClick={() =>
-                                    setSelectedUnitOptions((prev) =>
-                                      prev.map((selection, index) =>
-                                        index === comboIndex ? { ...selection, [group.id]: choice } : selection
-                                      )
-                                    )
-                                  }
+                                  onClick={() => handleComboUnitOptionSelect(comboIndex, group.id, choice)}
                                   className={`rounded-full px-3 py-2 text-sm font-medium transition ${
                                     selectedUnitOptions[comboIndex]?.[group.id] === choice
                                       ? "bg-red-700 text-white"
@@ -954,8 +1152,18 @@ export function MenuPage() {
                             ) : null}
                           </div>
                         ))}
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+
+                {productModalStep === "removals" && selectedItem.category === "combo-individual" ? (
+                  <div className="max-h-72 space-y-3 overflow-y-auto pr-1">
+                    {Array.from({ length: selectedQty }).map((_, comboIndex) => (
+                      <div key={`combo-removals-${comboIndex + 1}`} className="rounded-2xl border border-slate-200 p-3">
+                        <div className="mb-2 text-sm font-semibold text-slate-900">Combo {comboIndex + 1}</div>
                         {selectedItem.removableIngredients?.length ? (
-                          <div className="mt-3 space-y-2">
+                          <div className="space-y-2">
                             <div className="text-sm font-medium text-slate-800">Quitar ingredientes</div>
                             <div className="flex flex-wrap gap-2">
                               {selectedItem.removableIngredients.map((ingredient) => (
@@ -985,7 +1193,9 @@ export function MenuPage() {
                       </div>
                     ))}
                   </div>
-                ) : selectedItem.category === "hamburguesas" && selectedItem.removableIngredients?.length ? (
+                ) : null}
+
+                {productModalStep === "removals" && selectedItem.category === "hamburguesas" && selectedItem.removableIngredients?.length ? (
                   <div className="max-h-72 space-y-3 overflow-y-auto pr-1">
                     {Array.from({ length: selectedQty }).map((_, burgerIndex) => (
                       <div key={`burger-config-${burgerIndex + 1}`} className="rounded-2xl border border-slate-200 p-3">
@@ -1019,7 +1229,9 @@ export function MenuPage() {
                       </div>
                     ))}
                   </div>
-                ) : (
+                ) : null}
+
+                {productModalStep === "options" && selectedItem.category !== "combo-individual" ? (
                   <>
                     {(selectedItem.options ?? []).map((group) => (
                       <div key={group.id} className="space-y-2">
@@ -1043,6 +1255,13 @@ export function MenuPage() {
                       ) : null}
                     </div>
                   ))}
+                  </>
+                ) : null}
+
+                {productModalStep === "removals"
+                  && selectedItem.category !== "combo-individual"
+                  && selectedItem.category !== "hamburguesas" ? (
+                  <>
                   {selectedItem.removableIngredients?.length ? (
                     <div className="space-y-2">
                       <div className="text-sm font-semibold text-slate-900">Quitar ingredientes</div>
@@ -1066,20 +1285,42 @@ export function MenuPage() {
                       </div>
                     ) : null}
                   </>
-                )}
+                ) : null}
+
+                <div className="flex justify-between gap-3 border-t border-slate-100 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (previousStep) {
+                        setProductModalStep(previousStep);
+                        return;
+                      }
+                      closeProductModal();
+                    }}
+                    className="rounded-full px-4 py-3 text-sm font-semibold text-slate-600 ring-1 ring-slate-200 transition hover:bg-slate-50"
+                  >
+                    {previousStep ? "Volver" : "Cancelar"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (nextStep) {
+                        setProductModalStep(nextStep);
+                        return;
+                      }
+                      addSelectedItemToCart();
+                    }}
+                    disabled={productModalStep === "options" && !hasAllRequiredSelections()}
+                    className="rounded-full bg-red-700 px-5 py-3 text-sm font-semibold text-white shadow-lg disabled:opacity-50"
+                  >
+                    {nextStep ? "Continuar" : editingCartItemId ? "Guardar cambios" : "Agregar al carrito"}
+                  </button>
+                </div>
+                    </>
+                  );
+                })()}
               </div>
             </div>
-            </div>
-
-            <div className="mt-4 flex justify-end border-t border-slate-100 pt-4">
-              <button
-                type="button"
-                onClick={addSelectedItemToCart}
-                disabled={!hasAllRequiredSelections()}
-                className="rounded-full bg-red-700 px-5 py-3 text-sm font-semibold text-white shadow-lg disabled:opacity-50"
-              >
-                {editingCartItemId ? "Guardar cambios" : "Agregar al carrito"}
-              </button>
             </div>
           </div>
         </div>
