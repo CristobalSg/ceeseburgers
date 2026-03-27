@@ -37,7 +37,7 @@ export function ProductDetail({ product, ctaHref }: ProductDetailProps) {
       <div className="grid gap-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:grid-cols-[1fr_1.1fr] sm:p-8">
         <div className="overflow-hidden rounded-2xl">
           <div className="relative">
-            <img src={gallery[photoIndex]} alt={`${product.name} foto ${photoIndex + 1}`} className="w-full object-cover transition duration-300" />
+            <img src={gallery[photoIndex]} alt={`${product.name} foto ${photoIndex + 1}`} className="w-full object-cover transition duration-300" loading="lazy" />
             {gallery.length > 1 ? (
               <div className="absolute inset-x-0 bottom-3 flex justify-center gap-2">
                 {gallery.map((_, idx) => (
@@ -142,7 +142,7 @@ export function ProductDetail({ product, ctaHref }: ProductDetailProps) {
         <div className="grid gap-3 sm:grid-cols-3">
           {(product.detail?.images ?? [product.image]).map((img, idx) => (
             <div key={`${img}-${idx}`} className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
-              <img src={img} alt={`${product.name} - foto ${idx + 1}`} className="h-full w-full object-cover" />
+              <img src={img} alt={`${product.name} - foto ${idx + 1}`} className="h-full w-full object-cover" loading="lazy" />
             </div>
           ))}
         </div>

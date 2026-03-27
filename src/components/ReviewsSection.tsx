@@ -1,11 +1,10 @@
-import storyPoster from "../../img/historias_destacadas/572119725_17872084167464139_4581888357417690889_n..jpg";
-import storyOne from "../../img/historias_destacadas/AQNj1YjXQocI9w2dFhTi1HVBJy-Lzcr2RfjCArfiJ1RK_MkE-MEOlHP2vhUGUnDlUx5ONC6ow-GwETOpVUft7WTMVFNes3zv.jpg";
-import storyTwo from "../../img/historias_destacadas/AQNmxWX692Y6yakv3K0TfcmCholWl6048J4h8zQFE-eWEIctMEynY4hiH931Z7jRdEOAOFPfLB4MEpjscW87iOZlBcr8Vfa4.jpg";
-import storyThree from "../../img/historias_destacadas/AQO8D1PGYY1HGRKkI8Fz91c2W5VXcIt-gI8RnejovzhW0NyDAChhUGLuzVDw4IRdMOsdgGBGIh26RcR12T_NIH1-b_2pOqPC.jpg";
-import storyFour from "../../img/historias_destacadas/AQMnyHl5GAjgc225OIm2wTEEyZvzj3zqObxnG66aMRJqswCnLvN8Qj3QbTWFe7ehQLBIzDtOF6qsn4_n0Cl52CaK7txdkN0I.jpg";
-import storyFive from "../../img/historias_destacadas/AQNcMSqOamJbKxpKLEX5kx8zqvhK3S5g4xHN9_N09d7FZLIMn5_7NRUkSjvGEMPgwtdb_fkkXtawElMtLNwbCIG2QByQFAly.jpg";
-import storySix from "../../img/historias_destacadas/AQPrBY-5KwxAwIoEqgQOrW1s4yK347_HHiZ84AFvjhBI5-Y2jgktJrhr2E2Hzrry6V_NsyATjDg7uZwHQIOil33CCQJIOcOS.jpg";
-import storySeven from "../../img/historias_destacadas/AQPw_xEZIVZUQnmkGcezZB9jEjr75Urnq3TKHMXidTk9_CaBjRB-t_Id-WLHCxLkhktAAbKHoKUkCQOvjhS50qTjZ_9qrl4K.jpg";
+import storyOne from "../../img/historias_destacadas/AQNj1YjXQocI9w2dFhTi1HVBJy-Lzcr2RfjCArfiJ1RK_MkE-MEOlHP2vhUGUnDlUx5ONC6ow-GwETOpVUft7WTMVFNes3zv.webp";
+import storyTwo from "../../img/historias_destacadas/AQNmxWX692Y6yakv3K0TfcmCholWl6048J4h8zQFE-eWEIctMEynY4hiH931Z7jRdEOAOFPfLB4MEpjscW87iOZlBcr8Vfa4.webp";
+import storyThree from "../../img/historias_destacadas/AQO8D1PGYY1HGRKkI8Fz91c2W5VXcIt-gI8RnejovzhW0NyDAChhUGLuzVDw4IRdMOsdgGBGIh26RcR12T_NIH1-b_2pOqPC.webp";
+import storyFour from "../../img/historias_destacadas/AQMnyHl5GAjgc225OIm2wTEEyZvzj3zqObxnG66aMRJqswCnLvN8Qj3QbTWFe7ehQLBIzDtOF6qsn4_n0Cl52CaK7txdkN0I.webp";
+import storyFive from "../../img/historias_destacadas/AQNcMSqOamJbKxpKLEX5kx8zqvhK3S5g4xHN9_N09d7FZLIMn5_7NRUkSjvGEMPgwtdb_fkkXtawElMtLNwbCIG2QByQFAly.webp";
+import storySix from "../../img/historias_destacadas/AQPrBY-5KwxAwIoEqgQOrW1s4yK347_HHiZ84AFvjhBI5-Y2jgktJrhr2E2Hzrry6V_NsyATjDg7uZwHQIOil33CCQJIOcOS.webp";
+import storySeven from "../../img/historias_destacadas/AQPw_xEZIVZUQnmkGcezZB9jEjr75Urnq3TKHMXidTk9_CaBjRB-t_Id-WLHCxLkhktAAbKHoKUkCQOvjhS50qTjZ_9qrl4K.webp";
 
 const stories = [
   { src: storyOne, caption: "Historias reales · Clientes felices" },
@@ -18,7 +17,7 @@ const stories = [
 ];
 
 export function ReviewsSection() {
-  const storyThumbs = stories.map((story) => ({ ...story, thumb: story.src || storyPoster }));
+  const storyThumbs = stories.map((story) => ({ ...story, thumb: story.src }));
 
   return (
     <section className="space-y-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">

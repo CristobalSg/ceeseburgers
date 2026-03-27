@@ -15,7 +15,7 @@ export function Header({ logoSrc, brandName, instagramHref, whatsappHref }: Head
     <>
       <header className="flex items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white/70 px-4 py-3 shadow-sm backdrop-blur">
       <a href="/" className="flex items-center gap-3 transition hover:-translate-y-0.5">
-        <img src={logoSrc} alt={`${brandName} logo`} className="h-12 w-12 rounded-full object-cover" />
+        <img src={logoSrc} alt={`${brandName} logo`} className="h-12 w-12 rounded-full object-cover" loading="lazy" />
         <div>
           <p className="text-sm font-semibold text-red-700">{brandName}</p>
           <p className="text-xs text-slate-500">Hamburguesas · Labranza</p>

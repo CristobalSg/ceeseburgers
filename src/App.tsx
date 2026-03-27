@@ -18,9 +18,9 @@ import { getBlogPostBySlug } from "./data/blogPosts";
 import { StorySection } from "./components/StorySection";
 import { ValueProps } from "./components/ValueProps";
 
-import carouselOne from "../img/carrucel_1.png";
-import carouselTwo from "../img/carrucel_2.png";
-import logoImage from "../img/logo.PNG";
+import carouselOne from "../img/carrucel_1.webp";
+import carouselTwo from "../img/carrucel_2.webp";
+import logoImage from "../img/logo.webp";
 
 export default function App() {
   const CTA_LINK = "https://wa.me/56945568889";

@@ -80,7 +80,7 @@ export function HeroSplitCarousel({ slides }: HeroSplitCarouselProps) {
         </div>
 
         <div className="relative min-h-[340px] bg-slate-100">
-          <img src={current.imageSrc} alt={current.imageAlt} className="absolute inset-0 h-full w-full object-cover" />
+          <img src={current.imageSrc} alt={current.imageAlt} className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
         </div>
       </div>
     </section>

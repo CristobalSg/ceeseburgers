@@ -1,4 +1,4 @@
-import heroImage from "../../img/cs-bacon.PNG";
+import heroImage from "../../img/cs-bacon.webp";
 
 type HeroProps = {
   ctaHref: string;
@@ -39,6 +39,7 @@ export function Hero({ ctaHref }: HeroProps) {
               src={heroImage}
               alt="Cs-Bacon, hamburguesa artesanal de Ceeseburgers"
               className="aspect-[4/3] w-full rounded-xl object-cover"
+              loading="lazy"
             />
             <p className="mt-3 text-sm text-slate-100/80">Foto real de la Cs-Bacon para activar el antojo inmediato.</p>
           </div>

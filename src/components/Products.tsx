@@ -1,9 +1,9 @@
 import { StarIcon } from "@heroicons/react/24/solid";
-import csBaconImage from "../../img/prod-cs-bacon.png";
-import csRompeImage from "../../img/cs-rompedieta-prod.png";
-import csClasicaImage from "../../img/cs-clasica-prod.png";
-import csItalianaImage from "../../img/cs-italiana-prod.png";
-import csNuevaImage from "../../img/cs-nueva-prod.png";
+import csBaconImage from "../../img/prod-cs-bacon.webp";
+import csRompeImage from "../../img/cs-rompedieta-prod.webp";
+import csClasicaImage from "../../img/cs-clasica-prod.webp";
+import csItalianaImage from "../../img/cs-italiana-prod.webp";
+import csNuevaImage from "../../img/cs-nueva-prod.webp";
 
 export type Product = {
   name: string;
@@ -114,7 +114,7 @@ export function Products() {
               }`}
             >
               <div className="relative">
-                <img src={product.image} alt={product.imageAlt} className="h-44 w-full object-cover transition duration-200 group-hover:scale-[1.02]" />
+                <img src={product.image} alt={product.imageAlt} className="h-44 w-full object-cover transition duration-200 group-hover:scale-[1.02]" loading="lazy" />
                 <div
                   className={`absolute left-3 top-3 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${
                     isFeatured ? "bg-amber-100 text-amber-800 ring-1 ring-amber-200" : "bg-red-50 text-red-700"

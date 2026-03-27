@@ -73,7 +73,7 @@ export function Carousel({ slides }: CarouselProps) {
         <div className="relative">
           <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-orange-200 via-amber-300 to-rose-400 blur-3xl" />
           <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 shadow-inner">
-            <img src={current.imageSrc} alt={current.imageAlt} className="aspect-[4/3] w-full object-cover" />
+            <img src={current.imageSrc} alt={current.imageAlt} className="aspect-[4/3] w-full object-cover" loading="lazy" />
           </div>
 
           <div className="mt-4 flex items-center justify-center gap-2">

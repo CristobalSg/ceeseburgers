@@ -1,10 +1,10 @@
-import founderImage from "../../img/personaje.PNG";
+import founderImage from "../../img/personaje.webp";
 
 export function StorySection() {
   return (
     <section className="grid gap-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:grid-cols-[1fr_1.3fr] sm:p-8">
       <div className="relative overflow-hidden rounded-2xl bg-slate-50">
-        <img src={founderImage} alt="Cristóbal Sandoval cocinando una hamburguesa" className="h-full w-full object-cover" />
+        <img src={founderImage} alt="Cristóbal Sandoval cocinando una hamburguesa" className="h-full w-full object-cover" loading="lazy" />
       </div>
       <div className="space-y-4">
         <div className="flex items-center gap-3">

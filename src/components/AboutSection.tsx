@@ -1,4 +1,4 @@
-import founderImage from "../../img/personaje.PNG";
+import founderImage from "../../img/personaje.webp";
 
 const people = [
   {
@@ -43,7 +43,7 @@ export function AboutSection() {
             >
               <div className="relative">
                 <div className={`absolute inset-0 bg-gradient-to-br ${person.accent} opacity-0 transition group-hover:opacity-30`} />
-                <img src={person.photo} alt={person.name} className="h-64 w-full object-cover" />
+                <img src={person.photo} alt={person.name} className="h-64 w-full object-cover" loading="lazy" />
               </div>
               <div className="space-y-2 px-5 py-4 text-left">
                 <p className="text-sm font-semibold uppercase tracking-[0.18em] text-red-700">{person.role}</p>
