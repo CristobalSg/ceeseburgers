@@ -83,7 +83,7 @@ export const products: Product[] = [
   {
     name: "Rompedieta I",
     price: "$3.190",
-    description: "Pan brioche, hamburguesa de 90g, doble queso cheddar, tocino, lechuga, tomate, cebolla morada y salsa Chick-fil-A.",
+    description: "Pan brioche, hamburguesa de 90g, doble queso cheddar, tocino, lechuga, tomate, cebolla morada y mayonesa.",
     spec: "Version rompe dieta cargada de sabor",
     tag: "Rompedieta I",
     slug: "cs-nueva",

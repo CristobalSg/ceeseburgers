@@ -12,13 +12,13 @@ import hambItalianaImg from "../../../img/hamb-solas/italiana.webp";
 import hambRompedietaUnoImg from "../../../img/hamb-solas/rompedieta-uno.webp";
 import hambRompedietaDosImg from "../../../img/hamb-solas/rompedieta-dos.webp";
 import friesImage from "../../../img/acompaniamiento/papas.webp";
-import drinkImage from "../../../img/acompaniamiento/coca-cola.webp";
+import drinkImage from "../../../img/acompaniamiento/bebidas.webp";
 import sauceImage from "../../../img/salsas/ketchup.webp";
 import { parsePrice } from "./menuUtils";
 import type { MenuItem, MenuTab, MenuOptionGroup } from "./menuUtils";
 
 export const comboDrinkOptions = ["Sprite", "Coca-Cola", "Fanta"];
-export const friesSauceOptions = ["Mayonesa", "Ketchup", "Mostaza", "BBQ", "Chick Fill A"];
+export const friesSauceOptions = ["Mayonesa", "Ketchup", "Mostaza", "BBQ"];
 
 function createOptionGroup(id: string, label: string, choices: string[]): MenuOptionGroup {
   return { id, label, choices };
@@ -167,7 +167,6 @@ export const sauceItems: MenuItem[] = [
   { id: "ketchup", title: "Ketchup", description: "Extra para acompanar tu pedido.", price: 300, image: sauceImage, imageAlt: "Ketchup", category: "salsas" },
   { id: "mostaza", title: "Mostaza", description: "Extra para acompanar tu pedido.", price: 300, image: undefined, imageAlt: "Mostaza", category: "salsas" },
   { id: "bbq", title: "BBQ", description: "Extra para acompanar tu pedido.", price: 500, image: undefined, imageAlt: "BBQ", category: "salsas" },
-  { id: "chick-fill-a", title: "Chick Fill A", description: "Extra para acompanar tu pedido.", price: 500, image: undefined, imageAlt: "Chick Fill A", category: "salsas" },
   { id: "mayo-cilantro", title: "Mayo cilantro", description: "En promo porque se viene proximamente.", price: 0, category: "salsas", badge: "Proximamente" },
 ];
 
