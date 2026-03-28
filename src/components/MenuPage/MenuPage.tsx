@@ -1,6 +1,6 @@
 import { ShoppingCartIcon, StarIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import { useEffect, useState } from "react";
-import { getBurgerItems, sideItems as menuSideItems, sauceItems as menuSauceItems, menuTabs, individualCombos, familyCombos, paperoComingSoonItems } from "./menuData";
+import { getBurgerItems, sideItems as menuSideItems, sauceItems as menuSauceItems, menuTabs, individualCombos, familyCombos, paperoCombos, paperoComingSoonItems } from "./menuData";
 import { formatPrice, buildCartSignature, usesPerUnitRemovals } from "./menuUtils";
 
 import type { MenuItem, MenuTab, CartItem, ProductModalStep } from "./menuUtils";
@@ -598,10 +598,29 @@ export function MenuPage() {
       <section className="space-y-2">
         <div className="flex items-center justify-between">
           <h4 className="text-base font-semibold text-slate-900">Combo Papero</h4>
-          <span className="text-xs text-slate-500">Proximamente en el menu</span>
+          <span className="text-xs text-slate-500">Bacon disponible, mas versiones pronto</span>
         </div>
         <div className="-mx-3 overflow-x-auto px-3 pb-1">
           <div className="flex gap-3 snap-x snap-mandatory">
+            {paperoCombos.map((combo) => (
+              <div key={combo.id} className="flex min-w-[160px] flex-col items-start">
+                <button
+                  type="button"
+                  onClick={() => openProductModal(combo)}
+                  className={`w-full aspect-square snap-start overflow-hidden rounded-xl bg-white shadow-md transition hover:scale-105 ${combo.favorite ? "border-2 border-yellow-400" : ""}`}
+                >
+                  <img src={combo.image} alt={combo.imageAlt} className="h-full w-full object-cover" />
+                </button>
+                <div className="mt-1.5 w-full">
+                  <div className="flex items-center gap-1 text-sm font-semibold text-slate-900">
+                    {combo.title}
+                    {combo.favorite ? <StarIcon className="h-3.5 w-3.5 text-yellow-400" /> : null}
+                  </div>
+                  <div className="text-[11px] leading-tight text-slate-500">{combo.description}</div>
+                  <div className="mt-0.5 text-base font-bold text-slate-900">${formatPrice(combo.price)}</div>
+                </div>
+              </div>
+            ))}
             {paperoComingSoonItems.map((combo) => (
               <div key={combo.id} className="flex min-w-[160px] flex-col items-start opacity-90 grayscale">
                 <div className="relative w-full aspect-square snap-start overflow-hidden rounded-xl bg-slate-200 shadow-md">

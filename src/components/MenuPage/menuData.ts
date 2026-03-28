@@ -6,6 +6,7 @@ import comboClasicaIndividualImg from "../../../img/combos-individual/Clasica.we
 import comboBaconIndividualImg from "../../../img/combos-individual/bacon.webp";
 import comboItalianaIndividualImg from "../../../img/combos-individual/italiana.webp";
 import comboRompedietaDosIndividualImg from "../../../img/combos-individual/rompedieta-dos.webp";
+import comboPaperoBaconImg from "../../../img/combos-paperos/bacon-papero.webp";
 import hambBaconImg from "../../../img/hamb-solas/bacon.webp";
 import hambClasicaImg from "../../../img/hamb-solas/clasica.webp";
 import hambItalianaImg from "../../../img/hamb-solas/italiana.webp";
@@ -123,10 +124,24 @@ export const familyCombos: MenuItem[] = [
   },
 ];
 
+export const paperoCombos: MenuItem[] = [
+  {
+    id: "combo-papero-cs-bacon",
+    title: "Combo Papero Cs-Bacon",
+    description: "Cs-Bacon + papitas + salsa a eleccion.",
+    price: 3890,
+    image: comboPaperoBaconImg,
+    imageAlt: "Combo Papero Cs-Bacon",
+    category: "acompanamientos",
+    favorite: true,
+    removableIngredients: ["Salsa", "Tocino", "Queso", "Cebolla caramelizada"],
+    options: [createOptionGroup("salsa", "Salsa para las papas", friesSauceOptions)],
+  },
+];
+
 export const paperoComingSoonItems: MenuItem[] = [
   { id: "combo-papero-cs-clasica", title: "Combo Papero Cs-Clasica", description: "Cs-Clasica + papitas + salsa a eleccion.", price: 0, category: "acompanamientos", badge: "Proximamente" },
   { id: "combo-papero-cs-italiana", title: "Combo Papero Cs-Italiana", description: "Cs-Italiana + papitas + salsa a eleccion.", price: 0, category: "acompanamientos", badge: "Proximamente" },
-  { id: "combo-papero-cs-bacon", title: "Combo Papero Cs-Bacon", description: "Cs-Bacon + papitas + salsa a eleccion.", price: 0, category: "acompanamientos", badge: "Proximamente" },
   { id: "combo-papero-cs-rompedieta-ii", title: "Combo Papero Cs-Rompedieta II", description: "Cs-Rompedieta II + papitas + salsa a eleccion.", price: 0, category: "acompanamientos", badge: "Proximamente" },
 ];
 
