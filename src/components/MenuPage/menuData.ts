@@ -5,6 +5,7 @@ import comboBaconLoversImg from "../../../img/combos/combo-bacon-lovers.webp";
 import comboClasicaIndividualImg from "../../../img/combos-individual/Clasica.webp";
 import comboBaconIndividualImg from "../../../img/combos-individual/bacon.webp";
 import comboItalianaIndividualImg from "../../../img/combos-individual/italiana.webp";
+import comboRompedietaUnoIndividualImg from "../../../img/combos-individual/rompedieta-uno.webp";
 import comboRompedietaDosIndividualImg from "../../../img/combos-individual/rompedieta-dos.webp";
 import comboPaperoBaconImg from "../../../img/combos-paperos/bacon-papero.webp";
 import hambBaconImg from "../../../img/hamb-solas/bacon.webp";
@@ -86,6 +87,20 @@ export const individualCombos: MenuItem[] = [
     imageAlt: "Combo Rompedieta II",
     category: "combo-individual",
     removableIngredients: ["Salsa BBQ", "Huevo frito", "Tocino", "Queso cheddar", "Cebolla caramelizada"],
+    options: [
+      createOptionGroup("bebida", "Sabor de bebida", comboDrinkOptions),
+      createOptionGroup("salsa", "Salsa para las papas", friesSauceOptions),
+    ],
+  },
+  {
+    id: "combo-rompedieta-i",
+    title: "Combo Rompedieta I",
+    description: "Hamburguesa Rompedieta I + papitas + bebida + salsa",
+    price: 5590,
+    image: comboRompedietaUnoIndividualImg,
+    imageAlt: "Combo Rompedieta I",
+    category: "combo-individual",
+    removableIngredients: ["Mayonesa", "Tocino", "Lechuga", "Tomate", "Cebolla morada", "Queso cheddar"],
     options: [
       createOptionGroup("bebida", "Sabor de bebida", comboDrinkOptions),
       createOptionGroup("salsa", "Salsa para las papas", friesSauceOptions),
