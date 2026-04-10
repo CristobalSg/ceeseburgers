@@ -59,6 +59,34 @@ export function MenuPage() {
   const total = cart.reduce((sum, item) => sum + item.item.price * item.qty, 0);
   const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
 
+  function renderMenuTabButton(tab: (typeof menuTabs)[number]) {
+    const isActive = activeMenuTab === tab.id;
+
+    return (
+      <button
+        key={tab.id}
+        type="button"
+        onClick={() => setActiveMenuTab(tab.id)}
+        className={`group inline-flex min-w-[190px] items-center gap-3 rounded-[22px] border px-3.5 py-3 text-left transition duration-200 ${
+          isActive
+            ? "border-slate-900 bg-slate-900 text-white shadow-xl shadow-slate-900/20"
+            : "border-slate-200 bg-white text-slate-800 shadow-sm shadow-slate-200/70 hover:-translate-y-0.5 hover:border-red-200 hover:shadow-md"
+        }`}
+      >
+        <span
+          className={`inline-flex h-12 w-12 shrink-0 overflow-hidden rounded-2xl ring-1 ${
+            isActive ? "bg-white/15 ring-white/25" : "bg-slate-100 ring-black/5"
+          }`}
+        >
+          <img src={tab.icon} alt={tab.iconAlt} className="h-full w-full object-cover" />
+        </span>
+        <span className="min-w-0">
+          <span className="block text-sm font-semibold leading-tight">{tab.label}</span>
+        </span>
+      </button>
+    );
+  }
+
   function openProductModal(item: MenuItem) {
     const defaults = Object.fromEntries(
       (item.options ?? []).map((group) => [group.id, ""])
@@ -545,22 +573,8 @@ export function MenuPage() {
 
       <section className="space-y-3">
         <div className="-mx-3 overflow-x-auto px-3 pb-1">
-          <div className="flex w-max gap-2">
-            {menuTabs.map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveMenuTab(tab.id)}
-                className={`inline-flex items-center gap-2 rounded-full px-2.5 py-1.5 text-xs font-semibold transition ${
-                  activeMenuTab === tab.id ? "bg-red-700 text-white shadow-md" : "bg-white text-slate-700 ring-1 ring-slate-200"
-                }`}
-              >
-                <span className="inline-flex h-6 w-6 overflow-hidden rounded-full ring-1 ring-black/5">
-                  <img src={tab.icon} alt={tab.iconAlt} className="h-full w-full object-cover" />
-                </span>
-                {tab.label}
-              </button>
-            ))}
+          <div className="flex w-max gap-3">
+            {menuTabs.map((tab) => renderMenuTabButton(tab))}
           </div>
         </div>
 
