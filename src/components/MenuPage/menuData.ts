@@ -7,7 +7,10 @@ import comboBaconIndividualImg from "../../../img/combos-individual/bacon.webp";
 import comboItalianaIndividualImg from "../../../img/combos-individual/italiana.webp";
 import comboRompedietaUnoIndividualImg from "../../../img/combos-individual/rompedieta-uno.webp";
 import comboRompedietaDosIndividualImg from "../../../img/combos-individual/rompedieta-dos.webp";
-import comboPaperoBaconImg from "../../../img/combos-paperos/bacon-papero.webp";
+import comboSmokeCriminalIndividualImg from "../../../img/combos-individual/Smoke-Criminal.webp";
+import comboPaperoBaconImg from "../../../img/Combos-paperos/combo-papero-bacon.webp";
+import comboPaperoClasicaImg from "../../../img/Combos-paperos/combo-papero-clasica.webp";
+import comboPaperoItalianaImg from "../../../img/Combos-paperos/combo-papero-italiana.webp";
 import hambBaconImg from "../../../img/hamb-solas/bacon.webp";
 import hambClasicaImg from "../../../img/hamb-solas/clasica.webp";
 import hambItalianaImg from "../../../img/hamb-solas/italiana.webp";
@@ -86,6 +89,20 @@ export const individualCombos: MenuItem[] = [
     ],
   },
   {
+    id: "combo-smoke-criminal",
+    title: "Combo Smoke Criminal",
+    description: "Hamburguesa Smoke Criminal + papitas + bebida + salsa",
+    price: 5590,
+    image: comboSmokeCriminalIndividualImg,
+    imageAlt: "Combo Smoke Criminal",
+    category: "combo-individual",
+    removableIngredients: ["Salsa BBQ", "Tocino", "Queso cheddar", "Cebolla caramelizada"],
+    options: [
+      createOptionGroup("bebida", "Sabor de bebida", comboDrinkOptions),
+      createOptionGroup("salsa", "Salsa para las papas", comboFriesSauceOptions),
+    ],
+  },
+  {
     id: "combo-rompedieta-ii",
     title: "Combo Rompedieta II",
     description: "Hamburguesa Rompedieta II + papitas + bebida + salsa",
@@ -148,6 +165,17 @@ export const familyCombos: MenuItem[] = [
 
 export const paperoCombos: MenuItem[] = [
   {
+    id: "combo-papero-cs-clasica",
+    title: "Combo Papero Cs-Clasica",
+    description: "Cs-Clasica + papitas + salsa a eleccion.",
+    price: 3490,
+    image: comboPaperoClasicaImg,
+    imageAlt: "Combo Papero Cs-Clasica",
+    category: "acompanamientos",
+    removableIngredients: ["Salsa", "Tomate", "Lechuga", "Queso"],
+    options: [createOptionGroup("salsa", "Salsa para las papas", friesSauceOptions)],
+  },
+  {
     id: "combo-papero-cs-bacon",
     title: "Combo Papero Cs-Bacon",
     description: "Cs-Bacon + papitas + salsa a eleccion.",
@@ -159,12 +187,17 @@ export const paperoCombos: MenuItem[] = [
     removableIngredients: ["Salsa", "Tocino", "Queso", "Cebolla caramelizada"],
     options: [createOptionGroup("salsa", "Salsa para las papas", friesSauceOptions)],
   },
-];
-
-export const paperoComingSoonItems: MenuItem[] = [
-  { id: "combo-papero-cs-clasica", title: "Combo Papero Cs-Clasica", description: "Cs-Clasica + papitas + salsa a eleccion.", price: 0, category: "acompanamientos", badge: "Proximamente" },
-  { id: "combo-papero-cs-italiana", title: "Combo Papero Cs-Italiana", description: "Cs-Italiana + papitas + salsa a eleccion.", price: 0, category: "acompanamientos", badge: "Proximamente" },
-  { id: "combo-papero-cs-rompedieta-ii", title: "Combo Papero Cs-Rompedieta II", description: "Cs-Rompedieta II + papitas + salsa a eleccion.", price: 0, category: "acompanamientos", badge: "Proximamente" },
+  {
+    id: "combo-papero-cs-italiana",
+    title: "Combo Papero Cs-Italiana",
+    description: "Cs-Italiana + papitas + salsa a eleccion.",
+    price: 3690,
+    image: comboPaperoItalianaImg,
+    imageAlt: "Combo Papero Cs-Italiana",
+    category: "acompanamientos",
+    removableIngredients: ["Mayonesa", "Palta", "Tomate", "Queso"],
+    options: [createOptionGroup("salsa", "Salsa para las papas", friesSauceOptions)],
+  },
 ];
 
 export function getBurgerItems(): MenuItem[] {

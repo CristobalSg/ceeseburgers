@@ -1,6 +1,6 @@
 import { ShoppingCartIcon, StarIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import { useEffect, useState } from "react";
-import { getBurgerItems, sideItems as menuSideItems, sauceItems as menuSauceItems, menuTabs, individualCombos, familyCombos, paperoCombos, paperoComingSoonItems } from "./menuData";
+import { getBurgerItems, sideItems as menuSideItems, sauceItems as menuSauceItems, menuTabs, individualCombos, familyCombos, paperoCombos } from "./menuData";
 import { formatPrice, buildCartSignature, usesPerUnitRemovals } from "./menuUtils";
 
 import type { MenuItem, MenuTab, CartItem, ProductModalStep } from "./menuUtils";
@@ -704,6 +704,36 @@ export function MenuPage() {
 
       <section className="space-y-2">
         <div className="flex items-center justify-between">
+          <h4 className="text-base font-semibold text-slate-900">Combo Papero</h4>
+          <span className="text-xs text-slate-500">Hamburguesa + Papitas + Salsa</span>
+        </div>
+        <div className="-mx-3 overflow-x-auto px-3 pb-1">
+          <div className="flex gap-3 snap-x snap-mandatory">
+            {paperoCombos.map((combo) => (
+              <div key={combo.id} className="flex min-w-[160px] flex-col items-start">
+                <button
+                  type="button"
+                  onClick={() => openProductModal(combo)}
+                  className={`w-full aspect-square snap-start overflow-hidden rounded-xl bg-white shadow-md transition hover:scale-105 ${combo.favorite ? "border-2 border-yellow-400" : ""}`}
+                >
+                  <img src={combo.image} alt={combo.imageAlt} className="h-full w-full object-cover" />
+                </button>
+                <div className="mt-1.5 w-full">
+                  <div className="flex items-center gap-1 text-sm font-semibold text-slate-900">
+                    {combo.title}
+                    {combo.favorite ? <StarIcon className="h-3.5 w-3.5 text-yellow-400" /> : null}
+                  </div>
+                  <div className="text-[11px] leading-tight text-slate-500">{combo.description}</div>
+                  <div className="mt-0.5 text-base font-bold text-slate-900">${formatPrice(combo.price)}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="space-y-2">
+        <div className="flex items-center justify-between">
           <h4 className="text-base font-semibold text-slate-900">Combos Familiares</h4>
           <span className="text-xs text-slate-500">Ideales para compartir</span>
         </div>
@@ -768,51 +798,6 @@ export function MenuPage() {
             {renderMenuCards(sauceItems)}
           </div>
         ) : null}
-      </section>
-
-      <section className="space-y-2">
-        <div className="flex items-center justify-between">
-          <h4 className="text-base font-semibold text-slate-900">Combo Papero</h4>
-          <span className="text-xs text-slate-500">Bacon disponible, mas versiones pronto</span>
-        </div>
-        <div className="-mx-3 overflow-x-auto px-3 pb-1">
-          <div className="flex gap-3 snap-x snap-mandatory">
-            {paperoCombos.map((combo) => (
-              <div key={combo.id} className="flex min-w-[160px] flex-col items-start">
-                <button
-                  type="button"
-                  onClick={() => openProductModal(combo)}
-                  className={`w-full aspect-square snap-start overflow-hidden rounded-xl bg-white shadow-md transition hover:scale-105 ${combo.favorite ? "border-2 border-yellow-400" : ""}`}
-                >
-                  <img src={combo.image} alt={combo.imageAlt} className="h-full w-full object-cover" />
-                </button>
-                <div className="mt-1.5 w-full">
-                  <div className="flex items-center gap-1 text-sm font-semibold text-slate-900">
-                    {combo.title}
-                    {combo.favorite ? <StarIcon className="h-3.5 w-3.5 text-yellow-400" /> : null}
-                  </div>
-                  <div className="text-[11px] leading-tight text-slate-500">{combo.description}</div>
-                  <div className="mt-0.5 text-base font-bold text-slate-900">${formatPrice(combo.price)}</div>
-                </div>
-              </div>
-            ))}
-            {paperoComingSoonItems.map((combo) => (
-              <div key={combo.id} className="flex min-w-[160px] flex-col items-start opacity-90 grayscale">
-                <div className="relative w-full aspect-square snap-start overflow-hidden rounded-xl bg-slate-200 shadow-md">
-                  <div className="absolute inset-0 flex items-center justify-center bg-slate-200">
-                    <span className="rounded-full bg-slate-300 px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] text-slate-600">
-                      {combo.badge}
-                    </span>
-                  </div>
-                </div>
-                <div className="mt-1.5 w-full">
-                  <div className="text-sm font-semibold text-slate-900">{combo.title}</div>
-                  <div className="text-[11px] leading-tight text-slate-500">{combo.description}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
       </section>
 
       {!isCartOpen ? (
@@ -889,13 +874,39 @@ export function MenuPage() {
             >
               <XMarkIcon className="h-5 w-5" />
             </button>
+            <style>{`
+              @keyframes productImageExpand {
+                from { opacity: 0.88; transform: translateY(8px) scale(0.96); }
+                to { opacity: 1; transform: translateY(0) scale(1); }
+              }
+              @keyframes productImageCompact {
+                from { opacity: 0.88; transform: translateY(-8px) scale(1.04); }
+                to { opacity: 1; transform: translateY(0) scale(1); }
+              }
+              @keyframes productInfoShift {
+                from { opacity: 0.86; transform: translateY(6px); }
+                to { opacity: 1; transform: translateY(0); }
+              }
+            `}</style>
 
             <div className="overflow-y-auto pr-1">
-            <div className={`grid gap-4 transition-all duration-300 ease-out ${productModalStep === "quantity" ? "sm:grid-cols-[180px_1fr]" : "sm:grid-cols-[132px_1fr]"}`}>
+            <div className={`grid gap-4 transition-all duration-300 ease-out ${
+              productModalStep === "quantity"
+                ? "grid-cols-1 sm:grid-cols-[180px_1fr]"
+                : "grid-cols-[96px_1fr] sm:grid-cols-[112px_1fr]"
+            }`}>
               <div
                 className={`overflow-hidden rounded-2xl transition-all duration-300 ease-out ${
-                  productModalStep === "quantity" ? "aspect-square" : "aspect-[4/3] sm:aspect-square"
+                  productModalStep === "quantity"
+                    ? "aspect-square w-full max-h-[min(42dvh,18rem)] sm:h-auto sm:w-auto"
+                    : "h-24 w-24 sm:h-auto sm:w-auto sm:aspect-square"
                 }`}
+                style={{
+                  animation:
+                    productModalStep === "quantity"
+                      ? "productImageExpand 280ms ease-out"
+                      : "productImageCompact 280ms ease-out",
+                }}
               >
                 <img
                   src={selectedItem.image}
@@ -905,7 +916,10 @@ export function MenuPage() {
                   }`}
                 />
               </div>
-              <div className="space-y-4">
+              <div
+                className={productModalStep === "quantity" ? "space-y-4" : "contents sm:block sm:space-y-4"}
+                style={{ animation: "productInfoShift 260ms ease-out" }}
+              >
                 {(() => {
                   const steps = getProductModalSteps(selectedItem);
                   const currentStepIndex = steps.indexOf(productModalStep);
@@ -916,37 +930,33 @@ export function MenuPage() {
                   return (
                     <>
                 <div>
-                  <div className="text-sm font-semibold uppercase tracking-[0.16em] text-red-700">
-                    {selectedItem.category === "combo-individual" ? "Combo individual" : selectedItem.category === "combo-familiar" ? "Combo familiar" : "Producto"}
-                  </div>
-                  <h3 className="mt-1 text-2xl font-bold text-slate-900">{selectedItem.title}</h3>
+                  <h3 className="text-2xl font-bold text-slate-900">{selectedItem.title}</h3>
                   <p className="mt-2 text-sm text-slate-600">{selectedItem.description}</p>
-                  <div className="mt-3 text-xl font-bold text-slate-900">${formatPrice(selectedItem.price)}</div>
-                </div>
-
-                <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3">
-                  <div className="flex items-center justify-between gap-3">
-                    <div>
-                      <div className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-                        Paso {currentStepNumber} de {steps.length}
+                  <div className="mt-3 flex items-center justify-between gap-3">
+                    <div className="text-xl font-bold text-slate-900">${formatPrice(selectedItem.price)}</div>
+                    <div className="shrink-0 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                          Paso {currentStepNumber} de {steps.length}
+                        </div>
+                        <div className="flex items-center gap-1">
+                          {steps.map((step) => (
+                            <span
+                              key={step}
+                              className={`h-2 w-2 rounded-full transition-colors ${
+                                steps.indexOf(step) <= currentStepIndex ? "bg-red-700" : "bg-slate-300"
+                              }`}
+                            />
+                          ))}
+                        </div>
                       </div>
-                      <div className="text-sm font-semibold text-slate-900">
+                      <div className="text-xs font-semibold leading-tight text-slate-900">
                         {productModalStep === "quantity"
                           ? "Selecciona la cantidad"
                           : productModalStep === "options"
                             ? "Elige bebida y salsa"
                             : "Quita ingredientes si quieres"}
                       </div>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      {steps.map((step) => (
-                        <span
-                          key={step}
-                          className={`h-2.5 w-2.5 rounded-full ${
-                            steps.indexOf(step) <= currentStepIndex ? "bg-red-700" : "bg-slate-300"
-                          }`}
-                        />
-                      ))}
                     </div>
                   </div>
                 </div>
@@ -987,7 +997,7 @@ export function MenuPage() {
                 ) : null}
 
                 {productModalStep === "options" && selectedItem.category === "combo-individual" ? (
-                  <div className="max-h-72 space-y-3 overflow-y-auto pr-1">
+                  <div className="col-span-full max-h-72 space-y-3 overflow-y-auto pr-1">
                     {Array.from({ length: selectedQty }).map((_, comboIndex) => (
                       <div
                         id={`combo-config-${comboIndex + 1}`}
@@ -998,32 +1008,43 @@ export function MenuPage() {
                             : "border-slate-200"
                         }`}
                       >
-                        <div className="mb-2 flex items-center justify-between gap-2">
-                          <div className="text-sm font-semibold text-slate-900">Combo {comboIndex + 1}</div>
-                          {activeComboOptionIndex === comboIndex ? (
-                            <span className="rounded-full bg-red-100 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-red-700">
-                              En curso
-                            </span>
-                          ) : null}
-                        </div>
+                        {selectedQty > 1 ? (
+                          <div className="mb-2 flex items-center justify-between gap-2">
+                            <div className="text-sm font-semibold text-slate-900">Combo {comboIndex + 1}</div>
+                            {activeComboOptionIndex === comboIndex ? (
+                              <span className="rounded-full bg-red-100 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-red-700">
+                                En curso
+                              </span>
+                            ) : null}
+                          </div>
+                        ) : null}
                         {(selectedItem.options ?? []).map((group) => (
                           <div key={`${group.id}-${comboIndex}`} className="mt-3 space-y-2 first:mt-0">
                             <div className="text-sm font-medium text-slate-800">{group.label}</div>
                             <div className="flex flex-wrap gap-2">
-                              {group.choices.map((choice) => (
-                                <button
-                                  key={`${choice}-${comboIndex}`}
-                                  type="button"
-                                  onClick={() => handleComboUnitOptionSelect(comboIndex, group.id, choice)}
-                                  className={`rounded-full px-3 py-2 text-sm font-medium transition ${
-                                    selectedUnitOptions[comboIndex]?.[group.id] === choice
-                                      ? "bg-red-700 text-white"
-                                      : "bg-slate-100 text-slate-700"
-                                  }`}
-                                >
-                                  {choice}
-                                </button>
-                              ))}
+                              {group.choices.map((choice) => {
+                                const isSelected = selectedUnitOptions[comboIndex]?.[group.id] === choice;
+                                const isWithoutOption = choice.toLowerCase().startsWith("sin ");
+
+                                return (
+                                  <button
+                                    key={`${choice}-${comboIndex}`}
+                                    type="button"
+                                    onClick={() => handleComboUnitOptionSelect(comboIndex, group.id, choice)}
+                                    className={`rounded-full px-3 py-2 text-sm font-medium transition ${
+                                      isSelected
+                                        ? isWithoutOption
+                                          ? "bg-slate-800 text-white"
+                                          : "bg-red-700 text-white"
+                                        : isWithoutOption
+                                          ? "border border-dashed border-slate-400 bg-white text-slate-600"
+                                          : "bg-slate-100 text-slate-700"
+                                    }`}
+                                  >
+                                    {choice}
+                                  </button>
+                                );
+                              })}
                             </div>
                             {!selectedUnitOptions[comboIndex]?.[group.id] ? (
                               <div className="text-xs text-red-600">Debes elegir una opcion.</div>
@@ -1036,7 +1057,7 @@ export function MenuPage() {
                 ) : null}
 
                 {productModalStep === "removals" && selectedItem.category === "combo-individual" ? (
-                  <div className="max-h-72 space-y-3 overflow-y-auto pr-1">
+                  <div className="col-span-full max-h-72 space-y-3 overflow-y-auto pr-1">
                     {Array.from({ length: selectedQty }).map((_, comboIndex) => (
                       <div key={`combo-removals-${comboIndex + 1}`} className="rounded-2xl border border-slate-200 p-3">
                         <div className="mb-2 text-sm font-semibold text-slate-900">Combo {comboIndex + 1}</div>
@@ -1074,7 +1095,7 @@ export function MenuPage() {
                 ) : null}
 
                 {productModalStep === "removals" && selectedItem.category === "hamburguesas" && selectedItem.removableIngredients?.length ? (
-                  <div className="max-h-72 space-y-3 overflow-y-auto pr-1">
+                  <div className="col-span-full max-h-72 space-y-3 overflow-y-auto pr-1">
                     {Array.from({ length: selectedQty }).map((_, burgerIndex) => (
                       <div key={`burger-config-${burgerIndex + 1}`} className="rounded-2xl border border-slate-200 p-3">
                         <div className="mb-2 text-sm font-semibold text-slate-900">Hamburguesa {burgerIndex + 1}</div>
@@ -1110,7 +1131,7 @@ export function MenuPage() {
                 ) : null}
 
                 {productModalStep === "options" && selectedItem.category !== "combo-individual" ? (
-                  <>
+                  <div className="col-span-full space-y-4">
                     {(selectedItem.options ?? []).map((group) => (
                       <div key={group.id} className="space-y-2">
                         <div className="text-sm font-semibold text-slate-900">{group.label}</div>
@@ -1133,13 +1154,13 @@ export function MenuPage() {
                       ) : null}
                     </div>
                   ))}
-                  </>
+                  </div>
                 ) : null}
 
                 {productModalStep === "removals"
                   && selectedItem.category !== "combo-individual"
                   && selectedItem.category !== "hamburguesas" ? (
-                  <>
+                  <div className="col-span-full">
                   {selectedItem.removableIngredients?.length ? (
                     <div className="space-y-2">
                       <div className="text-sm font-semibold text-slate-900">Quitar ingredientes</div>
@@ -1162,10 +1183,10 @@ export function MenuPage() {
                         </div>
                       </div>
                     ) : null}
-                  </>
+                  </div>
                 ) : null}
 
-                <div className="flex justify-between gap-3 border-t border-slate-100 pt-4">
+                <div className="sticky bottom-0 col-span-full -mx-1 flex justify-between gap-3 border-t border-slate-100 bg-white px-1 pt-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:static sm:mx-0 sm:px-0 sm:pb-0">
                   <button
                     type="button"
                     onClick={() => {
@@ -1381,49 +1402,51 @@ export function MenuPage() {
 
               {paymentMethod === "cash" ? (
                 <div className="mt-3 rounded-2xl bg-slate-50 p-3">
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setCashPaymentType("exact");
-                        setCashAmount("");
-                        setShowAdvancedCashPayment(false);
-                      }}
-                      className={`rounded-full px-3 py-2 text-sm font-medium transition ${
-                        cashPaymentType === "exact" ? "bg-red-700 text-white" : "bg-white text-slate-700 ring-1 ring-slate-200"
-                      }`}
-                    >
-                      Efectivo justo
-                    </button>
-                    {cashPaymentSuggestions.map((amount) => (
+                  <div className="overflow-x-auto pb-1">
+                    <div className="flex w-max gap-2">
                       <button
-                        key={amount}
                         type="button"
                         onClick={() => {
-                          setCashPaymentType("amount");
-                          setCashAmount(String(amount));
+                          setCashPaymentType("exact");
+                          setCashAmount("");
                           setShowAdvancedCashPayment(false);
                         }}
-                        className={`rounded-full px-3 py-2 text-sm font-medium transition ${
-                          cashPaymentType === "amount" && normalizedCashAmount === amount
-                            ? "bg-red-700 text-white"
-                            : "bg-white text-slate-700 ring-1 ring-slate-200"
+                        className={`shrink-0 rounded-full px-3 py-2 text-sm font-medium transition ${
+                          cashPaymentType === "exact" ? "bg-red-700 text-white" : "bg-white text-slate-700 ring-1 ring-slate-200"
                         }`}
                       >
-                        ${formatPrice(amount)}
+                        Efectivo justo
                       </button>
-                    ))}
+                      {cashPaymentSuggestions.map((amount) => (
+                        <button
+                          key={amount}
+                          type="button"
+                          onClick={() => {
+                            setCashPaymentType("amount");
+                            setCashAmount(String(amount));
+                            setShowAdvancedCashPayment(false);
+                          }}
+                          className={`shrink-0 rounded-full px-3 py-2 text-sm font-medium transition ${
+                            cashPaymentType === "amount" && normalizedCashAmount === amount
+                              ? "bg-red-700 text-white"
+                              : "bg-white text-slate-700 ring-1 ring-slate-200"
+                          }`}
+                        >
+                          ${formatPrice(amount)}
+                        </button>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowAdvancedCashPayment((isVisible) => !isVisible);
+                          setCashPaymentType("amount");
+                        }}
+                        className="shrink-0 rounded-full bg-white px-3 py-2 text-sm font-medium text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-100"
+                      >
+                        Otro
+                      </button>
+                    </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowAdvancedCashPayment((isVisible) => !isVisible);
-                      setCashPaymentType("amount");
-                    }}
-                    className="mt-3 rounded-full bg-white px-3 py-2 text-sm font-medium text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-100"
-                  >
-                    Avanzado
-                  </button>
                   {showAdvancedCashPayment ? (
                     <input
                       value={cashAmount}
