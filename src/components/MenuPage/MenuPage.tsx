@@ -5,6 +5,145 @@ import { formatPrice, buildCartSignature, usesPerUnitRemovals } from "./menuUtil
 
 import type { MenuItem, MenuTab, CartItem, ProductModalStep } from "./menuUtils";
 
+const WHATSAPP_PHONE = "56945568889";
+const DELIVERY_ESTIMATE_MIN = 2000;
+const DELIVERY_ESTIMATE_MAX = 2500;
+const CASH_PAYMENT_STEPS = [1000, 2000, 5000, 10000];
+
+function appendCount(counter: Map<string, number>, value: string, amount = 1) {
+  if (!value) return;
+  counter.set(value, (counter.get(value) ?? 0) + amount);
+}
+
+function formatCountSummary(counter: Map<string, number>) {
+  return Array.from(counter.entries())
+    .map(([value, count]) => `${count} ${value}`)
+    .join(" | ");
+}
+
+function formatIngredientName(ingredient: string) {
+  return ingredient ? `${ingredient.charAt(0).toLowerCase()}${ingredient.slice(1)}` : ingredient;
+}
+
+function formatIngredientList(ingredients: string[]) {
+  const normalized = ingredients.map(formatIngredientName);
+
+  if (normalized.length <= 1) {
+    return normalized[0] ?? "";
+  }
+
+  if (normalized.length === 2) {
+    return `${normalized[0]} y ${normalized[1]}`;
+  }
+
+  return `${normalized.slice(0, -1).join(", ")} y ${normalized[normalized.length - 1]}`;
+}
+
+function buildGroupedSelectionLines(unitSelections: Record<string, string>[] | undefined, qtyFallback = 1) {
+  if (!unitSelections?.length) return [];
+
+  const groupedSelections = new Map<string, Map<string, number>>();
+
+  unitSelections.forEach((selection) => {
+    Object.entries(selection).forEach(([key, value]) => {
+      if (!value) return;
+
+      const optionCounts = groupedSelections.get(key) ?? new Map<string, number>();
+      appendCount(optionCounts, value);
+      groupedSelections.set(key, optionCounts);
+    });
+  });
+
+  const lines: string[] = [];
+  const bebidaCounts = groupedSelections.get("bebida");
+  const salsaCounts = groupedSelections.get("salsa");
+
+  if (bebidaCounts?.size) {
+    lines.push(`Bebidas: ${formatCountSummary(bebidaCounts)}`);
+  }
+
+  if (salsaCounts?.size) {
+    lines.push(`Salsas: ${formatCountSummary(salsaCounts)}`);
+  }
+
+  groupedSelections.forEach((counts, key) => {
+    if (key === "bebida" || key === "salsa" || !counts.size) return;
+    const label = `${key.charAt(0).toUpperCase()}${key.slice(1)}s`;
+    lines.push(`${label}: ${formatCountSummary(counts)}`);
+  });
+
+  if (lines.length > 0) {
+    return lines;
+  }
+
+  const fallbackSelections = unitSelections[0];
+  return Object.entries(fallbackSelections)
+    .filter(([, value]) => value)
+    .map(([key, value]) => {
+      const label = key === "bebida" ? "Bebidas" : key === "salsa" ? "Salsas" : `${key.charAt(0).toUpperCase()}${key.slice(1)}s`;
+      return `${label}: ${qtyFallback} ${value}`;
+    });
+}
+
+function buildSelectionLines(cartItem: CartItem) {
+  if (cartItem.unitSelections?.length) {
+    return buildGroupedSelectionLines(cartItem.unitSelections, cartItem.qty);
+  }
+
+  const repeatedSelections = Array.from({ length: cartItem.qty }, () => ({ ...cartItem.selections }));
+  return buildGroupedSelectionLines(repeatedSelections, cartItem.qty);
+}
+
+function buildGroupedRemovalLines(cartItem: CartItem) {
+  if (cartItem.unitRemovals?.length) {
+    const groupedRemovals = new Map<string, { count: number; removals: string[] }>();
+
+    cartItem.unitRemovals.forEach((removals) => {
+      if (!removals.length) return;
+
+      const normalizedRemovals = [...removals].sort((a, b) => a.localeCompare(b, "es"));
+      const signature = normalizedRemovals.join("|");
+      const existing = groupedRemovals.get(signature);
+
+      if (existing) {
+        existing.count += 1;
+        return;
+      }
+
+      groupedRemovals.set(signature, { count: 1, removals: normalizedRemovals });
+    });
+
+    if (!groupedRemovals.size) return [];
+
+    const unitLabel =
+      cartItem.item.category === "combo-individual" || cartItem.item.category === "hamburguesas"
+        ? "hamburguesa"
+        : "unidad";
+
+    return Array.from(groupedRemovals.values()).map(
+      ({ count, removals }) =>
+        `* ${count} ${unitLabel}${count > 1 ? "s" : ""} sin ${formatIngredientList(removals)}`
+    );
+  }
+
+  if (!cartItem.removals?.length) return [];
+
+  const prefix = cartItem.qty > 1 ? `* ${cartItem.qty} unidades sin ` : "* Sin ";
+  return [`${prefix}${formatIngredientList(cartItem.removals)}`];
+}
+
+function buildCashPaymentSuggestions(total: number) {
+  if (total <= 0) return [];
+
+  return Array.from(
+    new Set(
+      CASH_PAYMENT_STEPS.map((step) => Math.ceil(total / step) * step)
+        .filter((amount) => amount > total)
+        .sort((a, b) => a - b)
+    )
+  ).slice(0, 4);
+}
+
 export function MenuPage() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
@@ -18,8 +157,13 @@ export function MenuPage() {
   const [activeComboOptionIndex, setActiveComboOptionIndex] = useState(0);
   const [cartFeedback, setCartFeedback] = useState<{ title: string; mode: "added" | "edited" } | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [orderName, setOrderName] = useState("");
   const [orderType, setOrderType] = useState<"pickup" | "delivery">("pickup");
   const [address, setAddress] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<"transfer" | "cash" | "">("");
+  const [cashPaymentType, setCashPaymentType] = useState<"exact" | "amount">("exact");
+  const [cashAmount, setCashAmount] = useState("");
+  const [showAdvancedCashPayment, setShowAdvancedCashPayment] = useState(false);
   const [activeMenuTab, setActiveMenuTab] = useState<MenuTab>("hamburguesas");
 
   useEffect(() => {
@@ -56,8 +200,16 @@ export function MenuPage() {
   const sideItems = menuSideItems;
   const sauceItems = menuSauceItems;
 
-  const total = cart.reduce((sum, item) => sum + item.item.price * item.qty, 0);
+  const subtotal = cart.reduce((sum, item) => sum + item.item.price * item.qty, 0);
+  const deliveryFee = orderType === "delivery" ? DELIVERY_ESTIMATE_MAX : 0;
+  const total = subtotal + deliveryFee;
   const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
+  const cashPaymentSuggestions = buildCashPaymentSuggestions(total);
+  const normalizedCashAmount = Number(cashAmount.replace(/\D/g, ""));
+  const hasValidPayment =
+    paymentMethod === "transfer"
+    || (paymentMethod === "cash"
+      && (cashPaymentType === "exact" || normalizedCashAmount >= total));
 
   function renderMenuTabButton(tab: (typeof menuTabs)[number]) {
     const isActive = activeMenuTab === tab.id;
@@ -461,46 +613,55 @@ export function MenuPage() {
 
   function sendOrderToWhatsApp() {
     const lines = ["Quiero hacer un pedido:"];
+    lines.push(`Nombre: *${orderName.trim()}*`);
     lines.push(`Tipo: ${orderType === "delivery" ? "*Delivery*" : "*Retiro en local*"}`);
     if (orderType === "delivery") {
-      lines.push(`Direccion: *${address}*`);
-      lines.push("_Falta agregar el valor del envio/delivery_");
+      lines.push(`Dirección: *${address}*`);
+      lines.push(
+        `Delivery estimado: *$${formatPrice(DELIVERY_ESTIMATE_MIN)} a $${formatPrice(DELIVERY_ESTIMATE_MAX)}*`
+      );
+    }
+    lines.push(`Pago: *${paymentMethod === "transfer" ? "Transferencia" : "Efectivo"}*`);
+    if (paymentMethod === "cash") {
+      lines.push(
+        cashPaymentType === "exact"
+          ? "Efectivo: *justo*"
+          : `Paga con: *$${formatPrice(normalizedCashAmount)}*`
+      );
+    }
+
+    if (cart.length) {
+      lines.push("");
     }
 
     cart.forEach((cartItem) => {
-      lines.push(`- ${cartItem.item.title} x *${cartItem.qty}* -- $${formatPrice(cartItem.item.price * cartItem.qty)}`);
-      if (cartItem.unitSelections?.length) {
-        cartItem.unitSelections.forEach((selection, index) => {
-          lines.push(`  Combo ${index + 1}:`);
-          Object.entries(selection).forEach(([key, value]) => {
-            const label = key === "bebida" ? "Bebida" : key === "salsa" ? "Salsa" : key;
-            lines.push(`  - ${label}: ${value}`);
-          });
-          if (cartItem.unitRemovals?.[index]?.length) {
-            lines.push(`  - Sin: ${cartItem.unitRemovals[index].join(", ")}`);
-          }
-        });
-      } else if (cartItem.item.category === "hamburguesas" && cartItem.unitRemovals?.length) {
-        cartItem.unitRemovals.forEach((removals, index) => {
-          if (removals.length) {
-            lines.push(`  Hamburguesa ${index + 1} sin: ${removals.join(", ")}`);
-          }
-        });
-      } else {
-        Object.entries(cartItem.selections).forEach(([key, value]) => {
-          const label = key === "bebida" ? "Bebida" : key === "salsa" ? "Salsa" : key;
-          lines.push(`  ${label}: ${value}`);
-        });
-        if (cartItem.removals?.length) {
-          lines.push(`  Sin: ${cartItem.removals.join(", ")}`);
-        }
+      lines.push(
+        `*${cartItem.item.title} x${cartItem.qty}* — $${formatPrice(cartItem.item.price * cartItem.qty)}`
+      );
+
+      buildSelectionLines(cartItem).forEach((line) => lines.push(line));
+
+      const removalLines = buildGroupedRemovalLines(cartItem);
+      if (removalLines.length) {
+        lines.push("*Modificaciones:*");
+        removalLines.forEach((line) => lines.push(line));
       }
+
+      lines.push("");
     });
 
+    if (lines[lines.length - 1] === "") {
+      lines.pop();
+    }
+
+    lines.push("");
+    lines.push(`Subtotal: *$${formatPrice(subtotal)}*`);
+    if (orderType === "delivery") {
+      lines.push(`Delivery agregado: *$${formatPrice(deliveryFee)}*`);
+    }
     lines.push(`Total: *$${formatPrice(total)}*`);
     const message = lines.join("\n");
-    const phone = "56945568889";
-    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, "_blank");
+    window.open(`https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`, "_blank");
   }
 
   return (
@@ -718,9 +879,9 @@ export function MenuPage() {
       ) : null}
 
       {selectedItem ? (
-        <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center">
+        <div className="fixed inset-0 z-[60] flex min-h-[100dvh] items-end justify-center sm:items-center">
           <div className="absolute inset-0 bg-black/50" onClick={closeProductModal} />
-          <div className="relative flex max-h-[92vh] w-full max-w-lg flex-col rounded-t-3xl bg-white p-5 shadow-2xl sm:rounded-3xl">
+          <div className="relative flex max-h-[calc(100dvh-1rem)] w-full max-w-lg flex-col rounded-t-3xl bg-white p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-2xl sm:max-h-[92vh] sm:rounded-3xl sm:pb-5">
             <button
               type="button"
               onClick={closeProductModal}
@@ -1044,9 +1205,9 @@ export function MenuPage() {
       ) : null}
 
       {isCartOpen ? (
-        <div className="fixed inset-0 z-50 flex items-end justify-center">
+        <div className="fixed inset-0 z-50 flex min-h-[100dvh] items-end justify-center">
           <div className="absolute inset-0 bg-black/50" onClick={() => setIsCartOpen(false)} />
-          <div className="relative w-full max-w-md rounded-t-3xl bg-white p-4 shadow-2xl">
+          <div className="relative max-h-[calc(100dvh-1rem)] w-full max-w-md overflow-y-auto rounded-t-3xl bg-white p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-2xl">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-semibold text-slate-900">Tu carrito</h3>
@@ -1137,7 +1298,20 @@ export function MenuPage() {
             </div>
 
             <div className="mt-4 border-t pt-4">
-              <div className="text-sm font-medium text-slate-900">¿Como quieres tu pedido?</div>
+              <div>
+                <label className="text-xs font-medium text-slate-600">Nombre del pedido</label>
+                <input
+                  value={orderName}
+                  onChange={(e) => setOrderName(e.target.value)}
+                  placeholder="Nombre de quien pide"
+                  className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
+                />
+                {orderName.trim() === "" ? (
+                  <div className="mt-1 text-xs text-red-600">Debes ingresar un nombre para el pedido.</div>
+                ) : null}
+              </div>
+
+              <div className="mt-4 text-sm font-medium text-slate-900">¿Como quieres tu pedido?</div>
               <div className="mt-2 flex items-center gap-4">
                 <label className="inline-flex items-center gap-2 text-sm">
                   <input
@@ -1172,19 +1346,135 @@ export function MenuPage() {
                     placeholder="Calle, numero, referencia"
                     className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
                   />
+                  <p className="mt-1 text-xs text-slate-500">
+                    Delivery estimado entre ${formatPrice(DELIVERY_ESTIMATE_MIN)} y ${formatPrice(DELIVERY_ESTIMATE_MAX)}.
+                    Se agregan ${formatPrice(DELIVERY_ESTIMATE_MAX)} al total.
+                  </p>
                 </div>
+              ) : null}
+
+              <div className="mt-4 text-sm font-medium text-slate-900">¿Como cancelas el pedido?</div>
+              <div className="mt-2 flex items-center gap-4">
+                <label className="inline-flex items-center gap-2 text-sm">
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="transfer"
+                    checked={paymentMethod === "transfer"}
+                    onChange={() => setPaymentMethod("transfer")}
+                    className="h-4 w-4"
+                  />
+                  <span>Transferencia</span>
+                </label>
+                <label className="inline-flex items-center gap-2 text-sm">
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="cash"
+                    checked={paymentMethod === "cash"}
+                    onChange={() => setPaymentMethod("cash")}
+                    className="h-4 w-4"
+                  />
+                  <span>Efectivo</span>
+                </label>
+              </div>
+
+              {paymentMethod === "cash" ? (
+                <div className="mt-3 rounded-2xl bg-slate-50 p-3">
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCashPaymentType("exact");
+                        setCashAmount("");
+                        setShowAdvancedCashPayment(false);
+                      }}
+                      className={`rounded-full px-3 py-2 text-sm font-medium transition ${
+                        cashPaymentType === "exact" ? "bg-red-700 text-white" : "bg-white text-slate-700 ring-1 ring-slate-200"
+                      }`}
+                    >
+                      Efectivo justo
+                    </button>
+                    {cashPaymentSuggestions.map((amount) => (
+                      <button
+                        key={amount}
+                        type="button"
+                        onClick={() => {
+                          setCashPaymentType("amount");
+                          setCashAmount(String(amount));
+                          setShowAdvancedCashPayment(false);
+                        }}
+                        className={`rounded-full px-3 py-2 text-sm font-medium transition ${
+                          cashPaymentType === "amount" && normalizedCashAmount === amount
+                            ? "bg-red-700 text-white"
+                            : "bg-white text-slate-700 ring-1 ring-slate-200"
+                        }`}
+                      >
+                        ${formatPrice(amount)}
+                      </button>
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowAdvancedCashPayment((isVisible) => !isVisible);
+                      setCashPaymentType("amount");
+                    }}
+                    className="mt-3 rounded-full bg-white px-3 py-2 text-sm font-medium text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-100"
+                  >
+                    Avanzado
+                  </button>
+                  {showAdvancedCashPayment ? (
+                    <input
+                      value={cashAmount}
+                      onChange={(e) => {
+                        setCashPaymentType("amount");
+                        setCashAmount(e.target.value);
+                      }}
+                      inputMode="numeric"
+                      placeholder={`Ej: ${formatPrice(cashPaymentSuggestions[0] ?? total)}`}
+                      className="mt-2 w-full rounded-md border px-3 py-2 text-sm"
+                    />
+                  ) : null}
+                  {cashPaymentType === "amount" && normalizedCashAmount < total ? (
+                    <div className="mt-1 text-xs text-red-600">
+                      El monto debe ser igual o mayor al total.
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
+
+              {paymentMethod === "" ? (
+                <div className="mt-1 text-xs text-red-600">Debes elegir un metodo de pago.</div>
               ) : null}
             </div>
 
-            <div className="mt-4 flex items-center justify-between">
-              <div className="text-sm text-slate-700">Total</div>
-              <div className="text-lg font-bold text-slate-900">${formatPrice(total)}</div>
+            <div className="mt-4 space-y-1 border-t pt-3">
+              <div className="flex items-center justify-between text-sm text-slate-700">
+                <span>Subtotal</span>
+                <span>${formatPrice(subtotal)}</span>
+              </div>
+              {orderType === "delivery" ? (
+                <div className="flex items-center justify-between text-sm text-slate-700">
+                  <span>Delivery</span>
+                  <span>+ ${formatPrice(deliveryFee)}</span>
+                </div>
+              ) : null}
+              <div className="flex items-center justify-between pt-1">
+                <div className="text-sm font-semibold text-slate-900">Total</div>
+                <div className="text-lg font-bold text-slate-900">${formatPrice(total)}</div>
+              </div>
             </div>
 
             <div className="mt-4">
               <button
                 type="button"
-                disabled={cart.length === 0 || (orderType === "delivery" && address.trim() === "")}
+                disabled={
+                  cart.length === 0
+                  || orderName.trim() === ""
+                  || !hasValidPayment
+                  || (orderType === "delivery" && address.trim() === "")
+                }
                 onClick={sendOrderToWhatsApp}
                 className="w-full rounded-full bg-green-600 px-4 py-3 text-white disabled:opacity-50"
               >

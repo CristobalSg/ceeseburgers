@@ -25,8 +25,9 @@ import chickFillAImage from "../../../img/salsas/chick-fill-a.webp";
 import { parsePrice } from "./menuUtils";
 import type { MenuItem, MenuTab, MenuOptionGroup } from "./menuUtils";
 
-export const comboDrinkOptions = ["Sprite", "Coca-Cola", "Fanta"];
+export const comboDrinkOptions = ["Sprite", "Coca-Cola", "Fanta", "Sin bebida"];
 export const friesSauceOptions = ["Mayonesa", "Ketchup", "Mostaza", "BBQ", "Chick Fill A"];
+export const comboFriesSauceOptions = [...friesSauceOptions, "Sin salsa"];
 
 function createOptionGroup(id: string, label: string, choices: string[]): MenuOptionGroup {
   return { id, label, choices };
@@ -52,7 +53,7 @@ export const individualCombos: MenuItem[] = [
     removableIngredients: ["Salsa", "Tomate", "Lechuga", "Queso"],
     options: [
       createOptionGroup("bebida", "Sabor de bebida", comboDrinkOptions),
-      createOptionGroup("salsa", "Salsa para las papas", friesSauceOptions),
+      createOptionGroup("salsa", "Salsa para las papas", comboFriesSauceOptions),
     ],
   },
   {
@@ -67,7 +68,7 @@ export const individualCombos: MenuItem[] = [
     removableIngredients: ["Salsa", "Tocino", "Queso", "Cebolla caramelizada"],
     options: [
       createOptionGroup("bebida", "Sabor de bebida", comboDrinkOptions),
-      createOptionGroup("salsa", "Salsa para las papas", friesSauceOptions),
+      createOptionGroup("salsa", "Salsa para las papas", comboFriesSauceOptions),
     ],
   },
   {
@@ -81,7 +82,7 @@ export const individualCombos: MenuItem[] = [
     removableIngredients: ["Mayonesa", "Palta", "Tomate", "Queso"],
     options: [
       createOptionGroup("bebida", "Sabor de bebida", comboDrinkOptions),
-      createOptionGroup("salsa", "Salsa para las papas", friesSauceOptions),
+      createOptionGroup("salsa", "Salsa para las papas", comboFriesSauceOptions),
     ],
   },
   {
@@ -95,7 +96,7 @@ export const individualCombos: MenuItem[] = [
     removableIngredients: ["Salsa BBQ", "Huevo frito", "Tocino", "Queso cheddar", "Cebolla caramelizada"],
     options: [
       createOptionGroup("bebida", "Sabor de bebida", comboDrinkOptions),
-      createOptionGroup("salsa", "Salsa para las papas", friesSauceOptions),
+      createOptionGroup("salsa", "Salsa para las papas", comboFriesSauceOptions),
     ],
   },
   {
@@ -109,7 +110,7 @@ export const individualCombos: MenuItem[] = [
     removableIngredients: ["Mayonesa", "Tocino", "Lechuga", "Tomate", "Cebolla morada", "Queso cheddar"],
     options: [
       createOptionGroup("bebida", "Sabor de bebida", comboDrinkOptions),
-      createOptionGroup("salsa", "Salsa para las papas", friesSauceOptions),
+      createOptionGroup("salsa", "Salsa para las papas", comboFriesSauceOptions),
     ],
   },
 ];
