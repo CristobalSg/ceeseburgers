@@ -25,6 +25,7 @@ export type MenuItem = {
   favorite?: boolean;
   options?: MenuOptionGroup[];
   removableIngredients?: string[];
+  removalUnitLabels?: string[];
 };
 
 export type CartItem = {
@@ -57,5 +58,5 @@ export function buildCartSignature(itemId: string, selections: Record<string, st
 }
 
 export function usesPerUnitRemovals(item: MenuItem) {
-  return item.category === "combo-individual" || item.category === "hamburguesas";
+  return item.category === "combo-individual" || item.category === "hamburguesas" || item.category === "combo-familiar";
 }

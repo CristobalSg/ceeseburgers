@@ -1,6 +1,6 @@
 import { ShoppingCartIcon, StarIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import { useEffect, useState } from "react";
-import { getBurgerItems, sideItems as menuSideItems, sauceItems as menuSauceItems, menuTabs, individualCombos, familyCombos, paperoCombos } from "./menuData";
+import { getBurgerItems, sideItems as menuSideItems, sauceItems as menuSauceItems, menuTabs, newCombos, individualCombos, familyCombos, paperoCombos } from "./menuData";
 import { formatPrice, buildCartSignature, usesPerUnitRemovals } from "./menuUtils";
 
 import type { MenuItem, MenuTab, CartItem, ProductModalStep } from "./menuUtils";
@@ -94,8 +94,36 @@ function buildSelectionLines(cartItem: CartItem) {
   return buildGroupedSelectionLines(repeatedSelections, cartItem.qty);
 }
 
+function getRemovalUnitLabels(item: MenuItem, qty: number) {
+  if (item.removalUnitLabels?.length) {
+    return Array.from({ length: qty }).flatMap((_, comboIndex) =>
+      item.removalUnitLabels!.map((label) =>
+        qty > 1 ? `Combo ${comboIndex + 1} - ${label}` : label
+      )
+    );
+  }
+
+  const unitLabel =
+    item.category === "combo-individual"
+      ? "Combo"
+      : item.category === "hamburguesas"
+        ? "Hamburguesa"
+        : "Unidad";
+
+  return Array.from({ length: qty }, (_, index) => `${unitLabel} ${index + 1}`);
+}
+
 function buildGroupedRemovalLines(cartItem: CartItem) {
   if (cartItem.unitRemovals?.length) {
+    if (cartItem.item.removalUnitLabels?.length) {
+      const labels = getRemovalUnitLabels(cartItem.item, cartItem.qty);
+      return cartItem.unitRemovals.flatMap((removals, index) =>
+        removals.length
+          ? [`* ${labels[index] ?? `Hamburguesa ${index + 1}`} sin ${formatIngredientList(removals)}`]
+          : []
+      );
+    }
+
     const groupedRemovals = new Map<string, { count: number; removals: string[] }>();
 
     cartItem.unitRemovals.forEach((removals) => {
@@ -248,7 +276,7 @@ export function MenuPage() {
     setSelectedOptions(defaults);
     setSelectedUnitOptions(item.category === "combo-individual" ? [defaults] : []);
     setSelectedRemovals([]);
-    setSelectedUnitRemovals(usesPerUnitRemovals(item) ? [[]] : []);
+    setSelectedUnitRemovals(usesPerUnitRemovals(item) ? getRemovalUnitLabels(item, 1).map(() => []) : []);
     setEditingCartItemId(null);
     setProductModalStep("quantity");
     setActiveComboOptionIndex(0);
@@ -264,7 +292,7 @@ export function MenuPage() {
     setSelectedUnitOptions(cartItem.unitSelections ?? Array.from({ length: cartItem.qty }, () => ({ ...defaults })));
     setSelectedRemovals(cartItem.removals ?? []);
     setSelectedUnitRemovals(
-      cartItem.unitRemovals ?? (usesPerUnitRemovals(cartItem.item) ? Array.from({ length: cartItem.qty }, () => []) : [])
+      cartItem.unitRemovals ?? (usesPerUnitRemovals(cartItem.item) ? getRemovalUnitLabels(cartItem.item, cartItem.qty).map(() => []) : [])
     );
     setEditingCartItemId(cartItem.id);
     setProductModalStep("quantity");
@@ -299,8 +327,9 @@ export function MenuPage() {
     }
 
     if (usesPerUnitRemovals(selectedItem)) {
+      const nextRemovalCount = getRemovalUnitLabels(selectedItem, nextQty).length;
       setSelectedUnitRemovals((prev) =>
-        Array.from({ length: nextQty }, (_, index) => prev[index] ?? [])
+        Array.from({ length: nextRemovalCount }, (_, index) => prev[index] ?? [])
       );
     }
   }
@@ -315,13 +344,14 @@ export function MenuPage() {
     const normalizedRemovals =
       perUnitRemovalsEnabled ? [] : selectedRemovals;
     const normalizedUnitRemovals =
-      perUnitRemovalsEnabled ? selectedUnitRemovals.slice(0, selectedQty) : undefined;
+      perUnitRemovalsEnabled ? selectedUnitRemovals.slice(0, getRemovalUnitLabels(selectedItem, selectedQty).length) : undefined;
+    const removalUnitLabels = getRemovalUnitLabels(selectedItem, selectedQty);
     const signature = buildCartSignature(
       selectedItem.id,
-      selectedItem.category === "combo-individual" || selectedItem.category === "hamburguesas"
+      perUnitRemovalsEnabled
         ? Object.fromEntries(
-            Array.from({ length: selectedQty }, (_, index) => [
-              `${selectedItem.category === "combo-individual" ? "combo" : "hamb"}-${index + 1}`,
+            Array.from({ length: removalUnitLabels.length }, (_, index) => [
+              `unit-${index + 1}`,
               [
                 ...(selectedItem.category === "combo-individual"
                   ? [
@@ -346,7 +376,20 @@ export function MenuPage() {
         const mergeTarget = withoutEditingItem.find((item) => item.id === signature);
         if (mergeTarget) {
           return withoutEditingItem.map((item) =>
-            item.id === signature ? { ...item, qty: item.qty + selectedQty } : item
+            item.id === signature
+              ? {
+                  ...item,
+                  qty: item.qty + selectedQty,
+                  unitSelections:
+                    item.unitSelections || normalizedUnitSelections
+                      ? [...(item.unitSelections ?? []), ...(normalizedUnitSelections ?? [])]
+                      : undefined,
+                  unitRemovals:
+                    item.unitRemovals || normalizedUnitRemovals
+                      ? [...(item.unitRemovals ?? []), ...(normalizedUnitRemovals ?? [])]
+                      : undefined,
+                }
+              : item
           );
         }
 
@@ -367,7 +410,20 @@ export function MenuPage() {
       const existing = prev.find((item) => item.id === signature);
       if (existing) {
         return prev.map((item) =>
-          item.id === signature ? { ...item, qty: item.qty + selectedQty } : item
+          item.id === signature
+            ? {
+                ...item,
+                qty: item.qty + selectedQty,
+                unitSelections:
+                  item.unitSelections || normalizedUnitSelections
+                    ? [...(item.unitSelections ?? []), ...(normalizedUnitSelections ?? [])]
+                    : undefined,
+                unitRemovals:
+                  item.unitRemovals || normalizedUnitRemovals
+                    ? [...(item.unitRemovals ?? []), ...(normalizedUnitRemovals ?? [])]
+                    : undefined,
+              }
+            : item
         );
       }
 
@@ -411,26 +467,28 @@ export function MenuPage() {
                 ]
               : item.unitSelections.slice(0, nextQty);
           const fallbackRemovals = item.unitRemovals?.[item.unitRemovals.length - 1] ?? [];
+          const nextRemovalCount = getRemovalUnitLabels(item.item, nextQty).length;
           const nextUnitRemovals =
-            nextQty > (item.unitRemovals?.length ?? 0)
+            nextRemovalCount > (item.unitRemovals?.length ?? 0)
               ? [
                   ...(item.unitRemovals ?? []),
-                  ...Array.from({ length: nextQty - (item.unitRemovals?.length ?? 0) }, () => [...fallbackRemovals]),
+                  ...Array.from({ length: nextRemovalCount - (item.unitRemovals?.length ?? 0) }, () => [...fallbackRemovals]),
                 ]
-              : item.unitRemovals?.slice(0, nextQty);
+              : item.unitRemovals?.slice(0, nextRemovalCount);
 
           return { ...item, qty: nextQty, unitSelections: nextUnitSelections, unitRemovals: nextUnitRemovals };
         }
 
         if (item.unitRemovals?.length) {
-          const fallbackRemovals = item.unitRemovals[item.unitRemovals.length - 1] ?? [];
+          const nextRemovalCount = getRemovalUnitLabels(item.item, nextQty).length;
+          const fallbackRemovals = item.item.removalUnitLabels?.length ? [] : item.unitRemovals[item.unitRemovals.length - 1] ?? [];
           const nextUnitRemovals =
-            nextQty > item.unitRemovals.length
+            nextRemovalCount > item.unitRemovals.length
               ? [
                   ...item.unitRemovals,
-                  ...Array.from({ length: nextQty - item.unitRemovals.length }, () => [...fallbackRemovals]),
+                  ...Array.from({ length: nextRemovalCount - item.unitRemovals.length }, () => [...fallbackRemovals]),
                 ]
-              : item.unitRemovals.slice(0, nextQty);
+              : item.unitRemovals.slice(0, nextRemovalCount);
 
           return { ...item, qty: nextQty, unitRemovals: nextUnitRemovals };
         }
@@ -467,13 +525,13 @@ export function MenuPage() {
     ));
   }
 
-  function renderUnitRemovals(unitRemovals: string[][] | undefined, label: string) {
+  function renderUnitRemovals(unitRemovals: string[][] | undefined, label: string, labels?: string[]) {
     if (!unitRemovals?.length) return null;
 
     return unitRemovals.map((removals, index) =>
       removals.length ? (
         <div key={`${label}-removals-${index}`} className="text-xs text-slate-500">
-          {label} {index + 1} sin: {removals.join(", ")}
+          {labels?.[index] ?? `${label} ${index + 1}`} sin: {removals.join(", ")}
         </div>
       ) : null
     );
@@ -671,6 +729,43 @@ export function MenuPage() {
         <h3 className="text-2xl font-bold text-slate-900">Todos nuestros productos</h3>
         <p className="text-sm text-slate-600">Presiona cualquier producto para configurarlo y agregarlo al carrito.</p>
       </div>
+
+      <section className="-mx-3 space-y-3 border-y border-amber-200 bg-amber-50 px-3 py-4">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h4 className="text-lg font-black uppercase tracking-wide text-slate-950">Nuevas</h4>
+            <p className="text-xs font-semibold text-amber-900">Combos Smoke Criminal</p>
+          </div>
+          <span className="rounded-full bg-red-700 px-3 py-1 text-xs font-black uppercase tracking-wide text-white shadow-sm">
+            Lanzamiento
+          </span>
+        </div>
+        <div className="overflow-x-auto pb-1">
+          <div className="flex gap-3 snap-x snap-mandatory">
+            {newCombos.map((combo) => (
+              <div key={combo.id} className="flex min-w-[190px] flex-col items-start">
+                <button
+                  type="button"
+                  onClick={() => openProductModal(combo)}
+                  className="relative w-full aspect-square snap-start overflow-hidden rounded-xl border-2 border-red-700 bg-white shadow-lg shadow-red-950/10 transition hover:scale-105"
+                >
+                  <img src={combo.image} alt={combo.imageAlt} className="h-full w-full object-cover" />
+                  <span className="absolute left-2 top-2 rounded-full bg-slate-950 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-white">
+                    Nuevo
+                  </span>
+                </button>
+                <div className="mt-1.5 w-full">
+                  <div className="flex items-center gap-1 text-base font-black text-slate-950">
+                    {combo.title}
+                  </div>
+                  <div className="text-[12px] font-medium leading-tight text-slate-700">{combo.description}</div>
+                  <div className="mt-1 text-lg font-black text-red-700">${formatPrice(combo.price)}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       <section className="space-y-2">
         <div className="flex items-center justify-between">
@@ -1130,6 +1225,42 @@ export function MenuPage() {
                   </div>
                 ) : null}
 
+                {productModalStep === "removals" && selectedItem.category === "combo-familiar" && selectedItem.removableIngredients?.length ? (
+                  <div className="col-span-full max-h-72 space-y-3 overflow-y-auto pr-1">
+                    {getRemovalUnitLabels(selectedItem, selectedQty).map((label, burgerIndex) => (
+                      <div key={`family-removals-${burgerIndex + 1}`} className="rounded-2xl border border-slate-200 p-3">
+                        <div className="mb-2 text-sm font-semibold text-slate-900">{label}</div>
+                        <div className="space-y-2">
+                          <div className="text-sm font-medium text-slate-800">Quitar ingredientes</div>
+                          <div className="flex flex-wrap gap-2">
+                            {(selectedItem.removableIngredients ?? []).map((ingredient) => (
+                              <button
+                                key={`${ingredient}-${burgerIndex}`}
+                                type="button"
+                                onClick={() =>
+                                  setSelectedUnitRemovals((prev) =>
+                                    prev.map((removals, index) =>
+                                      index === burgerIndex ? toggleRemoval(removals, ingredient) : removals
+                                    )
+                                  )
+                                }
+                                className={`inline-flex items-center gap-1 rounded-full px-3 py-2 text-sm font-medium transition ${
+                                  selectedUnitRemovals[burgerIndex]?.includes(ingredient)
+                                    ? "bg-slate-900 text-white"
+                                    : "bg-slate-100 text-slate-700"
+                                }`}
+                              >
+                                <XMarkIcon className="h-3.5 w-3.5" />
+                                Sin {ingredient}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+
                 {productModalStep === "options" && selectedItem.category !== "combo-individual" ? (
                   <div className="col-span-full space-y-4">
                     {(selectedItem.options ?? []).map((group) => (
@@ -1159,7 +1290,8 @@ export function MenuPage() {
 
                 {productModalStep === "removals"
                   && selectedItem.category !== "combo-individual"
-                  && selectedItem.category !== "hamburguesas" ? (
+                  && selectedItem.category !== "hamburguesas"
+                  && selectedItem.category !== "combo-familiar" ? (
                   <div className="col-span-full">
                   {selectedItem.removableIngredients?.length ? (
                     <div className="space-y-2">
@@ -1264,8 +1396,12 @@ export function MenuPage() {
                               : renderSelections(cartItem.selections)}
                             {cartItem.unitSelections?.length
                               ? renderUnitRemovals(cartItem.unitRemovals, "Combo")
-                              : cartItem.item.category === "hamburguesas" && cartItem.unitRemovals?.length
-                                ? renderUnitRemovals(cartItem.unitRemovals, "Hamburguesa")
+                              : cartItem.unitRemovals?.length
+                                ? renderUnitRemovals(
+                                    cartItem.unitRemovals,
+                                    cartItem.item.category === "hamburguesas" ? "Hamburguesa" : "Unidad",
+                                    cartItem.item.removalUnitLabels ? getRemovalUnitLabels(cartItem.item, cartItem.qty) : undefined
+                                  )
                                 : renderRemovals(cartItem.removals)}
                           </div>
                         </div>
@@ -1283,14 +1419,14 @@ export function MenuPage() {
                                 ? renderUnitSelections(cartItem.unitSelections)
                                 : renderSelections(cartItem.selections)}
                               {cartItem.unitSelections?.length
-                                ? cartItem.unitRemovals?.map((removals, index) =>
-                                    removals.length ? (
-                                      <div key={`unit-removals-${index}`} className="text-xs text-slate-500">
-                                        Combo {index + 1} sin: {removals.join(", ")}
-                                      </div>
-                                    ) : null
-                                  )
-                                : renderRemovals(cartItem.removals)}
+                                ? renderUnitRemovals(cartItem.unitRemovals, "Combo")
+                                : cartItem.unitRemovals?.length
+                                  ? renderUnitRemovals(
+                                      cartItem.unitRemovals,
+                                      cartItem.item.category === "hamburguesas" ? "Hamburguesa" : "Unidad",
+                                      cartItem.item.removalUnitLabels ? getRemovalUnitLabels(cartItem.item, cartItem.qty) : undefined
+                                    )
+                                  : renderRemovals(cartItem.removals)}
                             </div>
                           </div>
                         </div>

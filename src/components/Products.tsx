@@ -4,6 +4,8 @@ import csRompeImage from "../../img/cs-rompedieta-prod.webp";
 import csClasicaImage from "../../img/cs-clasica-prod.webp";
 import csItalianaImage from "../../img/cs-italiana-prod.webp";
 import csNuevaImage from "../../img/cs-nueva-prod.webp";
+import smokeCriminalImage from "../../img/hamb-solas/smoke-criminal.webp";
+import smokeCriminalXlImage from "../../img/hamb-solas/smoke-criminal-xl.webp";
 
 export type Product = {
   name: string;
@@ -89,6 +91,26 @@ export const products: Product[] = [
     slug: "cs-nueva",
     image: csNuevaImage,
     imageAlt: "Hamburguesa Rompedieta I",
+  },
+  {
+    name: "Cs-Smoke Criminal",
+    price: "$2.490",
+    description: "Pan, carne, cheddar, tocino, cebolla crispy, BBQ y mayo.",
+    spec: "Sabor ahumado · cargada de cheddar",
+    tag: "Ahumada",
+    slug: "smoke-criminal",
+    image: smokeCriminalImage,
+    imageAlt: "Hamburguesa Smoke Criminal con tocino, cheddar y salsa BBQ",
+  },
+  {
+    name: "Cs-Smoke Criminal XL",
+    price: "$4.690",
+    description: "Pan brioche, doble carne, triple cheddar, doble tocino, cebolla crispy, BBQ y mayo.",
+    spec: "Formato XL · mas contundente",
+    tag: "XL",
+    slug: "smoke-criminal-xl",
+    image: smokeCriminalXlImage,
+    imageAlt: "Hamburguesa Smoke Criminal XL con tocino, cheddar y salsa BBQ",
   },
 ];
 

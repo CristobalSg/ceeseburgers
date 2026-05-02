@@ -7,7 +7,8 @@ import comboBaconIndividualImg from "../../../img/combos-individual/bacon.webp";
 import comboItalianaIndividualImg from "../../../img/combos-individual/italiana.webp";
 import comboRompedietaUnoIndividualImg from "../../../img/combos-individual/rompedieta-uno.webp";
 import comboRompedietaDosIndividualImg from "../../../img/combos-individual/rompedieta-dos.webp";
-import comboSmokeCriminalIndividualImg from "../../../img/combos-individual/Smoke-Criminal.webp";
+import comboSmokeCriminalIndividualImg from "../../../img/combos-individual/combo-smoke-criminal.webp";
+import comboSmokeCriminalXlIndividualImg from "../../../img/combos-individual/combo-smoke-criminal-xl.webp";
 import comboPaperoBaconImg from "../../../img/Combos-paperos/combo-papero-bacon.webp";
 import comboPaperoClasicaImg from "../../../img/Combos-paperos/combo-papero-clasica.webp";
 import comboPaperoItalianaImg from "../../../img/Combos-paperos/combo-papero-italiana.webp";
@@ -16,6 +17,8 @@ import hambClasicaImg from "../../../img/hamb-solas/clasica.webp";
 import hambItalianaImg from "../../../img/hamb-solas/italiana.webp";
 import hambRompedietaUnoImg from "../../../img/hamb-solas/rompedieta-uno.webp";
 import hambRompedietaDosImg from "../../../img/hamb-solas/rompedieta-dos.webp";
+import hambSmokeCriminalImg from "../../../img/hamb-solas/smoke-criminal.webp";
+import hambSmokeCriminalXlImg from "../../../img/hamb-solas/smoke-criminal-xl.webp";
 import friesImage from "../../../img/acompaniamiento/papas.webp";
 import drinkImage from "../../../img/acompaniamiento/bebidas.webp";
 import nuggetsX5Image from "../../../img/acompaniamiento/nuggets-x5.webp";
@@ -42,7 +45,40 @@ const burgerImagesBySlug: Partial<Record<string, string>> = {
   "cs-italiana": hambItalianaImg,
   "cs-nueva": hambRompedietaUnoImg,
   "cs-romp-ii": hambRompedietaDosImg,
+  "smoke-criminal": hambSmokeCriminalImg,
+  "smoke-criminal-xl": hambSmokeCriminalXlImg,
 };
+
+export const newCombos: MenuItem[] = [
+  {
+    id: "combo-smoke-criminal",
+    title: "Combo Smoke Criminal",
+    description: "Hamburguesa Smoke Criminal + papitas + bebida + salsa",
+    price: 4690,
+    image: comboSmokeCriminalIndividualImg,
+    imageAlt: "Combo Smoke Criminal",
+    category: "combo-individual",
+    removableIngredients: ["BBQ", "Mayo", "Tocino", "Cheddar", "Cebolla crispy"],
+    options: [
+      createOptionGroup("bebida", "Sabor de bebida", comboDrinkOptions),
+      createOptionGroup("salsa", "Salsa para las papas", comboFriesSauceOptions),
+    ],
+  },
+  {
+    id: "combo-smoke-criminal-xl",
+    title: "Combo Smoke Criminal XL",
+    description: "Hamburguesa Smoke Criminal XL + papitas + bebida + salsa",
+    price: 6990,
+    image: comboSmokeCriminalXlIndividualImg,
+    imageAlt: "Combo Smoke Criminal XL",
+    category: "combo-individual",
+    removableIngredients: ["BBQ", "Mayo", "Doble tocino", "Triple cheddar", "Cebolla crispy"],
+    options: [
+      createOptionGroup("bebida", "Sabor de bebida", comboDrinkOptions),
+      createOptionGroup("salsa", "Salsa para las papas", comboFriesSauceOptions),
+    ],
+  },
+];
 
 export const individualCombos: MenuItem[] = [
   {
@@ -89,20 +125,6 @@ export const individualCombos: MenuItem[] = [
     ],
   },
   {
-    id: "combo-smoke-criminal",
-    title: "Combo Smoke Criminal",
-    description: "Hamburguesa Smoke Criminal + papitas + bebida + salsa",
-    price: 5590,
-    image: comboSmokeCriminalIndividualImg,
-    imageAlt: "Combo Smoke Criminal",
-    category: "combo-individual",
-    removableIngredients: ["Salsa BBQ", "Tocino", "Queso cheddar", "Cebolla caramelizada"],
-    options: [
-      createOptionGroup("bebida", "Sabor de bebida", comboDrinkOptions),
-      createOptionGroup("salsa", "Salsa para las papas", comboFriesSauceOptions),
-    ],
-  },
-  {
     id: "combo-rompedieta-ii",
     title: "Combo Rompedieta II",
     description: "Hamburguesa Rompedieta II + papitas + bebida + salsa",
@@ -142,6 +164,8 @@ export const familyCombos: MenuItem[] = [
     imageAlt: "Combo familiar clasico",
     category: "combo-familiar",
     favorite: true,
+    removableIngredients: ["Salsa", "Tomate", "Lechuga", "Queso", "Tocino", "Cebolla caramelizada"],
+    removalUnitLabels: ["Clasica 1", "Clasica 2", "Clasica 3", "Bacon 1", "Bacon 2"],
   },
   {
     id: "combo-full-bacon",
@@ -151,6 +175,8 @@ export const familyCombos: MenuItem[] = [
     image: comboBaconLoversImg,
     imageAlt: "Combo familiar bacon",
     category: "combo-familiar",
+    removableIngredients: ["Salsa", "Tocino", "Queso", "Cebolla caramelizada"],
+    removalUnitLabels: ["Bacon 1", "Bacon 2", "Bacon 3", "Bacon 4", "Bacon 5"],
   },
   {
     id: "combo-full-clasicas",
@@ -160,6 +186,8 @@ export const familyCombos: MenuItem[] = [
     image: comboClasicasFullImg,
     imageAlt: "Combo full clasicas",
     category: "combo-familiar",
+    removableIngredients: ["Salsa", "Tomate", "Lechuga", "Queso"],
+    removalUnitLabels: ["Clasica 1", "Clasica 2", "Clasica 3", "Clasica 4", "Clasica 5"],
   },
 ];
 
@@ -216,6 +244,10 @@ export function getBurgerItems(): MenuItem[] {
         ? ["Tocino", "Salsa BBQ", "Cebolla caramelizada", "Queso cheddar"]
         : product.slug === "cs-romp-ii"
         ? ["Huevo frito", "Tocino", "Cebolla caramelizada", "Salsa BBQ", "Queso cheddar"]
+        : product.slug === "smoke-criminal"
+        ? ["BBQ", "Mayo", "Tocino", "Cheddar", "Cebolla crispy"]
+        : product.slug === "smoke-criminal-xl"
+        ? ["BBQ", "Mayo", "Doble tocino", "Triple cheddar", "Cebolla crispy"]
         : product.slug === "cs-clasica"
         ? ["Tomate", "Lechuga", "Aderezo", "Queso cheddar"]
         : product.slug === "cs-italiana"
