@@ -12,6 +12,7 @@ import comboSmokeCriminalXlIndividualImg from "../../../img/combos-individual/co
 import comboPaperoBaconImg from "../../../img/Combos-paperos/combo-papero-bacon.webp";
 import comboPaperoClasicaImg from "../../../img/Combos-paperos/combo-papero-clasica.webp";
 import comboPaperoItalianaImg from "../../../img/Combos-paperos/combo-papero-italiana.webp";
+import smokeCriminalOfferImg from "../../../img/ofertar/smoke-criminal-oferta.webp";
 import hambBaconImg from "../../../img/hamb-solas/bacon.webp";
 import hambClasicaImg from "../../../img/hamb-solas/clasica.webp";
 import hambItalianaImg from "../../../img/hamb-solas/italiana.webp";
@@ -48,6 +49,21 @@ const burgerImagesBySlug: Partial<Record<string, string>> = {
   "smoke-criminal": hambSmokeCriminalImg,
   "smoke-criminal-xl": hambSmokeCriminalXlImg,
 };
+
+export const offerItems: MenuItem[] = [
+  {
+    id: "oferta-smoke-criminal-2x",
+    title: "Oferta Smoke Criminal 2x",
+    description: "2 Smoke Criminal por precio especial. Solo por hoy, cupos limitados.",
+    price: 8000,
+    image: smokeCriminalOfferImg,
+    imageAlt: "Oferta 2 Smoke Criminal por 8000 pesos",
+    category: "combo-familiar",
+    badge: "Oferta",
+    removableIngredients: ["BBQ", "Mayo", "Tocino", "Cheddar", "Cebolla crispy"],
+    removalUnitLabels: ["Smoke Criminal 1", "Smoke Criminal 2"],
+  },
+];
 
 export const newCombos: MenuItem[] = [
   {

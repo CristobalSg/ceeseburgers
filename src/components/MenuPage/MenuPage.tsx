@@ -1,6 +1,6 @@
 import { ShoppingCartIcon, StarIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import { useEffect, useState } from "react";
-import { getBurgerItems, sideItems as menuSideItems, sauceItems as menuSauceItems, menuTabs, newCombos, individualCombos, familyCombos, paperoCombos } from "./menuData";
+import { getBurgerItems, sideItems as menuSideItems, sauceItems as menuSauceItems, menuTabs, offerItems, newCombos, individualCombos, familyCombos, paperoCombos } from "./menuData";
 import { formatPrice, buildCartSignature, usesPerUnitRemovals } from "./menuUtils";
 
 import type { MenuItem, MenuTab, CartItem, ProductModalStep } from "./menuUtils";
@@ -729,6 +729,44 @@ export function MenuPage() {
         <h3 className="text-2xl font-bold text-slate-900">Todos nuestros productos</h3>
         <p className="text-sm text-slate-600">Presiona cualquier producto para configurarlo y agregarlo al carrito.</p>
       </div>
+
+      <section className="-mx-3 space-y-3 border-y border-red-200 bg-red-50 px-3 py-4">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h4 className="text-lg font-black uppercase tracking-wide text-slate-950">Ofertas</h4>
+            <p className="text-xs font-semibold text-red-900">Precios especiales al inicio del menú</p>
+          </div>
+          <span className="rounded-full bg-slate-950 px-3 py-1 text-xs font-black uppercase tracking-wide text-white shadow-sm">
+            Solo por hoy
+          </span>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {offerItems.map((offer) => (
+            <button
+              key={offer.id}
+              type="button"
+              onClick={() => openProductModal(offer)}
+              className="group overflow-hidden rounded-2xl border-2 border-red-700 bg-white text-left shadow-lg shadow-red-950/10 transition duration-200 hover:-translate-y-0.5 hover:shadow-xl"
+            >
+              <div className="relative aspect-[4/5] overflow-hidden bg-slate-950">
+                <img src={offer.image} alt={offer.imageAlt} className="h-full w-full object-cover transition duration-200 group-hover:scale-[1.015]" />
+                <span className="absolute left-3 top-3 rounded-full bg-amber-400 px-3 py-1 text-[10px] font-black uppercase tracking-wide text-slate-950 shadow-sm">
+                  {offer.badge}
+                </span>
+              </div>
+              <div className="space-y-1 p-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="text-base font-black leading-tight text-slate-950">{offer.title}</div>
+                  <div className="shrink-0 rounded-full bg-red-700 px-2.5 py-1 text-sm font-black text-white">
+                    ${formatPrice(offer.price)}
+                  </div>
+                </div>
+                <p className="text-xs leading-tight text-slate-600">{offer.description}</p>
+              </div>
+            </button>
+          ))}
+        </div>
+      </section>
 
       <section className="-mx-3 space-y-3 border-y border-amber-200 bg-amber-50 px-3 py-4">
         <div className="flex items-center justify-between gap-3">
