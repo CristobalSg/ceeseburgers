@@ -49,6 +49,7 @@ const burgerImagesBySlug: Partial<Record<string, string>> = {
   "smoke-criminal": hambSmokeCriminalImg,
   "smoke-criminal-xl": hambSmokeCriminalXlImg,
 };
+const newBurgerSlugs = new Set(["smoke-criminal", "smoke-criminal-xl"]);
 
 export const offerItems: MenuItem[] = [
   {
@@ -253,7 +254,11 @@ export function getBurgerItems(): MenuItem[] {
     image: burgerImagesBySlug[product.slug] ?? product.image,
     imageAlt: product.imageAlt,
     category: "hamburguesas",
-    badge: product.mostOrdered || product.tag === "Top ventas" ? product.tag : undefined,
+    badge: newBurgerSlugs.has(product.slug)
+      ? "Nuevo"
+      : product.mostOrdered || product.tag === "Top ventas"
+      ? product.tag
+      : undefined,
     favorite: product.mostOrdered,
     removableIngredients:
       product.slug === "cs-bacon"

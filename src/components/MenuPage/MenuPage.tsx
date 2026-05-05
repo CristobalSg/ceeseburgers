@@ -1,6 +1,6 @@
 import { ShoppingCartIcon, StarIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import { useEffect, useState } from "react";
-import { getBurgerItems, sideItems as menuSideItems, sauceItems as menuSauceItems, menuTabs, offerItems, newCombos, individualCombos, familyCombos, paperoCombos } from "./menuData";
+import { getBurgerItems, sideItems as menuSideItems, sauceItems as menuSauceItems, menuTabs, newCombos, individualCombos, familyCombos, paperoCombos } from "./menuData";
 import { formatPrice, buildCartSignature, usesPerUnitRemovals } from "./menuUtils";
 
 import type { MenuItem, MenuTab, CartItem, ProductModalStep } from "./menuUtils";
@@ -9,6 +9,25 @@ const WHATSAPP_PHONE = "56945568889";
 const DELIVERY_ESTIMATE_MIN = 2000;
 const DELIVERY_ESTIMATE_MAX = 2500;
 const CASH_PAYMENT_STEPS = [1000, 2000, 5000, 10000];
+const OPEN_DAYS = new Set([4, 5, 6]);
+const OPEN_HOUR = 17;
+const CLOSE_HOUR_AFTER_MIDNIGHT = 1;
+
+function isBusinessOpen(date = new Date()) {
+  const day = date.getDay();
+  const hour = date.getHours();
+
+  if (OPEN_DAYS.has(day) && hour >= OPEN_HOUR) {
+    return true;
+  }
+
+  const previousDay = day === 0 ? 6 : day - 1;
+  return OPEN_DAYS.has(previousDay) && hour < CLOSE_HOUR_AFTER_MIDNIGHT;
+}
+
+function shouldShowMenuScheduleNotice() {
+  return !isBusinessOpen();
+}
 
 function appendCount(counter: Map<string, number>, value: string, amount = 1) {
   if (!value) return;
@@ -174,6 +193,7 @@ function buildCashPaymentSuggestions(total: number) {
 
 export function MenuPage() {
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isMenuPopupOpen, setIsMenuPopupOpen] = useState(shouldShowMenuScheduleNotice);
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [selectedQty, setSelectedQty] = useState(1);
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
@@ -195,7 +215,7 @@ export function MenuPage() {
   const [activeMenuTab, setActiveMenuTab] = useState<MenuTab>("hamburguesas");
 
   useEffect(() => {
-    const hasOpenModal = isCartOpen || selectedItem !== null;
+    const hasOpenModal = isCartOpen || isMenuPopupOpen || selectedItem !== null;
     const previousOverflow = document.body.style.overflow;
 
     if (hasOpenModal) {
@@ -205,7 +225,7 @@ export function MenuPage() {
     return () => {
       document.body.style.overflow = previousOverflow;
     };
-  }, [isCartOpen, selectedItem]);
+  }, [isCartOpen, isMenuPopupOpen, selectedItem]);
 
   useEffect(() => {
     if (!cartFeedback) return;
@@ -627,6 +647,8 @@ export function MenuPage() {
             className={`overflow-hidden rounded-xl border text-left shadow-sm transition-transform duration-200 ${
               item.badge === "Proximamente"
                 ? "border-slate-300 bg-slate-100 text-slate-500 opacity-90 grayscale"
+                : item.badge === "Nuevo"
+                ? "border-red-700 bg-red-50 shadow-lg shadow-red-950/10 ring-1 ring-red-200 hover:scale-[1.02]"
                 : "border-slate-200 bg-white hover:scale-[1.02]"
             }`}
           >
@@ -634,7 +656,11 @@ export function MenuPage() {
               <div className="relative aspect-square overflow-hidden">
                 <img src={item.image} alt={item.imageAlt} className="h-full w-full object-cover" />
                 {item.badge ? (
-                  <span className="absolute right-2 top-2 rounded-full bg-amber-100 px-1.5 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] text-amber-800">
+                  <span className={`absolute right-2 top-2 rounded-full px-1.5 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] ${
+                    item.badge === "Nuevo"
+                      ? "bg-red-700 text-white shadow-md shadow-red-950/20"
+                      : "bg-amber-100 text-amber-800"
+                  }`}>
                     {item.badge}
                   </span>
                 ) : null}
@@ -729,44 +755,6 @@ export function MenuPage() {
         <h3 className="text-2xl font-bold text-slate-900">Todos nuestros productos</h3>
         <p className="text-sm text-slate-600">Presiona cualquier producto para configurarlo y agregarlo al carrito.</p>
       </div>
-
-      <section className="-mx-3 space-y-3 border-y border-red-200 bg-red-50 px-3 py-4">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <h4 className="text-lg font-black uppercase tracking-wide text-slate-950">Ofertas</h4>
-            <p className="text-xs font-semibold text-red-900">Precios especiales al inicio del menú</p>
-          </div>
-          <span className="rounded-full bg-slate-950 px-3 py-1 text-xs font-black uppercase tracking-wide text-white shadow-sm">
-            Solo por hoy
-          </span>
-        </div>
-        <div className="grid gap-3 sm:grid-cols-2">
-          {offerItems.map((offer) => (
-            <button
-              key={offer.id}
-              type="button"
-              onClick={() => openProductModal(offer)}
-              className="group overflow-hidden rounded-2xl border-2 border-red-700 bg-white text-left shadow-lg shadow-red-950/10 transition duration-200 hover:-translate-y-0.5 hover:shadow-xl"
-            >
-              <div className="relative aspect-[4/5] overflow-hidden bg-slate-950">
-                <img src={offer.image} alt={offer.imageAlt} className="h-full w-full object-cover transition duration-200 group-hover:scale-[1.015]" />
-                <span className="absolute left-3 top-3 rounded-full bg-amber-400 px-3 py-1 text-[10px] font-black uppercase tracking-wide text-slate-950 shadow-sm">
-                  {offer.badge}
-                </span>
-              </div>
-              <div className="space-y-1 p-3">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="text-base font-black leading-tight text-slate-950">{offer.title}</div>
-                  <div className="shrink-0 rounded-full bg-red-700 px-2.5 py-1 text-sm font-black text-white">
-                    ${formatPrice(offer.price)}
-                  </div>
-                </div>
-                <p className="text-xs leading-tight text-slate-600">{offer.description}</p>
-              </div>
-            </button>
-          ))}
-        </div>
-      </section>
 
       <section className="-mx-3 space-y-3 border-y border-amber-200 bg-amber-50 px-3 py-4">
         <div className="flex items-center justify-between gap-3">
@@ -932,6 +920,54 @@ export function MenuPage() {
           </div>
         ) : null}
       </section>
+
+      {isMenuPopupOpen ? (
+        <div className="fixed inset-0 z-[70] flex min-h-[100dvh] items-center justify-center px-4 py-6">
+          <div
+            className="absolute inset-0 bg-slate-950/45 backdrop-blur-[2px]"
+            onClick={() => setIsMenuPopupOpen(false)}
+          />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="menu-schedule-notice-title"
+            className="relative w-full max-w-sm overflow-hidden rounded-3xl border border-white/70 bg-white p-6 text-center shadow-2xl shadow-slate-950/25 sm:max-w-md sm:p-7"
+          >
+            <button
+              type="button"
+              aria-label="Cerrar aviso"
+              onClick={() => setIsMenuPopupOpen(false)}
+              className="absolute right-4 top-4 z-20 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/95 text-slate-500 shadow-md ring-1 ring-slate-200 backdrop-blur transition hover:bg-slate-100 hover:text-slate-900"
+            >
+              <XMarkIcon className="h-5 w-5" />
+            </button>
+
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-xl font-black text-red-700 ring-1 ring-red-100">
+              !
+            </div>
+            <p className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-red-700">
+              Aviso de horario
+            </p>
+            <h4 id="menu-schedule-notice-title" className="text-2xl font-black leading-tight text-slate-950">
+              Por ahora atendemos de jueves a sábado
+            </h4>
+            <p className="mt-4 text-base leading-7 text-slate-600">
+              Nuestro horario aproximado es de{" "}
+              <strong className="font-black text-slate-950">5:00 PM a 1:00 AM</strong>.
+            </p>
+            <p className="mt-3 text-sm leading-6 text-slate-500">
+              Gracias por tu comprensión, ¡te esperamos pronto!
+            </p>
+            <button
+              type="button"
+              onClick={() => setIsMenuPopupOpen(false)}
+              className="mt-6 w-full rounded-2xl bg-slate-950 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-slate-950/15 transition hover:-translate-y-0.5 hover:bg-red-700"
+            >
+              Ver menú
+            </button>
+          </div>
+        </div>
+      ) : null}
 
       {!isCartOpen ? (
         <div className="fixed bottom-6 right-4 z-50 sm:right-6">
