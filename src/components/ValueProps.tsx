@@ -20,7 +20,7 @@ const attributes = [
   {
     icon: BoltIcon,
     title: "Entrega rápida en Labranza",
-    description: "Despacho y retiro optimizados para llegar en 14–17 minutos promedio sin perder frescura ni temperatura.",
+    description: "Despacho y retiro optimizados para llegar en 15–20 minutos promedio sin perder frescura ni temperatura.",
   },
 ];
 

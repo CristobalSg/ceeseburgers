@@ -18,7 +18,7 @@ export function Hero({ ctaHref }: HeroProps) {
             <span className="block text-cyan-200">Aquí empieza tu nueva Ceeseburger favorita.</span>
           </h1>
           <p className="max-w-2xl text-lg text-slate-100/80">
-            Preparamos burgers artesanales con recetas propias, porciones contundentes y entrega promedio de 14–17 minutos en Labranza. Sin filas,
+            Preparamos burgers artesanales con recetas propias, porciones contundentes y entrega promedio de 15–20 minutos en Labranza. Sin filas,
             sin complicaciones: solo sabor honesto cuando más lo necesitas.
           </p>
           <div className="flex flex-wrap items-center gap-3">
@@ -28,7 +28,7 @@ export function Hero({ ctaHref }: HeroProps) {
             >
               Pide tu Ceeseburger ahora
             </a>
-            <span className="text-sm text-slate-100/80">Entrega estimada 14–17 minutos · Pago online seguro</span>
+            <span className="text-sm text-slate-100/80">Entrega estimada 15–20 minutos · Pago online seguro</span>
           </div>
         </div>
 

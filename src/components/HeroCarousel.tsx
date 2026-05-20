@@ -78,7 +78,7 @@ export function HeroCarousel({ slides }: HeroCarouselProps) {
             >
               Pide tu Ceeseburger ahora
             </a>
-            <span className="text-sm text-slate-100/80">Entrega estimada 14–17 minutos · Pago online seguro</span>
+            <span className="text-sm text-slate-100/80">Entrega estimada 15–20 minutos · Pago online seguro</span>
           </div>
         </div>
 

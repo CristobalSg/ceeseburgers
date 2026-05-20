@@ -6,6 +6,7 @@ import csItalianaImage from "../../img/cs-italiana-prod.webp";
 import csNuevaImage from "../../img/cs-nueva-prod.webp";
 import smokeCriminalImage from "../../img/hamb-solas/smoke-criminal.webp";
 import smokeCriminalXlImage from "../../img/hamb-solas/smoke-criminal-xl.webp";
+import rompedietitaImage from "../../img/hamb-solas/rompedietita-i.webp";
 
 export type Product = {
   name: string;
@@ -32,7 +33,7 @@ export const products: Product[] = [
     name: "Cs-Bacon",
     price: "$2.490",
     description: "Pan de hamburguesa, 90g de hamburguesa, cheddar, tocino ahumado, cebolla caramelizada y salsa BBQ.",
-    spec: "Gancho estrella · lista en 14–17 min",
+    spec: "Gancho estrella · lista en 15–20 min",
     tag: "Top ventas",
     slug: "cs-bacon",
     featured: true,
@@ -47,7 +48,7 @@ export const products: Product[] = [
         "“Una hamburguesa que sorprende por su sabor y precio. Ideal para el fin de semana.” — Cliente real.",
       ],
       ingredients: "Pan brioche, hamburguesa 90g, queso cheddar (1 lámina), tocino ahumado, cebolla caramelizada, aderezos.",
-      availability: "Disponible para despacho (14–17 minutos promedio) y retiro en el local.",
+      availability: "Disponible para despacho (15–20 minutos promedio) y retiro en el local.",
       images: [csBaconImage, csBaconImage, csBaconImage],
     },
   },
@@ -91,6 +92,16 @@ export const products: Product[] = [
     slug: "cs-nueva",
     image: csNuevaImage,
     imageAlt: "Hamburguesa Rompedieta I",
+  },
+  {
+    name: "Rompedietita I",
+    price: "$2.690",
+    description: "Pan brioche, hamburguesa de 90g, queso cheddar, tocino, lechuga, tomate, cebolla morada y mayonesa.",
+    spec: "Version compacta · sabor rompedieta",
+    tag: "Premium",
+    slug: "rompedietita-i",
+    image: rompedietitaImage,
+    imageAlt: "Hamburguesa Rompedietita I",
   },
   {
     name: "Cs-Smoke Criminal",

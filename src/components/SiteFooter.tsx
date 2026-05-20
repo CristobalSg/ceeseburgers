@@ -12,7 +12,7 @@ export function SiteFooter({ brandName, instagramHref, whatsappHref }: SiteFoote
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="text-sm font-semibold text-red-700">{brandName}</p>
-          <p className="text-xs text-slate-500">Hamburguesas artesanales · Labranza</p>
+          <p className="text-xs text-slate-500">Hamburguesas · Labranza</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <a
@@ -41,14 +41,14 @@ export function SiteFooter({ brandName, instagramHref, whatsappHref }: SiteFoote
           <MapPinIcon className="mt-1 h-4 w-4 text-red-700" aria-hidden />
           <div>
             <p className="font-semibold text-slate-900">Zona de entrega</p>
-            <p className="text-slate-600">Labranza, Temuco y puntos acordados.</p>
+            <p className="text-slate-600">Labranza y puntos acordados.</p>
           </div>
         </div>
         <div className="flex items-start gap-2">
           <ClockIcon className="mt-1 h-4 w-4 text-red-700" aria-hidden />
           <div>
             <p className="font-semibold text-slate-900">Horarios</p>
-            <p className="text-slate-600">Jue–sáb 16:00–22:30 · Tiempo promedio 14–17 minutos.</p>
+            <p className="text-slate-600">Jue–sáb 17:00–1:00 · Tiempo promedio 15–20 minutos.</p>
           </div>
         </div>
         <div className="flex items-start gap-2">

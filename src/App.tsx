@@ -25,6 +25,8 @@ import logoImage from "../img/logo.webp";
 export default function App() {
   const CTA_LINK = "https://wa.me/56945568889";
   const INSTAGRAM_LINK = "https://www.instagram.com/ceeseburgers";
+  const ANNOUNCEMENT_MESSAGE = "Hecho al momento. Hecho en Ceeseburgers.";
+  const ANNOUNCEMENT_CTA = "Pedir ahora";
   const path = window.location.pathname;
   const productMatch = path.match(/^\/producto\/([^/]+)$/);
   const blogDetailMatch = path.match(/^\/blog\/([^/]+)$/);
@@ -44,7 +46,7 @@ export default function App() {
     {
       badge: "Cómo lo hacemos",
       title: "Pedido fácil, entrega rápida y sabor incomparable.",
-      description: "Haz tu pedido online, paga seguro y recibe tu burger recién preparada en 14–17 minutos promedio. Elige, paga y disfruta sin fricciones.",
+      description: "Haz tu pedido online, paga seguro y recibe tu burger recién preparada en 15–20 minutos promedio. Elige, paga y disfruta sin fricciones.",
       ctaHref: CTA_LINK,
       imageSrc: carouselTwo,
       imageAlt: "Pedido de Ceeseburgers empacado listo para entrega",
@@ -67,9 +69,9 @@ export default function App() {
         header={
           <div className="space-y-3">
             <AnnouncementBar
-              message="Cada 15 de cada mes: ofertas imperdibles y nuevas."
+              message={ANNOUNCEMENT_MESSAGE}
               ctaHref={CTA_LINK}
-              ctaLabel="Aprovechar"
+              ctaLabel={ANNOUNCEMENT_CTA}
             />
             <Header logoSrc={logoImage} brandName="Ceeseburgers" instagramHref={INSTAGRAM_LINK} whatsappHref={CTA_LINK} />
           </div>
@@ -87,9 +89,9 @@ export default function App() {
         header={
           <div className="space-y-3">
             <AnnouncementBar
-              message="Cada 15 de cada mes: ofertas imperdibles y nuevas."
+              message={ANNOUNCEMENT_MESSAGE}
               ctaHref={CTA_LINK}
-              ctaLabel="Aprovechar"
+              ctaLabel={ANNOUNCEMENT_CTA}
             />
             <Header logoSrc={logoImage} brandName="Ceeseburgers" instagramHref={INSTAGRAM_LINK} whatsappHref={CTA_LINK} />
           </div>
@@ -107,9 +109,9 @@ export default function App() {
         header={
           <div className="space-y-3">
             <AnnouncementBar
-              message="Cada 15 de cada mes: ofertas imperdibles y nuevas."
+              message={ANNOUNCEMENT_MESSAGE}
               ctaHref={CTA_LINK}
-              ctaLabel="Aprovechar"
+              ctaLabel={ANNOUNCEMENT_CTA}
             />
             <Header logoSrc={logoImage} brandName="Ceeseburgers" instagramHref={INSTAGRAM_LINK} whatsappHref={CTA_LINK} />
           </div>
@@ -127,9 +129,9 @@ export default function App() {
         header={
           <div className="space-y-3">
             <AnnouncementBar
-              message="Cada 15 de cada mes: ofertas imperdibles y nuevas."
+              message={ANNOUNCEMENT_MESSAGE}
               ctaHref={CTA_LINK}
-              ctaLabel="Aprovechar"
+              ctaLabel={ANNOUNCEMENT_CTA}
             />
             <Header logoSrc={logoImage} brandName="Ceeseburgers" instagramHref={INSTAGRAM_LINK} whatsappHref={CTA_LINK} />
           </div>
@@ -146,9 +148,9 @@ export default function App() {
       header={
         <div className="space-y-3">
           <AnnouncementBar
-            message="Cada 15 de cada mes: ofertas imperdibles y nuevas."
+            message={ANNOUNCEMENT_MESSAGE}
             ctaHref={CTA_LINK}
-            ctaLabel="Aprovechar"
+            ctaLabel={ANNOUNCEMENT_CTA}
           />
           <Header logoSrc={logoImage} brandName="Ceeseburgers" instagramHref={INSTAGRAM_LINK} whatsappHref={CTA_LINK} />
         </div>
@@ -163,7 +165,7 @@ export default function App() {
 
       <CTABanner
         title="Listo para tu próxima Ceeseburger?"
-        subtitle="Pedidos online seguros, horarios jue-sáb 16:00-22:30, entrega promedio 14-17 minutos."
+        subtitle="Pedidos online seguros, horarios jue-sáb 17:00-1:00, entrega promedio 15-20 minutos."
         ctaHref={CTA_LINK}
         variant="dark"
       />

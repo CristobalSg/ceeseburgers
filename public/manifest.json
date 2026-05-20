@@ -1,21 +1,16 @@
 {
-  "name": "SGH",
-  "short_name": "SGH",
+  "name": "Ceeseburgers",
+  "short_name": "Ceeseburgers",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#f1f5f9",
-  "description": "Sistema de Gestión Horario",
+  "description": "Hamburguesas artesanales, combos y pedidos online de Ceeseburgers.",
   "icons": [
     {
-      "src": "/icons/icon-192x192.webp",
-      "sizes": "192x192",
-      "type": "image/webp"
-    },
-    {
-      "src": "/icons/icon-512x512.webp",
-      "sizes": "512x512",
-      "type": "image/webp"
+      "src": "/receipt-logo.png",
+      "sizes": "1080x1080",
+      "type": "image/png"
     }
   ]
 }

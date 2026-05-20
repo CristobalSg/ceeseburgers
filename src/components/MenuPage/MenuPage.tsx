@@ -1,6 +1,6 @@
 import { ShoppingCartIcon, StarIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import { useEffect, useState } from "react";
-import { getBurgerItems, sideItems as menuSideItems, sauceItems as menuSauceItems, menuTabs, newCombos, individualCombos, familyCombos, paperoCombos } from "./menuData";
+import { getClassicBurgerItems, getPremiumBurgerItems, sideItems as menuSideItems, sauceItems as menuSauceItems, menuTabs, trioCombos, classicCombos, premiumCombos, familyCombos, paperoCombos } from "./menuData";
 import { formatPrice, buildCartSignature, usesPerUnitRemovals } from "./menuUtils";
 
 import type { MenuItem, MenuTab, CartItem, ProductModalStep } from "./menuUtils";
@@ -244,7 +244,12 @@ export function MenuPage() {
     nextElement?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [activeComboOptionIndex, productModalStep, selectedItem]);
 
-  const burgerItems = getBurgerItems();
+  const classicBurgerItems = getClassicBurgerItems();
+  const premiumBurgerItems = getPremiumBurgerItems();
+  const featuredNewItems = [
+    ...classicBurgerItems.filter((item) => item.id === "rompedietita-i"),
+    ...trioCombos,
+  ];
   const sideItems = menuSideItems;
   const sauceItems = menuSauceItems;
 
@@ -760,7 +765,7 @@ export function MenuPage() {
         <div className="flex items-center justify-between gap-3">
           <div>
             <h4 className="text-lg font-black uppercase tracking-wide text-slate-950">Nuevas</h4>
-            <p className="text-xs font-semibold text-amber-900">Combos Smoke Criminal</p>
+            <p className="text-xs font-semibold text-amber-900">Rompedietita I y trios para compartir</p>
           </div>
           <span className="rounded-full bg-red-700 px-3 py-1 text-xs font-black uppercase tracking-wide text-white shadow-sm">
             Lanzamiento
@@ -768,7 +773,7 @@ export function MenuPage() {
         </div>
         <div className="overflow-x-auto pb-1">
           <div className="flex gap-3 snap-x snap-mandatory">
-            {newCombos.map((combo) => (
+            {featuredNewItems.map((combo) => (
               <div key={combo.id} className="flex min-w-[190px] flex-col items-start">
                 <button
                   type="button"
@@ -795,12 +800,42 @@ export function MenuPage() {
 
       <section className="space-y-2">
         <div className="flex items-center justify-between">
-          <h4 className="text-base font-semibold text-slate-900">Combos Individuales</h4>
+          <h4 className="text-base font-semibold text-slate-900">Combos Clásicos</h4>
           <span className="text-xs text-slate-500">Hamburguesa + Papitas + Bebida + Salsa</span>
         </div>
         <div className="-mx-3 overflow-x-auto px-3 pb-1">
           <div className="flex gap-3 snap-x snap-mandatory">
-            {individualCombos.map((combo) => (
+            {classicCombos.map((combo) => (
+              <div key={combo.id} className="flex min-w-[160px] flex-col items-start">
+                <button
+                  type="button"
+                  onClick={() => openProductModal(combo)}
+                  className={`w-full aspect-square snap-start overflow-hidden rounded-xl bg-white shadow-md transition hover:scale-105 ${combo.favorite ? "border-2 border-yellow-400" : ""}`}
+                >
+                  <img src={combo.image} alt={combo.imageAlt} className="h-full w-full object-cover" />
+                </button>
+                <div className="mt-1.5 w-full">
+                  <div className="flex items-center gap-1 text-sm font-semibold text-slate-900">
+                    {combo.title}
+                    {combo.favorite ? <StarIcon className="h-3.5 w-3.5 text-yellow-400" /> : null}
+                  </div>
+                  <div className="text-[11px] leading-tight text-slate-500">{combo.description}</div>
+                  <div className="mt-0.5 text-base font-bold text-slate-900">${formatPrice(combo.price)}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="space-y-2">
+        <div className="flex items-center justify-between">
+          <h4 className="text-base font-semibold text-slate-900">Combos Premium</h4>
+          <span className="text-xs text-slate-500">Más grandes</span>
+        </div>
+        <div className="-mx-3 overflow-x-auto px-3 pb-1">
+          <div className="flex gap-3 snap-x snap-mandatory">
+            {premiumCombos.map((combo) => (
               <div key={combo.id} className="flex min-w-[160px] flex-col items-start">
                 <button
                   type="button"
@@ -891,12 +926,23 @@ export function MenuPage() {
         </div>
 
         {activeMenuTab === "hamburguesas" ? (
-          <div className="space-y-2">
+          <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h5 className="text-sm font-semibold text-slate-900">Hamburguesas Solas</h5>
-              <span className="text-xs text-slate-500">Las 5 hamburguesas del menu anterior</span>
+              <span className="text-xs text-slate-500">Solo hamburguesas</span>
             </div>
-            {renderMenuCards(burgerItems, true)}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <h6 className="text-sm font-semibold text-slate-900">Clásicas</h6>
+              </div>
+              {renderMenuCards(classicBurgerItems, true)}
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <h6 className="text-sm font-semibold text-slate-900">Premium</h6>
+              </div>
+              {renderMenuCards(premiumBurgerItems, true)}
+            </div>
           </div>
         ) : null}
 

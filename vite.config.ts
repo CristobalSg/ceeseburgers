@@ -13,15 +13,15 @@ export default defineConfig({
       registerType: 'autoUpdate',
       devOptions: { enabled: false }, 
       manifest: {
-        name: 'Vitamin Health',
-        short_name: 'VH',
+        name: 'Ceeseburgers',
+        short_name: 'Ceeseburgers',
+        description: 'Hamburguesas artesanales, combos y pedidos online de Ceeseburgers.',
         start_url: '/',
         display: 'standalone',
         background_color: '#ffffff',
-        theme_color: '#1d4ed8',
+        theme_color: '#f1f5f9',
         icons: [
-          { src: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
-          { src: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png' }
+          { src: '/receipt-logo.png', sizes: '1080x1080', type: 'image/png' }
         ]
       }
     })

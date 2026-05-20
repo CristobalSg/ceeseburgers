@@ -22,7 +22,7 @@ export function StorySection() {
             Tras la pérdida de su mascota decidió convertir esa pasión en propósito. Con apoyo familiar profesionalizó el proyecto, disenó una carta clara y se propuso ofrecer comida honesta, rica y accesible que mejorara el dı́a de quien la pide.
           </p>
           <p>
-            Hoy cada pedido en Labranza es parte de esa historia: burgers artesanales, precios transparentes y entregas de 14–17 minutos pensadas para jóvenes exploradores y luchadores que necesitan una pausa rica y sin complicaciones.
+            Hoy cada pedido en Labranza es parte de esa historia: burgers artesanales, precios transparentes y entregas de 15–20 minutos pensadas para jóvenes exploradores y luchadores que necesitan una pausa rica y sin complicaciones.
           </p>
         </div>
       </div>
