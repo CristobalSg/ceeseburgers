@@ -2,8 +2,10 @@ import { ShoppingCartIcon, StarIcon, XMarkIcon } from "@heroicons/react/24/solid
 import { useEffect, useState } from "react";
 import { getClassicBurgerItems, getPremiumBurgerItems, sideItems as menuSideItems, sauceItems as menuSauceItems, menuTabs, trioCombos, classicCombos, premiumCombos, familyCombos, paperoCombos } from "./menuData";
 import { formatPrice, buildCartSignature, usesPerUnitRemovals } from "./menuUtils";
+import { createOrder } from "@/services/orders";
 
 import type { MenuItem, MenuTab, CartItem, ProductModalStep } from "./menuUtils";
+import type { CreateOrderPayload, OrderItemPayload } from "@/services/orders";
 
 const WHATSAPP_PHONE = "56945568889";
 const DELIVERY_ESTIMATE_MIN = 2000;
@@ -213,6 +215,8 @@ export function MenuPage() {
   const [cashAmount, setCashAmount] = useState("");
   const [showAdvancedCashPayment, setShowAdvancedCashPayment] = useState(false);
   const [activeMenuTab, setActiveMenuTab] = useState<MenuTab>("hamburguesas");
+  const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
+  const [orderError, setOrderError] = useState("");
 
   useEffect(() => {
     const hasOpenModal = isCartOpen || isMenuPopupOpen || selectedItem !== null;
@@ -700,7 +704,7 @@ export function MenuPage() {
     );
   }
 
-  function sendOrderToWhatsApp() {
+  function buildWhatsAppOrderMessage() {
     const lines = ["Quiero hacer un pedido:"];
     lines.push(`Nombre: *${orderName.trim()}*`);
     lines.push(`Tipo: ${orderType === "delivery" ? "*Delivery*" : "*Retiro en local*"}`);
@@ -749,8 +753,91 @@ export function MenuPage() {
       lines.push(`Delivery agregado: *$${formatPrice(deliveryFee)}*`);
     }
     lines.push(`Total: *$${formatPrice(total)}*`);
-    const message = lines.join("\n");
-    window.open(`https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`, "_blank");
+    return lines.join("\n");
+  }
+
+  function buildOrderItemsPayload(): OrderItemPayload[] {
+    return cart.map((cartItem) => {
+      const selectionLines = buildSelectionLines(cartItem);
+      const removalLines = buildGroupedRemovalLines(cartItem);
+
+      return {
+        cartId: cartItem.id,
+        productId: cartItem.item.id,
+        title: cartItem.item.title,
+        category: cartItem.item.category,
+        unitPrice: cartItem.item.price,
+        quantity: cartItem.qty,
+        lineTotal: cartItem.item.price * cartItem.qty,
+        selections: cartItem.selections,
+        unitSelections: cartItem.unitSelections ?? [],
+        removals: cartItem.removals ?? [],
+        unitRemovals: cartItem.unitRemovals ?? [],
+        notes: [...selectionLines, ...removalLines],
+      };
+    });
+  }
+
+  function buildOrderPayload(whatsappMessage: string): CreateOrderPayload | null {
+    if (paymentMethod === "") return null;
+
+    return {
+      customerName: orderName.trim(),
+      orderType,
+      address: orderType === "delivery" ? address.trim() : null,
+      paymentMethod,
+      cashPaymentType: paymentMethod === "cash" ? cashPaymentType : null,
+      cashAmount: paymentMethod === "cash" && cashPaymentType === "amount" ? normalizedCashAmount : null,
+      subtotal,
+      deliveryFee,
+      deliveryEstimateMin: orderType === "delivery" ? DELIVERY_ESTIMATE_MIN : null,
+      deliveryEstimateMax: orderType === "delivery" ? DELIVERY_ESTIMATE_MAX : null,
+      total,
+      totalItems: totalCount,
+      whatsappMessage,
+      items: buildOrderItemsPayload(),
+      metadata: {
+        source: "react-vite-frontend",
+        userAgent: window.navigator.userAgent,
+      },
+    };
+  }
+
+  async function submitOrder() {
+    if (
+      cart.length === 0
+      || orderName.trim() === ""
+      || !hasValidPayment
+      || (orderType === "delivery" && address.trim() === "")
+      || isSubmittingOrder
+    ) {
+      return;
+    }
+
+    const whatsappMessage = buildWhatsAppOrderMessage();
+    const orderPayload = buildOrderPayload(whatsappMessage);
+    if (!orderPayload) return;
+
+    setIsSubmittingOrder(true);
+    setOrderError("");
+
+    const whatsappUrl = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(whatsappMessage)}`;
+    const whatsappWindow = window.open("", "_blank");
+
+    try {
+      await createOrder(orderPayload);
+      if (whatsappWindow) {
+        whatsappWindow.location.href = whatsappUrl;
+      } else {
+        window.location.href = whatsappUrl;
+      }
+    } catch (error) {
+      console.error(error);
+      whatsappWindow?.close();
+      setOrderError("No pudimos guardar el pedido. Revisa tu conexion e intenta nuevamente.");
+    } finally {
+      setIsSubmittingOrder(false);
+    }
   }
 
   return (
@@ -1753,12 +1840,16 @@ export function MenuPage() {
                   || orderName.trim() === ""
                   || !hasValidPayment
                   || (orderType === "delivery" && address.trim() === "")
+                  || isSubmittingOrder
                 }
-                onClick={sendOrderToWhatsApp}
+                onClick={submitOrder}
                 className="w-full rounded-full bg-green-600 px-4 py-3 text-white disabled:opacity-50"
               >
-                Pedir por WhatsApp
+                {isSubmittingOrder ? "Guardando pedido..." : "Pedir por WhatsApp"}
               </button>
+              {orderError ? (
+                <div className="mt-2 text-center text-xs text-red-600">{orderError}</div>
+              ) : null}
             </div>
           </div>
         </div>
