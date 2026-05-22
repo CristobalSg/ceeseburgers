@@ -23,7 +23,7 @@ import carouselTwo from "../img/carrucel_2.webp";
 import logoImage from "../img/logo.webp";
 
 export default function App() {
-  const CTA_LINK = "https://wa.me/56945568889";
+  const CTA_LINK = "https://wa.me/56956270428";
   const INSTAGRAM_LINK = "https://www.instagram.com/ceeseburgers";
   const ANNOUNCEMENT_MESSAGE = "Hecho al momento. Hecho en Ceeseburgers.";
   const ANNOUNCEMENT_CTA = "Pedir ahora";

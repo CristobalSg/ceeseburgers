@@ -7,7 +7,7 @@ import { createOrder } from "@/services/orders";
 import type { MenuItem, MenuTab, CartItem, ProductModalStep } from "./menuUtils";
 import type { CreateOrderPayload, OrderItemPayload } from "@/services/orders";
 
-const WHATSAPP_PHONE = "56945568889";
+const WHATSAPP_PHONE = "56956270428";
 const DELIVERY_ESTIMATE_MIN = 2000;
 const DELIVERY_ESTIMATE_MAX = 2500;
 const CASH_PAYMENT_STEPS = [1000, 2000, 5000, 10000];
