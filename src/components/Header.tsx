@@ -1,32 +1,53 @@
 import { CameraIcon, PhoneIcon, Bars3Icon, XMarkIcon } from "@heroicons/react/24/solid";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type HeaderProps = {
   logoSrc: string;
   brandName: string;
   instagramHref: string;
   whatsappHref: string;
+  transparentOnTop?: boolean;
 };
 
-export function Header({ logoSrc, brandName, instagramHref, whatsappHref }: HeaderProps) {
+export function Header({ logoSrc, brandName, instagramHref, whatsappHref, transparentOnTop = false }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [hasScrolled, setHasScrolled] = useState(false);
+  const isTransparent = transparentOnTop && !hasScrolled;
+
+  useEffect(() => {
+    if (!transparentOnTop) return;
+
+    const handleScroll = () => {
+      setHasScrolled(window.scrollY > 56);
+    };
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [transparentOnTop]);
 
   return (
     <>
-      <header className="flex items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white/70 px-4 py-3 shadow-sm backdrop-blur">
+      <header
+        className={`flex items-center justify-between gap-4 rounded-2xl border px-4 py-3 shadow-sm backdrop-blur-xl transition duration-300 ${
+          isTransparent ? "border-white/15 bg-black/15 text-white shadow-black/10" : "border-slate-200 bg-white/90 text-slate-900 shadow-slate-900/10"
+        }`}
+      >
       <a href="/" className="flex items-center gap-3 transition hover:-translate-y-0.5">
         <img src={logoSrc} alt={`${brandName} logo`} className="h-12 w-12 rounded-full object-cover" loading="lazy" />
         <div>
-          <p className="text-sm font-semibold text-red-700">{brandName}</p>
-          <p className="text-xs text-slate-500">Hamburguesas · Labranza</p>
+          <p className={`text-sm font-semibold ${isTransparent ? "text-white" : "text-red-700"}`}>{brandName}</p>
+          <p className={`text-xs ${isTransparent ? "text-white/75" : "text-slate-500"}`}>Hamburguesas · Labranza</p>
         </div>
       </a>
 
       {/* Desktop links (visible on md+) */}
       <div className="hidden md:flex flex-wrap items-center gap-2 ml-4">
-        <a href="/menu" className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-600 transition hover:text-red-700">Menú</a>
-        <a href="/blog" className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-600 transition hover:text-red-700">Blog</a>
-        <a className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-800 shadow-sm transition hover:-translate-y-0.5 hover:border-red-300" href={instagramHref} target="_blank" rel="noreferrer">
+        <a href="/menu" className={`text-xs font-semibold uppercase tracking-[0.2em] transition ${isTransparent ? "text-white/80 hover:text-white" : "text-slate-600 hover:text-red-700"}`}>Menú</a>
+        <a href="/blog" className={`text-xs font-semibold uppercase tracking-[0.2em] transition ${isTransparent ? "text-white/80 hover:text-white" : "text-slate-600 hover:text-red-700"}`}>Blog</a>
+        <a className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold shadow-sm transition hover:-translate-y-0.5 ${
+          isTransparent ? "border-white/20 bg-white/10 text-white hover:bg-white/20" : "border-slate-200 bg-white text-slate-800 hover:border-red-300"
+        }`} href={instagramHref} target="_blank" rel="noreferrer">
           <CameraIcon className="h-4 w-4" aria-hidden />
           Instagram
         </a>
@@ -38,7 +59,11 @@ export function Header({ logoSrc, brandName, instagramHref, whatsappHref }: Head
 
       {/* Hamburger button (mobile only) */}
       <div className="md:hidden ml-auto">
-        <button aria-label="Abrir menú" onClick={() => setMenuOpen(true)} className="inline-flex items-center justify-center rounded-md p-2 text-slate-700 hover:bg-slate-100">
+        <button
+          aria-label="Abrir menú"
+          onClick={() => setMenuOpen(true)}
+          className={`inline-flex items-center justify-center rounded-md p-2 transition ${isTransparent ? "text-white hover:bg-white/10" : "text-slate-700 hover:bg-slate-100"}`}
+        >
           <Bars3Icon className="h-6 w-6" />
         </button>
       </div>

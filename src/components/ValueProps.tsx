@@ -3,39 +3,41 @@ import { BoltIcon, CurrencyDollarIcon, FireIcon, ShieldCheckIcon } from "@heroic
 const attributes = [
   {
     icon: FireIcon,
-    title: "Sabor inolvidable",
-    description:
-      "Recetas propias que equilibran jugosidad, textura y un sello artesanal. Pensadas para quienes buscan algo distinto sin salir de casa.",
+    title: "Sabor propio",
+    description: "Recetas con sello casero, salsas sabrosas y burgers bien cargadas.",
   },
   {
     icon: CurrencyDollarIcon,
-    title: "Precio transparente y justo",
-    description: "Mostramos el valor real de cada burger y sus insumos para que sepas exactamente qué estás pagando.",
+    title: "Precios claros",
+    description: "Opciones simples de entender, sin sorpresas al momento de pedir.",
   },
   {
     icon: ShieldCheckIcon,
-    title: "Ingredientes seleccionados",
-    description: "Carne de calidad, pan fresco y vegetales de proveedores confiables. Nada genérico, todo cuidado desde la cocina.",
+    title: "Hecho al momento",
+    description: "Pan, carne, papitas y extras preparados para salir calientes.",
   },
   {
     icon: BoltIcon,
-    title: "Entrega rápida en Labranza",
-    description: "Despacho y retiro optimizados para llegar en 15–20 minutos promedio sin perder frescura ni temperatura.",
+    title: "Retiro o delivery",
+    description: "Pide fácil y coordina tu entrega durante nuestro horario.",
   },
 ];
 
 export function ValueProps() {
   return (
-    <section className="space-y-8 animate-fade-up motion-reduce:animate-none">
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <section className="animate-fade-up motion-reduce:animate-none">
+      <div className="grid grid-cols-4 gap-2 sm:gap-4">
         {attributes.map((item) => (
-          <article key={item.title} className="flex h-full flex-col items-center gap-3 rounded-2xl border border-slate-200 bg-white p-5 text-center shadow-sm">
-            <div className="flex h-14 w-14 items-center justify-center text-red-700">
-              <item.icon className="h-8 w-8" aria-hidden />
+          <article
+            key={item.title}
+            className="flex min-h-32 flex-col items-center justify-start gap-2 rounded-2xl border border-amber-100 bg-white p-2.5 text-center shadow-sm sm:min-h-44 sm:p-5"
+          >
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-50 text-red-700 sm:h-12 sm:w-12">
+              <item.icon className="h-5 w-5 sm:h-7 sm:w-7" aria-hidden />
             </div>
             <div className="space-y-1">
-              <h4 className="text-lg font-semibold text-slate-900">{item.title}</h4>
-              <p className="text-sm text-slate-600">{item.description}</p>
+              <h4 className="text-[0.72rem] font-black leading-tight text-slate-950 sm:text-base">{item.title}</h4>
+              <p className="text-[0.62rem] leading-snug text-slate-600 sm:text-sm sm:leading-6">{item.description}</p>
             </div>
           </article>
         ))}

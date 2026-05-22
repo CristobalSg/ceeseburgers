@@ -40,11 +40,6 @@ export type CartItem = {
 
 export type ProductModalStep = "quantity" | "options" | "removals";
 
-export function parsePrice(price: string) {
-  const digits = price.replace(/\D/g, "");
-  return parseInt(digits || "0", 10);
-}
-
 export function formatPrice(amount: number) {
   return new Intl.NumberFormat("es-CL").format(amount);
 }

@@ -1,12 +1,10 @@
 import { AnnouncementBar } from "./components/AnnouncementBar";
 import { AboutSection } from "./components/AboutSection";
 import { BlogTeaser } from "./components/BlogTeaser";
-import { CTABanner } from "./components/CTABanner";
 import { Header } from "./components/Header";
-import { HeroCarousel } from "./components/HeroCarousel";
+import { Hero } from "./components/Hero";
 import { Layout } from "./components/Layout";
-import { ProductDetail } from "./components/ProductDetail";
-import { Products, products } from "./components/Products";
+import { MenuPreview } from "./components/MenuPreview";
 import { MenuPage } from "./components/MenuPage";
 import { ReviewsSection } from "./components/ReviewsSection";
 import { SiteFooter } from "./components/SiteFooter";
@@ -18,8 +16,6 @@ import { getBlogPostBySlug } from "./data/blogPosts";
 import { StorySection } from "./components/StorySection";
 import { ValueProps } from "./components/ValueProps";
 
-import carouselOne from "../img/carrucel_1.webp";
-import carouselTwo from "../img/carrucel_2.webp";
 import logoImage from "../img/logo.webp";
 
 export default function App() {
@@ -28,60 +24,8 @@ export default function App() {
   const ANNOUNCEMENT_MESSAGE = "Hecho al momento. Hecho en Ceeseburgers.";
   const ANNOUNCEMENT_CTA = "Pedir ahora";
   const path = window.location.pathname;
-  const productMatch = path.match(/^\/producto\/([^/]+)$/);
   const blogDetailMatch = path.match(/^\/blog\/([^/]+)$/);
-  const matchedProduct = productMatch ? products.find((item) => item.slug === productMatch[1]) ?? null : null;
   const matchedPost = blogDetailMatch ? getBlogPostBySlug(blogDetailMatch[1]) ?? null : null;
-
-  const slides = [
-    {
-      badge: "Qué hacemos",
-      title: "¿Cansado de cocinar o comer siempre lo mismo?.",
-      description:
-        "Elaboramos hamburguesas artesanales con recetas propias, ingredientes seleccionados y porciones contundentes. Transformamos un antojo en una experiencia real, sin filas ni esperas innecesarias.",
-      ctaHref: CTA_LINK,
-      imageSrc: carouselOne,
-      imageAlt: "Hamburguesa artesana de Ceeseburgers",
-    },
-    {
-      badge: "Cómo lo hacemos",
-      title: "Pedido fácil, entrega rápida y sabor incomparable.",
-      description: "Haz tu pedido online, paga seguro y recibe tu burger recién preparada en 15–20 minutos promedio. Elige, paga y disfruta sin fricciones.",
-      ctaHref: CTA_LINK,
-      imageSrc: carouselTwo,
-      imageAlt: "Pedido de Ceeseburgers empacado listo para entrega",
-      align: "right" as const,
-    },
-    {
-      badge: "Por qué lo hacemos",
-      title: "Creemos que una buena hamburguesa puede mejorar tu día.",
-      description:
-        "Ceeseburgers nace para ofrecer comida honesta, rica y accesible. Después de una jornada agotadora o un fin de semana de descanso, queremos que disfrutes sin complicaciones, lejos de lo genérico.",
-      ctaHref: CTA_LINK,
-      imageSrc: carouselOne,
-      imageAlt: "Hamburguesa artesanal de Ceeseburgers",
-    },
-  ];
-
-  if (productMatch) {
-    return (
-      <Layout
-        header={
-          <div className="space-y-3">
-            <AnnouncementBar
-              message={ANNOUNCEMENT_MESSAGE}
-              ctaHref={CTA_LINK}
-              ctaLabel={ANNOUNCEMENT_CTA}
-            />
-            <Header logoSrc={logoImage} brandName="Ceeseburgers" instagramHref={INSTAGRAM_LINK} whatsappHref={CTA_LINK} />
-          </div>
-        }
-        footer={<SiteFooter brandName="Ceeseburgers" instagramHref={INSTAGRAM_LINK} whatsappHref={CTA_LINK} />}
-      >
-        <ProductDetail product={matchedProduct} ctaHref={CTA_LINK} />
-      </Layout>
-    );
-  }
 
   if (path === "/blog") {
     return (
@@ -144,43 +88,44 @@ export default function App() {
   }
 
   return (
-    <Layout
-      header={
-        <div className="space-y-3">
-          <AnnouncementBar
-            message={ANNOUNCEMENT_MESSAGE}
-            ctaHref={CTA_LINK}
-            ctaLabel={ANNOUNCEMENT_CTA}
+    <div className="min-h-screen bg-slate-100 text-slate-900">
+      <div className="fixed inset-x-0 top-4 z-40 px-4 sm:px-6 lg:px-10">
+        <div className="mx-auto w-full max-w-6xl">
+          <Header
+            logoSrc={logoImage}
+            brandName="Ceeseburgers"
+            instagramHref={INSTAGRAM_LINK}
+            whatsappHref={CTA_LINK}
+            transparentOnTop
           />
-          <Header logoSrc={logoImage} brandName="Ceeseburgers" instagramHref={INSTAGRAM_LINK} whatsappHref={CTA_LINK} />
         </div>
-      }
-      footer={<SiteFooter brandName="Ceeseburgers" instagramHref={INSTAGRAM_LINK} whatsappHref={CTA_LINK} />}
-    >
-      <HeroCarousel slides={slides} />
+      </div>
 
-      <ValueProps />
+      <main>
+        <Hero ctaHref="#menu" />
 
-      <Products />
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-4 py-12 sm:px-6 lg:px-10">
+          <ValueProps />
 
-      <CTABanner
-        title="Listo para tu próxima Ceeseburger?"
-        subtitle="Pedidos online seguros, horarios jue-sáb 17:00-1:00, entrega promedio 15-20 minutos."
-        ctaHref={CTA_LINK}
-        variant="dark"
-      />
-      
-      <BlogTeaser />
+          <MenuPreview menuHref="/menu" />
+          
+          <BlogTeaser />
 
-      <ReviewsSection />
+          <ReviewsSection />
 
-      <AboutSection />
+          <AboutSection />
 
-      <StorySection />
+          <StorySection />
 
-      <SocialLinks instagramUrl={INSTAGRAM_LINK} />
+          <SocialLinks instagramUrl={INSTAGRAM_LINK} />
+        </div>
+      </main>
+
+      <div className="mx-auto w-full max-w-6xl px-4 pb-10 sm:px-6 lg:px-10">
+        <SiteFooter brandName="Ceeseburgers" instagramHref={INSTAGRAM_LINK} whatsappHref={CTA_LINK} />
+      </div>
 
       <BackToTop />
-    </Layout>
+    </div>
   );
 }

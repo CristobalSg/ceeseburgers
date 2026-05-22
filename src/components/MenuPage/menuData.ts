@@ -1,4 +1,3 @@
-import { products } from "../Products";
 import comboClasicasFullImg from "../../../img/combos/01-full-clasicas.webp";
 import comboFamiliarImg from "../../../img/combos/02-combo-familiar.webp";
 import comboBaconLoversImg from "../../../img/combos/03-full-bacon.webp";
@@ -33,7 +32,6 @@ import mayoImage from "../../../img/salsas/mayo.webp";
 import mostazaImage from "../../../img/salsas/mostaza.webp";
 import bbqImage from "../../../img/salsas/bbq.webp";
 import chickFillAImage from "../../../img/salsas/chick-fill-a.webp";
-import { parsePrice } from "./menuUtils";
 import type { MenuItem, MenuTab, MenuOptionGroup } from "./menuUtils";
 
 export const comboDrinkOptions = ["Sprite", "Coca-Cola", "Fanta", "Sin bebida"];
@@ -55,15 +53,6 @@ const burgerImagesBySlug: Partial<Record<string, string>> = {
   "smoke-criminal-xl": hambSmokeCriminalXlImg,
 };
 const newBurgerSlugs = new Set(["rompedietita-i", "smoke-criminal", "smoke-criminal-xl"]);
-const burgerMenuNames: Partial<Record<string, string>> = {
-  "cs-bacon": "Bacon",
-  "cs-romp-ii": "Romp II",
-  "cs-clasica": "Clásica",
-  "cs-italiana": "Italiana",
-  "rompedietita-i": "Rompedietita I",
-  "smoke-criminal": "Smoke Criminal",
-  "smoke-criminal-xl": "Smoke Criminal XL",
-};
 const classicBurgerSlugs = ["rompedietita-i", "cs-clasica", "cs-italiana", "cs-bacon", "smoke-criminal"];
 const premiumBurgerSlugs = ["cs-nueva", "cs-romp-ii", "smoke-criminal-xl"];
 
@@ -301,35 +290,101 @@ export const paperoCombos: MenuItem[] = [
   },
 ];
 
-export function getBurgerItems(): MenuItem[] {
-  return products.map((product) => ({
-    id: product.slug,
-    title: burgerMenuNames[product.slug] ?? product.name,
-    description: product.description,
-    price: parsePrice(product.price),
-    image: burgerImagesBySlug[product.slug] ?? product.image,
-    imageAlt: product.imageAlt,
+const burgerItems: MenuItem[] = [
+  {
+    id: "cs-bacon",
+    title: "Bacon",
+    description: "Pan de hamburguesa, 90g de hamburguesa, cheddar, tocino ahumado, cebolla caramelizada y salsa BBQ.",
+    price: 2490,
+    image: hambBaconImg,
+    imageAlt: "Hamburguesa Bacon con tocino y queso cheddar",
     category: "hamburguesas",
-    badge: newBurgerSlugs.has(product.slug)
-      ? "Nuevo"
-      : product.mostOrdered || product.tag === "Top ventas"
-      ? product.tag
-      : undefined,
-    favorite: product.mostOrdered,
-    removableIngredients:
-      product.slug === "cs-bacon"
-        ? ["Tocino", "Salsa BBQ", "Cebolla caramelizada", "Queso cheddar"]
-        : product.slug === "cs-romp-ii"
-        ? ["Huevo frito", "Tocino", "Cebolla caramelizada", "Salsa BBQ", "Queso cheddar"]
-        : product.slug === "smoke-criminal"
-        ? ["BBQ", "Mayo", "Tocino", "Cheddar", "Cebolla crispy"]
-        : product.slug === "smoke-criminal-xl"
-        ? ["BBQ", "Mayo", "Doble tocino", "Triple cheddar", "Cebolla crispy"]
-        : product.slug === "cs-clasica"
-        ? ["Tomate", "Lechuga", "Aderezo", "Queso cheddar"]
-        : product.slug === "cs-italiana"
-        ? ["Palta", "Tomate", "Mayonesa", "Queso cheddar"]
-        : ["Tocino", "Lechuga", "Tomate", "Cebolla morada", "Salsa", "Queso cheddar"],
+    badge: "Top ventas",
+    favorite: true,
+    removableIngredients: ["Tocino", "Salsa BBQ", "Cebolla caramelizada", "Queso cheddar"],
+  },
+  {
+    id: "cs-romp-ii",
+    title: "Romp II",
+    description: "Pan artesanal, hamburguesa de 90g, doble cheddar, doble tocino ahumado, huevo frito, cebolla caramelizada y salsa BBQ.",
+    price: 3190,
+    image: hambRompedietaDosImg,
+    imageAlt: "Hamburguesa Romp II con doble cheddar y huevo",
+    category: "hamburguesas",
+    badge: "Top ventas",
+    favorite: true,
+    removableIngredients: ["Huevo frito", "Tocino", "Cebolla caramelizada", "Salsa BBQ", "Queso cheddar"],
+  },
+  {
+    id: "cs-clasica",
+    title: "Clásica",
+    description: "Pan de hamburguesa, hamburguesa de 90g, cheddar, tomate, lechuga y aderezo tipo Big Mac.",
+    price: 2090,
+    image: hambClasicaImg,
+    imageAlt: "Hamburguesa Clásica de Ceeseburger's",
+    category: "hamburguesas",
+    removableIngredients: ["Tomate", "Lechuga", "Aderezo", "Queso cheddar"],
+  },
+  {
+    id: "cs-italiana",
+    title: "Italiana",
+    description: "Pan de hamburguesa, 90g de hamburguesa, cheddar, mayonesa, tomate y palta.",
+    price: 2290,
+    image: hambItalianaImg,
+    imageAlt: "Hamburguesa Italiana con cheddar, tomate y palta",
+    category: "hamburguesas",
+    removableIngredients: ["Palta", "Tomate", "Mayonesa", "Queso cheddar"],
+  },
+  {
+    id: "cs-nueva",
+    title: "Rompedieta I",
+    description: "Pan brioche, hamburguesa de 90g, doble queso cheddar, tocino, lechuga, tomate, cebolla morada y mayonesa.",
+    price: 3190,
+    image: hambRompedietaUnoImg,
+    imageAlt: "Hamburguesa Rompedieta I",
+    category: "hamburguesas",
+    removableIngredients: ["Tocino", "Lechuga", "Tomate", "Cebolla morada", "Salsa", "Queso cheddar"],
+  },
+  {
+    id: "rompedietita-i",
+    title: "Rompedietita I",
+    description: "Pan brioche, hamburguesa de 90g, queso cheddar, tocino, lechuga, tomate, cebolla morada y mayonesa.",
+    price: 2690,
+    image: hambRompedietitaImg,
+    imageAlt: "Hamburguesa Rompedietita I",
+    category: "hamburguesas",
+    badge: "Nuevo",
+    removableIngredients: ["Tocino", "Lechuga", "Tomate", "Cebolla morada", "Salsa", "Queso cheddar"],
+  },
+  {
+    id: "smoke-criminal",
+    title: "Smoke Criminal",
+    description: "Pan, carne, cheddar, tocino, cebolla crispy, BBQ y mayo.",
+    price: 2490,
+    image: hambSmokeCriminalImg,
+    imageAlt: "Hamburguesa Smoke Criminal con tocino, cheddar y salsa BBQ",
+    category: "hamburguesas",
+    badge: "Nuevo",
+    removableIngredients: ["BBQ", "Mayo", "Tocino", "Cheddar", "Cebolla crispy"],
+  },
+  {
+    id: "smoke-criminal-xl",
+    title: "Smoke Criminal XL",
+    description: "Pan brioche, doble carne, triple cheddar, doble tocino, cebolla crispy, BBQ y mayo.",
+    price: 4690,
+    image: hambSmokeCriminalXlImg,
+    imageAlt: "Hamburguesa Smoke Criminal XL con tocino, cheddar y salsa BBQ",
+    category: "hamburguesas",
+    badge: "Nuevo",
+    removableIngredients: ["BBQ", "Mayo", "Doble tocino", "Triple cheddar", "Cebolla crispy"],
+  },
+];
+
+export function getBurgerItems(): MenuItem[] {
+  return burgerItems.map((item) => ({
+    ...item,
+    image: burgerImagesBySlug[item.id] ?? item.image,
+    badge: newBurgerSlugs.has(item.id) ? "Nuevo" : item.badge,
   }));
 }
 

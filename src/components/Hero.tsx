@@ -1,4 +1,5 @@
-import heroImage from "../../img/cs-bacon.webp";
+import heroDesktopImage from "../../img/hero-desktop.webp";
+import heroMobileImage from "../../img/hero-mobile.webp";
 
 type HeroProps = {
   ctaHref: string;
@@ -6,42 +7,42 @@ type HeroProps = {
 
 export function Hero({ ctaHref }: HeroProps) {
   return (
-    <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 px-6 py-14 text-white shadow-lg sm:px-10">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(14,165,233,0.22),transparent_35%),radial-gradient(circle_at_80%_0%,rgba(94,234,212,0.18),transparent_32%)]" />
-      <div className="relative grid gap-10 lg:grid-cols-[1.2fr_1fr] lg:items-center">
-        <div className="space-y-4">
-          <p className="inline-flex items-center rounded-full bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-cyan-200">
-            Hamburguesas artesanales · Labranza
+    <section className="relative isolate min-h-svh overflow-hidden bg-zinc-950 text-white shadow-2xl shadow-red-950/20">
+      <picture className="absolute inset-0 -z-10 block">
+        <source media="(min-width: 1024px)" srcSet={heroDesktopImage} />
+        <img
+          src={heroMobileImage}
+          alt="Combo de hamburguesa Ceeseburger's con papitas"
+          className="h-full w-full object-cover object-center lg:object-right"
+          fetchPriority="high"
+        />
+      </picture>
+
+      <div className="absolute inset-0 -z-10 bg-gradient-to-t from-black via-black/70 to-black/10 lg:bg-gradient-to-r lg:from-black lg:via-black/70 lg:to-black/5" />
+      <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(127,29,29,0.08),rgba(251,146,60,0.10))]" />
+
+      <div className="mx-auto flex min-h-svh w-full max-w-6xl items-end px-6 pb-12 pt-32 sm:px-8 sm:pb-14 lg:items-center lg:px-10 lg:py-28">
+        <div className="max-w-xl space-y-5 text-center sm:text-left">
+          <p className="inline-flex rounded-full border border-amber-200/25 bg-black/35 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-amber-100 backdrop-blur">
+            Out kitchen · Retiro o delivery
           </p>
-          <h1 className="text-4xl font-bold leading-tight sm:text-5xl">
-            ¿Cansado de cocinar o comer siempre lo mismo?
-            <span className="block text-cyan-200">Aquí empieza tu nueva Ceeseburger favorita.</span>
+
+          <h1 className="text-4xl font-black leading-[1.02] text-white drop-shadow-xl sm:text-5xl lg:text-6xl">
+            Hoy se come Ceeseburger’s
           </h1>
-          <p className="max-w-2xl text-lg text-slate-100/80">
-            Preparamos burgers artesanales con recetas propias, porciones contundentes y entrega promedio de 15–20 minutos en Labranza. Sin filas,
-            sin complicaciones: solo sabor honesto cuando más lo necesitas.
+
+          <p className="mx-auto max-w-lg text-base font-medium leading-7 text-zinc-100 drop-shadow sm:mx-0 sm:text-lg">
+            Hamburguesas contundentes, papitas y combos listos para retiro o delivery.
           </p>
-          <div className="flex flex-wrap items-center gap-3">
+
+          <div className="flex flex-col items-stretch gap-3 pt-1 sm:flex-row sm:items-center">
             <a
-              className="rounded-full bg-red-700 px-6 py-3 text-sm font-semibold text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-red-600"
+              className="inline-flex min-h-14 items-center justify-center rounded-full bg-amber-400 px-8 py-4 text-base font-extrabold text-zinc-950 shadow-xl shadow-black/35 transition hover:-translate-y-0.5 hover:bg-orange-400 focus:outline-none focus:ring-4 focus:ring-amber-200/60"
               href={ctaHref}
             >
-              Pide tu Ceeseburger ahora
+              Ver menú y pedir
             </a>
-            <span className="text-sm text-slate-100/80">Entrega estimada 15–20 minutos · Pago online seguro</span>
-          </div>
-        </div>
-
-        <div className="relative">
-          <div className="absolute inset-0 -rotate-3 rounded-2xl bg-cyan-300/20 blur-3xl" />
-          <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-4 shadow-xl">
-            <img
-              src={heroImage}
-              alt="Cs-Bacon, hamburguesa artesanal de Ceeseburgers"
-              className="aspect-[4/3] w-full rounded-xl object-cover"
-              loading="lazy"
-            />
-            <p className="mt-3 text-sm text-slate-100/80">Foto real de la Cs-Bacon para activar el antojo inmediato.</p>
+            <span className="text-sm font-semibold text-zinc-200 drop-shadow">Jueves a sábado · 17:00 a 01:00 aprox.</span>
           </div>
         </div>
       </div>
