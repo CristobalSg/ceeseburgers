@@ -34,13 +34,17 @@ import bbqImage from "../../../img/salsas/bbq.webp";
 import chickFillAImage from "../../../img/salsas/chick-fill-a.webp";
 import type { MenuItem, MenuTab, MenuOptionGroup } from "./menuUtils";
 
-export const comboDrinkOptions = ["Sprite", "Coca-Cola", "Fanta", "Sin bebida"];
+export const comboDrinkOptions = ["Sprite", "Coca-Cola", "Coca Zero", "Fanta", "Sin bebida"];
+const sideDrinkOptions = comboDrinkOptions.filter((choice) => choice !== "Sin bebida");
 export const friesSauceOptions = ["Mayonesa", "Ketchup", "Mostaza", "BBQ", "Chick Fill A"];
 export const comboFriesSauceOptions = [...friesSauceOptions, "Sin salsa"];
 
 function createOptionGroup(id: string, label: string, choices: string[]): MenuOptionGroup {
   return { id, label, choices };
 }
+
+const clasicaRemovableIngredients = ["Tomate", "Lechuga", "Aderezo", "Queso cheddar"];
+const baconRemovableIngredients = ["Tocino", "Salsa BBQ", "Cebolla caramelizada", "Queso cheddar"];
 
 const burgerImagesBySlug: Partial<Record<string, string>> = {
   "cs-bacon": hambBaconImg,
@@ -110,8 +114,8 @@ export const trioCombos: MenuItem[] = [
     image: trioFamiliarImg,
     imageAlt: "Trio Familiar con una Bacon y dos Clasicas",
     category: "combo-familiar",
-    removableIngredients: ["Salsa", "Tomate", "Lechuga", "Queso", "Tocino", "Cebolla caramelizada"],
     removalUnitLabels: ["Bacon", "Clasica 1", "Clasica 2"],
+    removalUnitIngredients: [baconRemovableIngredients, clasicaRemovableIngredients, clasicaRemovableIngredients],
   },
   {
     id: "trio-premiun",
@@ -121,8 +125,8 @@ export const trioCombos: MenuItem[] = [
     image: trioPremiunImg,
     imageAlt: "Trio Premiun con dos Bacon y una Clasica",
     category: "combo-familiar",
-    removableIngredients: ["Salsa", "Tomate", "Lechuga", "Queso", "Tocino", "Cebolla caramelizada"],
     removalUnitLabels: ["Bacon 1", "Bacon 2", "Clasica"],
+    removalUnitIngredients: [baconRemovableIngredients, baconRemovableIngredients, clasicaRemovableIngredients],
   },
   {
     id: "trio-premiun-smoke",
@@ -237,8 +241,14 @@ export const familyCombos: MenuItem[] = [
     imageAlt: "Combo familiar clasico",
     category: "combo-familiar",
     favorite: true,
-    removableIngredients: ["Salsa", "Tomate", "Lechuga", "Queso", "Tocino", "Cebolla caramelizada"],
     removalUnitLabels: ["Clasica 1", "Clasica 2", "Clasica 3", "Bacon 1", "Bacon 2"],
+    removalUnitIngredients: [
+      clasicaRemovableIngredients,
+      clasicaRemovableIngredients,
+      clasicaRemovableIngredients,
+      baconRemovableIngredients,
+      baconRemovableIngredients,
+    ],
   },
   {
     id: "combo-full-bacon",
@@ -301,12 +311,12 @@ const burgerItems: MenuItem[] = [
     category: "hamburguesas",
     badge: "Top ventas",
     favorite: true,
-    removableIngredients: ["Tocino", "Salsa BBQ", "Cebolla caramelizada", "Queso cheddar"],
+    removableIngredients: baconRemovableIngredients,
   },
   {
     id: "cs-romp-ii",
     title: "Romp II",
-    description: "Pan artesanal, hamburguesa de 90g, doble cheddar, doble tocino ahumado, huevo frito, cebolla caramelizada y salsa BBQ.",
+    description: "Pan artesanal, hamburguesa de 100g, doble cheddar, doble tocino ahumado, huevo frito, cebolla caramelizada y salsa BBQ.",
     price: 3190,
     image: hambRompedietaDosImg,
     imageAlt: "Hamburguesa Romp II con doble cheddar y huevo",
@@ -318,12 +328,12 @@ const burgerItems: MenuItem[] = [
   {
     id: "cs-clasica",
     title: "Clásica",
-    description: "Pan de hamburguesa, hamburguesa de 90g, cheddar, tomate, lechuga y aderezo tipo Big Mac.",
+    description: "Pan, hamburguesa de 90g, cheddar, tomate, lechuga y aderezo tipo Big Mac (sin pepinillo).",
     price: 2090,
     image: hambClasicaImg,
     imageAlt: "Hamburguesa Clásica de Ceeseburger's",
     category: "hamburguesas",
-    removableIngredients: ["Tomate", "Lechuga", "Aderezo", "Queso cheddar"],
+    removableIngredients: clasicaRemovableIngredients,
   },
   {
     id: "cs-italiana",
@@ -338,7 +348,7 @@ const burgerItems: MenuItem[] = [
   {
     id: "cs-nueva",
     title: "Rompedieta I",
-    description: "Pan brioche, hamburguesa de 90g, doble queso cheddar, tocino, lechuga, tomate, cebolla morada y mayonesa.",
+    description: "Pan brioche, hamburguesa de 100g, doble queso cheddar, tocino, lechuga, tomate, cebolla morada y mayonesa.",
     price: 3190,
     image: hambRompedietaUnoImg,
     imageAlt: "Hamburguesa Rompedieta I",
@@ -348,18 +358,18 @@ const burgerItems: MenuItem[] = [
   {
     id: "rompedietita-i",
     title: "Rompedietita I",
-    description: "Pan brioche, hamburguesa de 90g, queso cheddar, tocino, lechuga, tomate, cebolla morada y mayonesa.",
+    description: "Pan, hamburguesa de 90g, queso cheddar, tocino, lechuga, tomate, cebolla morada y salsa Chick Fill A.",
     price: 2690,
     image: hambRompedietitaImg,
     imageAlt: "Hamburguesa Rompedietita I",
     category: "hamburguesas",
     badge: "Nuevo",
-    removableIngredients: ["Tocino", "Lechuga", "Tomate", "Cebolla morada", "Salsa", "Queso cheddar"],
+    removableIngredients: ["Tocino", "Lechuga", "Tomate", "Cebolla morada", "Salsa Chick Fill A", "Queso cheddar"],
   },
   {
     id: "smoke-criminal",
     title: "Smoke Criminal",
-    description: "Pan, carne, cheddar, tocino, cebolla crispy, BBQ y mayo.",
+    description: "Pan, hamb de 90g, cheddar, tocino, cebolla crispy, BBQ y mayo.",
     price: 2490,
     image: hambSmokeCriminalImg,
     imageAlt: "Hamburguesa Smoke Criminal con tocino, cheddar y salsa BBQ",
@@ -370,7 +380,7 @@ const burgerItems: MenuItem[] = [
   {
     id: "smoke-criminal-xl",
     title: "Smoke Criminal XL",
-    description: "Pan brioche, doble carne, triple cheddar, doble tocino, cebolla crispy, BBQ y mayo.",
+    description: "Pan brioche, 2 hamburguesas de 100g, triple cheddar, doble tocino, cebolla crispy, BBQ y mayo.",
     price: 4690,
     image: hambSmokeCriminalXlImg,
     imageAlt: "Hamburguesa Smoke Criminal XL con tocino, cheddar y salsa BBQ",
@@ -404,7 +414,16 @@ export function getPremiumBurgerItems(): MenuItem[] {
 
 export const sideItems: MenuItem[] = [
   { id: "papitas-fritas", title: "Papitas fritas", description: "El acompanamiento clasico para cualquier pedido.", price: 1300, image: friesImage, imageAlt: "Papitas fritas", category: "acompanamientos" },
-  { id: "bebida", title: "Bebida", description: "Acompanamiento para tu pedido.", price: 1000, image: drinkImage, imageAlt: "Bebida", category: "acompanamientos" },
+  {
+    id: "bebida",
+    title: "Bebida",
+    description: "Acompanamiento para tu pedido.",
+    price: 1000,
+    image: drinkImage,
+    imageAlt: "Bebida",
+    category: "acompanamientos",
+    options: [createOptionGroup("bebida", "Sabor de bebida", sideDrinkOptions)],
+  },
   {
     id: "nuggets-x5",
     title: "Nuggets x5",

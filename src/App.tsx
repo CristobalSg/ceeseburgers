@@ -1,6 +1,8 @@
 import { AnnouncementBar } from "./components/AnnouncementBar";
 import { AboutSection } from "./components/AboutSection";
 import { BlogTeaser } from "./components/BlogTeaser";
+import { CeesepuntosPage } from "./components/CeesepuntosPage";
+import { CeesepuntosRankingPage } from "./components/CeesepuntosRankingPage";
 import { Header } from "./components/Header";
 import { Hero } from "./components/Hero";
 import { Layout } from "./components/Layout";
@@ -67,6 +69,52 @@ export default function App() {
     );
   }
 
+  if (path === "/ceesepuntos") {
+    return (
+      <div className="min-h-screen bg-slate-100 text-slate-900">
+        <div className="fixed inset-x-0 top-4 z-40 px-4 sm:px-6 lg:px-10">
+          <div className="mx-auto w-full max-w-6xl">
+            <Header
+              logoSrc={logoImage}
+              brandName="Ceeseburgers"
+              instagramHref={INSTAGRAM_LINK}
+              whatsappHref={CTA_LINK}
+              transparentOnTop
+            />
+          </div>
+        </div>
+
+        <main>
+          <CeesepuntosPage />
+        </main>
+
+        <div className="mx-auto w-full max-w-6xl px-4 pb-10 sm:px-6 lg:px-10">
+          <SiteFooter brandName="Ceeseburgers" instagramHref={INSTAGRAM_LINK} whatsappHref={CTA_LINK} />
+        </div>
+      </div>
+    );
+  }
+
+  if (path === "/ceesepuntos/ranking") {
+    return (
+      <Layout
+        header={
+          <div className="space-y-3">
+            <AnnouncementBar
+              message={ANNOUNCEMENT_MESSAGE}
+              ctaHref={CTA_LINK}
+              ctaLabel={ANNOUNCEMENT_CTA}
+            />
+            <Header logoSrc={logoImage} brandName="Ceeseburgers" instagramHref={INSTAGRAM_LINK} whatsappHref={CTA_LINK} />
+          </div>
+        }
+        footer={<SiteFooter brandName="Ceeseburgers" instagramHref={INSTAGRAM_LINK} whatsappHref={CTA_LINK} />}
+      >
+        <CeesepuntosRankingPage />
+      </Layout>
+    );
+  }
+
   if (blogDetailMatch) {
     return (
       <Layout
@@ -102,7 +150,7 @@ export default function App() {
       </div>
 
       <main>
-        <Hero ctaHref="#menu" />
+        <Hero ctaHref="/menu" />
 
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-4 py-12 sm:px-6 lg:px-10">
           <ValueProps />

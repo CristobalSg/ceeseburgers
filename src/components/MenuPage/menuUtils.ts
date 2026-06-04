@@ -26,6 +26,7 @@ export type MenuItem = {
   options?: MenuOptionGroup[];
   removableIngredients?: string[];
   removalUnitLabels?: string[];
+  removalUnitIngredients?: string[][];
 };
 
 export type CartItem = {

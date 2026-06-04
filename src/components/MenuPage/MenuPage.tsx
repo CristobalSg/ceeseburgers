@@ -1,4 +1,15 @@
-import { ShoppingCartIcon, StarIcon, XMarkIcon } from "@heroicons/react/24/solid";
+import {
+  BanknotesIcon,
+  BuildingStorefrontIcon,
+  CheckCircleIcon,
+  CreditCardIcon,
+  MapPinIcon,
+  ShoppingCartIcon,
+  StarIcon,
+  TruckIcon,
+  UserIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/solid";
 import { useEffect, useState } from "react";
 import { getClassicBurgerItems, getPremiumBurgerItems, sideItems as menuSideItems, sauceItems as menuSauceItems, menuTabs, trioCombos, classicCombos, premiumCombos, familyCombos, paperoCombos } from "./menuData";
 import { formatPrice, buildCartSignature, usesPerUnitRemovals } from "./menuUtils";
@@ -134,6 +145,10 @@ function getRemovalUnitLabels(item: MenuItem, qty: number) {
   return Array.from({ length: qty }, (_, index) => `${unitLabel} ${index + 1}`);
 }
 
+function getRemovalIngredientsForUnit(item: MenuItem, unitIndex: number) {
+  return item.removalUnitIngredients?.[unitIndex] ?? item.removableIngredients ?? [];
+}
+
 function buildGroupedRemovalLines(cartItem: CartItem) {
   if (cartItem.unitRemovals?.length) {
     if (cartItem.item.removalUnitLabels?.length) {
@@ -250,10 +265,14 @@ export function MenuPage() {
 
   const classicBurgerItems = getClassicBurgerItems();
   const premiumBurgerItems = getPremiumBurgerItems();
-  const featuredNewItems = [
-    ...classicBurgerItems.filter((item) => item.id === "rompedietita-i"),
-    ...trioCombos,
-  ];
+  const featuredItems = [
+    trioCombos.find((item) => item.id === "trio-premiun"),
+    familyCombos.find((item) => item.id === "combo-familiar"),
+    premiumCombos.find((item) => item.id === "combo-smoke-criminal-xl"),
+    classicCombos.find((item) => item.id === "combo-bacon"),
+    paperoCombos.find((item) => item.id === "combo-papero-cs-italiana"),
+  ].filter((item): item is MenuItem => Boolean(item));
+  const featuredLoopItems = [...featuredItems, ...featuredItems];
   const sideItems = menuSideItems;
   const sauceItems = menuSauceItems;
 
@@ -595,7 +614,7 @@ export function MenuPage() {
   }
 
   function hasRemovalsStep(item: MenuItem) {
-    return Boolean(item.removableIngredients?.length);
+    return Boolean(item.removableIngredients?.length || item.removalUnitIngredients?.some((ingredients) => ingredients.length));
   }
 
   function getProductModalSteps(item: MenuItem): ProductModalStep[] {
@@ -618,7 +637,11 @@ export function MenuPage() {
   }
 
   function canEditCartItem(cartItem: CartItem) {
-    return Boolean(cartItem.item.options?.length || cartItem.item.removableIngredients?.length);
+    return Boolean(
+      cartItem.item.options?.length
+      || cartItem.item.removableIngredients?.length
+      || cartItem.item.removalUnitIngredients?.some((ingredients) => ingredients.length)
+    );
   }
 
   function isUnitSelectionComplete(item: MenuItem, selection: Record<string, string>) {
@@ -697,6 +720,71 @@ export function MenuPage() {
                 ) : null}
               </div>
               {!hideDescription ? <p className="mt-1 text-xs leading-tight text-slate-600">{item.description}</p> : null}
+            </div>
+          </button>
+        ))}
+      </div>
+    );
+  }
+
+  function renderBurgerCards(items: MenuItem[]) {
+    return (
+      <div className="grid gap-3">
+        {items.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => openProductModal(item)}
+            className={`group relative grid h-[112px] grid-cols-[112px_minmax(0,1fr)] overflow-hidden rounded-2xl border bg-white text-left shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-lg ${
+              item.badge === "Nuevo"
+                ? "border-red-200 ring-1 ring-red-100"
+                : item.favorite
+                  ? "border-yellow-300 ring-1 ring-yellow-100"
+                  : "border-slate-200"
+            }`}
+          >
+            <div className="relative h-full aspect-square overflow-hidden bg-slate-100">
+              {item.image ? (
+                <img
+                  src={item.image}
+                  alt={item.imageAlt}
+                  className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                />
+              ) : null}
+              {item.badge || item.favorite ? (
+                <span
+                  className={`absolute left-1.5 top-1.5 inline-flex max-w-[calc(100%-0.75rem)] items-center gap-1 rounded-full px-1.5 py-0.5 text-[8px] font-black uppercase tracking-wide shadow-sm ${
+                    item.badge === "Nuevo"
+                      ? "bg-red-700 text-white"
+                      : "bg-white/95 text-slate-950"
+                  }`}
+                >
+                  {item.favorite ? <StarIcon className="h-2.5 w-2.5 shrink-0 text-yellow-400" /> : null}
+                  {item.badge ?? "Favorita"}
+                </span>
+              ) : null}
+            </div>
+            <div className="flex min-w-0 flex-col justify-between gap-2 p-2.5">
+              <div className="min-w-0">
+                <div className="flex items-start justify-between gap-2">
+                  <h6 className="text-base font-black leading-tight text-slate-950">{item.title}</h6>
+                  <span className="shrink-0 rounded-full bg-red-50 px-2 py-1 text-sm font-black text-red-700">
+                    ${formatPrice(item.price)}
+                  </span>
+                </div>
+                <p className="mt-1 overflow-hidden text-xs font-medium leading-4 text-slate-600 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">
+                  {item.description}
+                </p>
+              </div>
+              <div className="flex items-center justify-between gap-2">
+                <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-600">
+                  Personalizable
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-full bg-slate-950 px-3 py-1.5 text-xs font-black text-white transition group-hover:bg-red-700">
+                  <ShoppingCartIcon className="h-3.5 w-3.5" />
+                  Agregar
+                </span>
+              </div>
             </div>
           </button>
         ))}
@@ -848,28 +936,42 @@ export function MenuPage() {
         <p className="text-sm text-slate-600">Presiona cualquier producto para configurarlo y agregarlo al carrito.</p>
       </div>
 
-      <section className="-mx-3 space-y-3 border-y border-amber-200 bg-amber-50 px-3 py-4">
+      <section className="-mx-3 space-y-3 border-y border-red-100 bg-white px-3 py-4">
+        <style>{`
+          @keyframes featuredMarquee {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+          }
+          .featured-marquee-track {
+            animation: featuredMarquee 34s linear infinite;
+          }
+          @media (prefers-reduced-motion: reduce) {
+            .featured-marquee-track {
+              animation: none;
+            }
+          }
+        `}</style>
         <div className="flex items-center justify-between gap-3">
           <div>
-            <h4 className="text-lg font-black uppercase tracking-wide text-slate-950">Nuevas</h4>
-            <p className="text-xs font-semibold text-amber-900">Rompedietita I y trios para compartir</p>
+            <h4 className="text-lg font-black uppercase tracking-wide text-slate-950">Destacados</h4>
+            <p className="text-xs font-semibold text-slate-600">Los favoritos para pedir rapido</p>
           </div>
-          <span className="rounded-full bg-red-700 px-3 py-1 text-xs font-black uppercase tracking-wide text-white shadow-sm">
-            Lanzamiento
+          <span className="rounded-full bg-slate-950 px-3 py-1 text-xs font-black uppercase tracking-wide text-white shadow-sm">
+            Top picks
           </span>
         </div>
-        <div className="overflow-x-auto pb-1">
-          <div className="flex gap-3 snap-x snap-mandatory">
-            {featuredNewItems.map((combo) => (
-              <div key={combo.id} className="flex min-w-[190px] flex-col items-start">
+        <div className="overflow-hidden pb-1">
+          <div className="featured-marquee-track flex w-max gap-3">
+            {featuredLoopItems.map((combo, index) => (
+              <div key={`${combo.id}-${index}`} className="flex w-[190px] shrink-0 flex-col items-start">
                 <button
                   type="button"
                   onClick={() => openProductModal(combo)}
-                  className="relative w-full aspect-square snap-start overflow-hidden rounded-xl border-2 border-red-700 bg-white shadow-lg shadow-red-950/10 transition hover:scale-105"
+                  className="relative w-full aspect-square overflow-hidden rounded-xl border-2 border-red-700 bg-white shadow-lg shadow-red-950/10 transition hover:scale-105"
                 >
                   <img src={combo.image} alt={combo.imageAlt} className="h-full w-full object-cover" />
                   <span className="absolute left-2 top-2 rounded-full bg-slate-950 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-white">
-                    Nuevo
+                    Destacado
                   </span>
                 </button>
                 <div className="mt-1.5 w-full">
@@ -923,6 +1025,36 @@ export function MenuPage() {
         <div className="-mx-3 overflow-x-auto px-3 pb-1">
           <div className="flex gap-3 snap-x snap-mandatory">
             {premiumCombos.map((combo) => (
+              <div key={combo.id} className="flex min-w-[160px] flex-col items-start">
+                <button
+                  type="button"
+                  onClick={() => openProductModal(combo)}
+                  className={`w-full aspect-square snap-start overflow-hidden rounded-xl bg-white shadow-md transition hover:scale-105 ${combo.favorite ? "border-2 border-yellow-400" : ""}`}
+                >
+                  <img src={combo.image} alt={combo.imageAlt} className="h-full w-full object-cover" />
+                </button>
+                <div className="mt-1.5 w-full">
+                  <div className="flex items-center gap-1 text-sm font-semibold text-slate-900">
+                    {combo.title}
+                    {combo.favorite ? <StarIcon className="h-3.5 w-3.5 text-yellow-400" /> : null}
+                  </div>
+                  <div className="text-[11px] leading-tight text-slate-500">{combo.description}</div>
+                  <div className="mt-0.5 text-base font-bold text-slate-900">${formatPrice(combo.price)}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="space-y-2">
+        <div className="flex items-center justify-between">
+          <h4 className="text-base font-semibold text-slate-900">Tríos</h4>
+          <span className="text-xs text-slate-500">Para compartir</span>
+        </div>
+        <div className="-mx-3 overflow-x-auto px-3 pb-1">
+          <div className="flex gap-3 snap-x snap-mandatory">
+            {trioCombos.map((combo) => (
               <div key={combo.id} className="flex min-w-[160px] flex-col items-start">
                 <button
                   type="button"
@@ -1013,22 +1145,41 @@ export function MenuPage() {
         </div>
 
         {activeMenuTab === "hamburguesas" ? (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h5 className="text-sm font-semibold text-slate-900">Hamburguesas Solas</h5>
-              <span className="text-xs text-slate-500">Solo hamburguesas</span>
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <h6 className="text-sm font-semibold text-slate-900">Clásicas</h6>
+          <div className="space-y-5">
+            <div className="rounded-2xl border border-red-100 bg-red-50/60 p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h5 className="text-lg font-black uppercase tracking-wide text-slate-950">Hamburguesas Solas</h5>
+                  <p className="mt-1 text-xs font-semibold leading-5 text-slate-600">
+                    Elige tu burger y ajusta ingredientes antes de agregarla.
+                  </p>
+                </div>
+                <span className="shrink-0 rounded-full bg-white px-3 py-1 text-[11px] font-black uppercase tracking-wide text-red-700 shadow-sm ring-1 ring-red-100">
+                  A tu pinta
+                </span>
               </div>
-              {renderMenuCards(classicBurgerItems, true)}
             </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <h6 className="text-sm font-semibold text-slate-900">Premium</h6>
+
+            <div className="space-y-3">
+              <div className="flex items-end justify-between gap-3">
+                <div>
+                  <h6 className="text-base font-black text-slate-950">Clásicas</h6>
+                  <p className="text-xs font-medium text-slate-500">Livianas, rápidas y buenas para partir.</p>
+                </div>
+                <span className="text-xs font-bold text-slate-400">{classicBurgerItems.length} opciones</span>
               </div>
-              {renderMenuCards(premiumBurgerItems, true)}
+              {renderBurgerCards(classicBurgerItems)}
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-end justify-between gap-3">
+                <div>
+                  <h6 className="text-base font-black text-slate-950">Premium</h6>
+                  <p className="text-xs font-medium text-slate-500">Más grandes, más carga y más sabor.</p>
+                </div>
+                <span className="text-xs font-bold text-slate-400">{premiumBurgerItems.length} opciones</span>
+              </div>
+              {renderBurgerCards(premiumBurgerItems)}
             </div>
           </div>
         ) : null}
@@ -1136,32 +1287,38 @@ export function MenuPage() {
               <div className="mt-0.5 truncate text-[11px] text-white/75">{cartFeedback.title}</div>
             </div>
           ) : null}
-          <button
-            aria-label="Abrir carrito"
-            onClick={() => setIsCartOpen(true)}
+          <div
+            className="relative inline-flex"
             style={{
               animation: cartFeedback ? "cartPop 420ms ease-out 1" : "floatY 3s ease-in-out infinite",
-              boxShadow: "0 0 12px 2px rgba(255,255,255,0.25)",
             }}
-            className="relative inline-flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-red-700 text-white shadow-2xl"
           >
-            <ShoppingCartIcon className="relative z-10 h-7 w-7" />
-            <span
-              className="absolute inset-0 pointer-events-none rounded-full"
+            <button
+              aria-label="Abrir carrito"
+              onClick={() => setIsCartOpen(true)}
               style={{
-                animation: "shine 6s linear infinite",
-                backgroundImage: "linear-gradient(120deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,0) 100%)",
-                backgroundSize: "240px 100%",
-                backgroundRepeat: "no-repeat",
-                opacity: 0,
+                boxShadow: "0 0 12px 2px rgba(255,255,255,0.25)",
               }}
-            />
+              className="relative inline-flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-red-700 text-white shadow-2xl"
+            >
+              <ShoppingCartIcon className="relative z-10 h-7 w-7" />
+              <span
+                className="absolute inset-0 pointer-events-none rounded-full"
+                style={{
+                  animation: "shine 6s linear infinite",
+                  backgroundImage: "linear-gradient(120deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,0) 100%)",
+                  backgroundSize: "240px 100%",
+                  backgroundRepeat: "no-repeat",
+                  opacity: 0,
+                }}
+              />
+            </button>
             {totalCount > 0 ? (
-              <span className="absolute right-1 top-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-white px-1 text-[10px] font-bold leading-none text-red-700 ring-2 ring-red-700">
+              <span className="absolute -right-1 -top-1 z-20 inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-white px-1.5 text-[11px] font-black leading-none text-red-700 shadow-md ring-2 ring-red-700">
                 {totalCount}
               </span>
             ) : null}
-          </button>
+          </div>
         </div>
       ) : null}
 
@@ -1432,7 +1589,7 @@ export function MenuPage() {
                   </div>
                 ) : null}
 
-                {productModalStep === "removals" && selectedItem.category === "combo-familiar" && selectedItem.removableIngredients?.length ? (
+                {productModalStep === "removals" && selectedItem.category === "combo-familiar" && hasRemovalsStep(selectedItem) ? (
                   <div className="col-span-full max-h-72 space-y-3 overflow-y-auto pr-1">
                     {getRemovalUnitLabels(selectedItem, selectedQty).map((label, burgerIndex) => (
                       <div key={`family-removals-${burgerIndex + 1}`} className="rounded-2xl border border-slate-200 p-3">
@@ -1440,7 +1597,7 @@ export function MenuPage() {
                         <div className="space-y-2">
                           <div className="text-sm font-medium text-slate-800">Quitar ingredientes</div>
                           <div className="flex flex-wrap gap-2">
-                            {(selectedItem.removableIngredients ?? []).map((ingredient) => (
+                            {getRemovalIngredientsForUnit(selectedItem, burgerIndex).map((ingredient) => (
                               <button
                                 key={`${ingredient}-${burgerIndex}`}
                                 type="button"
@@ -1661,91 +1818,145 @@ export function MenuPage() {
               )}
             </div>
 
-            <div className="mt-4 border-t pt-4">
-              <div>
-                <label className="text-xs font-medium text-slate-600">Nombre del pedido</label>
-                <input
-                  value={orderName}
-                  onChange={(e) => setOrderName(e.target.value)}
-                  placeholder="Nombre de quien pide"
-                  className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
-                />
+            <div className="mt-4 space-y-4 border-t border-slate-100 pt-4">
+              <div className="rounded-2xl border border-slate-100 bg-slate-50/80 p-3 shadow-sm">
+                <label className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">Nombre del pedido</label>
+                <div className={`mt-2 flex items-center gap-2 rounded-2xl bg-white px-3 py-2.5 ring-1 transition ${
+                  orderName.trim() === "" ? "ring-red-100 focus-within:ring-red-300" : "ring-slate-200 focus-within:ring-red-300"
+                }`}>
+                  <UserIcon className="h-5 w-5 shrink-0 text-red-700" />
+                  <input
+                    value={orderName}
+                    onChange={(e) => setOrderName(e.target.value)}
+                    placeholder="Nombre de quien pide"
+                    className="min-w-0 flex-1 bg-transparent text-sm font-medium text-slate-900 outline-none placeholder:text-slate-400"
+                  />
+                </div>
                 {orderName.trim() === "" ? (
-                  <div className="mt-1 text-xs text-red-600">Debes ingresar un nombre para el pedido.</div>
+                  <div className="mt-2 text-xs font-medium text-red-600">Debes ingresar un nombre para el pedido.</div>
                 ) : null}
               </div>
 
-              <div className="mt-4 text-sm font-medium text-slate-900">¿Como quieres tu pedido?</div>
-              <div className="mt-2 flex items-center gap-4">
-                <label className="inline-flex items-center gap-2 text-sm">
-                  <input
-                    type="radio"
-                    name="orderType"
-                    value="pickup"
-                    checked={orderType === "pickup"}
-                    onChange={() => setOrderType("pickup")}
-                    className="h-4 w-4"
-                  />
-                  <span>Retiro en local</span>
-                </label>
-                <label className="inline-flex items-center gap-2 text-sm">
-                  <input
-                    type="radio"
-                    name="orderType"
-                    value="delivery"
-                    checked={orderType === "delivery"}
-                    onChange={() => setOrderType("delivery")}
-                    className="h-4 w-4"
-                  />
-                  <span>Delivery</span>
-                </label>
+              <div className="space-y-2">
+                <div className="flex items-end justify-between gap-3">
+                  <div>
+                    <div className="text-sm font-bold text-slate-950">¿Como quieres tu pedido?</div>
+                    <div className="text-xs text-slate-500">Elige retiro o delivery.</div>
+                  </div>
+                  {orderType === "delivery" ? (
+                    <span className="shrink-0 rounded-full bg-red-50 px-2.5 py-1 text-[11px] font-bold text-red-700">
+                      + ${formatPrice(deliveryFee)}
+                    </span>
+                  ) : null}
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setOrderType("pickup")}
+                    className={`relative rounded-2xl border p-3 text-left transition ${
+                      orderType === "pickup"
+                        ? "border-slate-950 bg-slate-950 text-white shadow-lg shadow-slate-950/15"
+                        : "border-slate-200 bg-white text-slate-800 shadow-sm hover:border-red-200"
+                    }`}
+                  >
+                    <BuildingStorefrontIcon className={`h-5 w-5 ${orderType === "pickup" ? "text-white" : "text-red-700"}`} />
+                    <div className="mt-2 text-sm font-bold leading-tight">Retiro</div>
+                    <div className={`mt-0.5 text-[11px] leading-tight ${orderType === "pickup" ? "text-white/70" : "text-slate-500"}`}>
+                      En local
+                    </div>
+                    {orderType === "pickup" ? <CheckCircleIcon className="absolute right-2 top-2 h-5 w-5 text-white" /> : null}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setOrderType("delivery")}
+                    className={`relative rounded-2xl border p-3 text-left transition ${
+                      orderType === "delivery"
+                        ? "border-red-700 bg-red-700 text-white shadow-lg shadow-red-950/20"
+                        : "border-slate-200 bg-white text-slate-800 shadow-sm hover:border-red-200"
+                    }`}
+                  >
+                    <TruckIcon className={`h-5 w-5 ${orderType === "delivery" ? "text-white" : "text-red-700"}`} />
+                    <div className="mt-2 text-sm font-bold leading-tight">Delivery</div>
+                    <div className={`mt-0.5 text-[11px] leading-tight ${orderType === "delivery" ? "text-white/75" : "text-slate-500"}`}>
+                      A domicilio
+                    </div>
+                    {orderType === "delivery" ? <CheckCircleIcon className="absolute right-2 top-2 h-5 w-5 text-white" /> : null}
+                  </button>
+                </div>
               </div>
 
               {orderType === "delivery" ? (
-                <div className="mt-3">
-                  <label className="text-xs text-slate-600">Direccion de entrega</label>
-                  <input
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    placeholder="Calle, numero, referencia"
-                    className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
-                  />
-                  <p className="mt-1 text-xs text-slate-500">
+                <div className="rounded-2xl border border-red-100 bg-red-50/50 p-3">
+                  <label className="text-xs font-bold uppercase tracking-[0.14em] text-red-700">Direccion de entrega</label>
+                  <div className={`mt-2 flex items-center gap-2 rounded-2xl bg-white px-3 py-2.5 ring-1 transition ${
+                    address.trim() === "" ? "ring-red-100 focus-within:ring-red-300" : "ring-slate-200 focus-within:ring-red-300"
+                  }`}>
+                    <MapPinIcon className="h-5 w-5 shrink-0 text-red-700" />
+                    <input
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      placeholder="Calle, numero, referencia"
+                      className="min-w-0 flex-1 bg-transparent text-sm font-medium text-slate-900 outline-none placeholder:text-slate-400"
+                    />
+                  </div>
+                  <p className="mt-2 text-xs font-medium leading-5 text-slate-600">
                     Delivery estimado entre ${formatPrice(DELIVERY_ESTIMATE_MIN)} y ${formatPrice(DELIVERY_ESTIMATE_MAX)}.
                     Se agregan ${formatPrice(DELIVERY_ESTIMATE_MAX)} al total.
                   </p>
                 </div>
               ) : null}
 
-              <div className="mt-4 text-sm font-medium text-slate-900">¿Como cancelas el pedido?</div>
-              <div className="mt-2 flex items-center gap-4">
-                <label className="inline-flex items-center gap-2 text-sm">
-                  <input
-                    type="radio"
-                    name="paymentMethod"
-                    value="transfer"
-                    checked={paymentMethod === "transfer"}
-                    onChange={() => setPaymentMethod("transfer")}
-                    className="h-4 w-4"
-                  />
-                  <span>Transferencia</span>
-                </label>
-                <label className="inline-flex items-center gap-2 text-sm">
-                  <input
-                    type="radio"
-                    name="paymentMethod"
-                    value="cash"
-                    checked={paymentMethod === "cash"}
-                    onChange={() => setPaymentMethod("cash")}
-                    className="h-4 w-4"
-                  />
-                  <span>Efectivo</span>
-                </label>
+              <div className="space-y-2">
+                <div>
+                  <div className="text-sm font-bold text-slate-950">¿Como pagas?</div>
+                  <div className="text-xs text-slate-500">Confirma el metodo para cerrar el pedido.</div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod("transfer")}
+                    className={`relative rounded-2xl border p-3 text-left transition ${
+                      paymentMethod === "transfer"
+                        ? "border-red-700 bg-red-700 text-white shadow-lg shadow-red-950/20"
+                        : "border-slate-200 bg-white text-slate-800 shadow-sm hover:border-red-200"
+                    }`}
+                  >
+                    <CreditCardIcon className={`h-5 w-5 ${paymentMethod === "transfer" ? "text-white" : "text-red-700"}`} />
+                    <div className="mt-2 text-sm font-bold leading-tight">Transferencia</div>
+                    <div className={`mt-0.5 text-[11px] leading-tight ${paymentMethod === "transfer" ? "text-white/75" : "text-slate-500"}`}>
+                      Pago digital
+                    </div>
+                    {paymentMethod === "transfer" ? <CheckCircleIcon className="absolute right-2 top-2 h-5 w-5 text-white" /> : null}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod("cash")}
+                    className={`relative rounded-2xl border p-3 text-left transition ${
+                      paymentMethod === "cash"
+                        ? "border-slate-950 bg-slate-950 text-white shadow-lg shadow-slate-950/15"
+                        : "border-slate-200 bg-white text-slate-800 shadow-sm hover:border-red-200"
+                    }`}
+                  >
+                    <BanknotesIcon className={`h-5 w-5 ${paymentMethod === "cash" ? "text-white" : "text-red-700"}`} />
+                    <div className="mt-2 text-sm font-bold leading-tight">Efectivo</div>
+                    <div className={`mt-0.5 text-[11px] leading-tight ${paymentMethod === "cash" ? "text-white/70" : "text-slate-500"}`}>
+                      Con vuelto
+                    </div>
+                    {paymentMethod === "cash" ? <CheckCircleIcon className="absolute right-2 top-2 h-5 w-5 text-white" /> : null}
+                  </button>
+                </div>
               </div>
 
               {paymentMethod === "cash" ? (
-                <div className="mt-3 rounded-2xl bg-slate-50 p-3">
-                  <div className="overflow-x-auto pb-1">
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <div className="text-sm font-bold text-slate-950">¿Con cuanto pagas?</div>
+                      <div className="text-xs text-slate-500">Para calcular el vuelto.</div>
+                    </div>
+                    <BanknotesIcon className="h-6 w-6 shrink-0 text-red-700" />
+                  </div>
+                  <div className="mt-3 overflow-x-auto pb-1">
                     <div className="flex w-max gap-2">
                       <button
                         type="button"
@@ -1754,11 +1965,11 @@ export function MenuPage() {
                           setCashAmount("");
                           setShowAdvancedCashPayment(false);
                         }}
-                        className={`shrink-0 rounded-full px-3 py-2 text-sm font-medium transition ${
-                          cashPaymentType === "exact" ? "bg-red-700 text-white" : "bg-white text-slate-700 ring-1 ring-slate-200"
+                        className={`shrink-0 rounded-full px-3.5 py-2 text-sm font-bold transition ${
+                          cashPaymentType === "exact" ? "bg-red-700 text-white shadow-md shadow-red-950/20" : "bg-white text-slate-700 ring-1 ring-slate-200"
                         }`}
                       >
-                        Efectivo justo
+                        Justo
                       </button>
                       {cashPaymentSuggestions.map((amount) => (
                         <button
@@ -1769,9 +1980,9 @@ export function MenuPage() {
                             setCashAmount(String(amount));
                             setShowAdvancedCashPayment(false);
                           }}
-                          className={`shrink-0 rounded-full px-3 py-2 text-sm font-medium transition ${
+                          className={`shrink-0 rounded-full px-3.5 py-2 text-sm font-bold transition ${
                             cashPaymentType === "amount" && normalizedCashAmount === amount
-                              ? "bg-red-700 text-white"
+                              ? "bg-red-700 text-white shadow-md shadow-red-950/20"
                               : "bg-white text-slate-700 ring-1 ring-slate-200"
                           }`}
                         >
@@ -1784,26 +1995,33 @@ export function MenuPage() {
                           setShowAdvancedCashPayment((isVisible) => !isVisible);
                           setCashPaymentType("amount");
                         }}
-                        className="shrink-0 rounded-full bg-white px-3 py-2 text-sm font-medium text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-100"
+                        className={`shrink-0 rounded-full px-3.5 py-2 text-sm font-bold transition ${
+                          showAdvancedCashPayment
+                            ? "bg-slate-950 text-white shadow-md shadow-slate-950/15"
+                            : "bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-100"
+                        }`}
                       >
                         Otro
                       </button>
                     </div>
                   </div>
                   {showAdvancedCashPayment ? (
-                    <input
-                      value={cashAmount}
-                      onChange={(e) => {
-                        setCashPaymentType("amount");
-                        setCashAmount(e.target.value);
-                      }}
-                      inputMode="numeric"
-                      placeholder={`Ej: ${formatPrice(cashPaymentSuggestions[0] ?? total)}`}
-                      className="mt-2 w-full rounded-md border px-3 py-2 text-sm"
-                    />
+                    <div className="mt-2 flex items-center gap-2 rounded-2xl bg-white px-3 py-2.5 ring-1 ring-slate-200 focus-within:ring-red-300">
+                      <span className="text-sm font-black text-red-700">$</span>
+                      <input
+                        value={cashAmount}
+                        onChange={(e) => {
+                          setCashPaymentType("amount");
+                          setCashAmount(e.target.value);
+                        }}
+                        inputMode="numeric"
+                        placeholder={`Ej: ${formatPrice(cashPaymentSuggestions[0] ?? total)}`}
+                        className="min-w-0 flex-1 bg-transparent text-sm font-medium text-slate-900 outline-none placeholder:text-slate-400"
+                      />
+                    </div>
                   ) : null}
                   {cashPaymentType === "amount" && normalizedCashAmount < total ? (
-                    <div className="mt-1 text-xs text-red-600">
+                    <div className="mt-2 text-xs font-medium text-red-600">
                       El monto debe ser igual o mayor al total.
                     </div>
                   ) : null}
@@ -1811,24 +2029,24 @@ export function MenuPage() {
               ) : null}
 
               {paymentMethod === "" ? (
-                <div className="mt-1 text-xs text-red-600">Debes elegir un metodo de pago.</div>
+                <div className="rounded-2xl bg-red-50 px-3 py-2 text-xs font-bold text-red-700">Debes elegir un metodo de pago.</div>
               ) : null}
             </div>
 
-            <div className="mt-4 space-y-1 border-t pt-3">
-              <div className="flex items-center justify-between text-sm text-slate-700">
+            <div className="mt-4 space-y-2 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+              <div className="flex items-center justify-between text-sm font-medium text-slate-600">
                 <span>Subtotal</span>
                 <span>${formatPrice(subtotal)}</span>
               </div>
               {orderType === "delivery" ? (
-                <div className="flex items-center justify-between text-sm text-slate-700">
+                <div className="flex items-center justify-between text-sm font-medium text-slate-600">
                   <span>Delivery</span>
                   <span>+ ${formatPrice(deliveryFee)}</span>
                 </div>
               ) : null}
-              <div className="flex items-center justify-between pt-1">
-                <div className="text-sm font-semibold text-slate-900">Total</div>
-                <div className="text-lg font-bold text-slate-900">${formatPrice(total)}</div>
+              <div className="flex items-center justify-between border-t border-slate-100 pt-2">
+                <div className="text-sm font-black uppercase tracking-[0.12em] text-slate-500">Total</div>
+                <div className="text-2xl font-black text-slate-950">${formatPrice(total)}</div>
               </div>
             </div>
 
@@ -1843,8 +2061,9 @@ export function MenuPage() {
                   || isSubmittingOrder
                 }
                 onClick={submitOrder}
-                className="w-full rounded-full bg-green-600 px-4 py-3 text-white disabled:opacity-50"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-green-600 px-4 py-3.5 text-sm font-black uppercase tracking-wide text-white shadow-xl shadow-green-900/20 transition hover:bg-green-700 disabled:opacity-50"
               >
+                <ShoppingCartIcon className="h-5 w-5" />
                 {isSubmittingOrder ? "Guardando pedido..." : "Pedir por WhatsApp"}
               </button>
               {orderError ? (

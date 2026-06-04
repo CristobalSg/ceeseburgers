@@ -44,6 +44,7 @@ export function Header({ logoSrc, brandName, instagramHref, whatsappHref, transp
       {/* Desktop links (visible on md+) */}
       <div className="hidden md:flex flex-wrap items-center gap-2 ml-4">
         <a href="/menu" className={`text-xs font-semibold uppercase tracking-[0.2em] transition ${isTransparent ? "text-white/80 hover:text-white" : "text-slate-600 hover:text-red-700"}`}>Menú</a>
+        <a href="/ceesepuntos" className={`text-xs font-semibold uppercase tracking-[0.2em] transition ${isTransparent ? "text-white/80 hover:text-white" : "text-slate-600 hover:text-red-700"}`}>Ceesepuntos</a>
         <a href="/blog" className={`text-xs font-semibold uppercase tracking-[0.2em] transition ${isTransparent ? "text-white/80 hover:text-white" : "text-slate-600 hover:text-red-700"}`}>Blog</a>
         <a className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold shadow-sm transition hover:-translate-y-0.5 ${
           isTransparent ? "border-white/20 bg-white/10 text-white hover:bg-white/20" : "border-slate-200 bg-white text-slate-800 hover:border-red-300"
@@ -84,6 +85,12 @@ export function Header({ logoSrc, brandName, instagramHref, whatsappHref, transp
           <ul className="mt-4 flex flex-col gap-3">
             <li>
               <a href="/menu" className="block rounded-md px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Menú</a>
+            </li>
+            <li>
+              <a href="/ceesepuntos" className="block rounded-md px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Ceesepuntos</a>
+            </li>
+            <li>
+              <a href="/ceesepuntos/ranking" className="block rounded-md px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Ranking</a>
             </li>
             <li>
               <a href="/blog" className="block rounded-md px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Blog</a>
