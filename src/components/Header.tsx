@@ -37,7 +37,7 @@ export function Header({ logoSrc, brandName, instagramHref, whatsappHref, transp
         <img src={logoSrc} alt={`${brandName} logo`} className="h-12 w-12 rounded-full object-cover" loading="lazy" />
         <div>
           <p className={`text-sm font-semibold ${isTransparent ? "text-white" : "text-red-700"}`}>{brandName}</p>
-          <p className={`text-xs ${isTransparent ? "text-white/75" : "text-slate-500"}`}>Hamburguesas · Labranza</p>
+          <p className={`text-xs ${isTransparent ? "text-white/75" : "text-slate-500"}`}>No son solo hamburguesas.</p>
         </div>
       </a>
 

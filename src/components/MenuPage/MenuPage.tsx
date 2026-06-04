@@ -12,7 +12,7 @@ import {
 } from "@heroicons/react/24/solid";
 import { useEffect, useState } from "react";
 import { getClassicBurgerItems, getPremiumBurgerItems, sideItems as menuSideItems, sauceItems as menuSauceItems, menuTabs, trioCombos, classicCombos, premiumCombos, familyCombos, paperoCombos } from "./menuData";
-import { formatPrice, buildCartSignature, usesPerUnitRemovals } from "./menuUtils";
+import { formatPrice, buildCartSignature, usesPerUnitOptions, usesPerUnitRemovals } from "./menuUtils";
 import { createOrder } from "@/services/orders";
 
 import type { MenuItem, MenuTab, CartItem, ProductModalStep } from "./menuUtils";
@@ -126,6 +126,52 @@ function buildSelectionLines(cartItem: CartItem) {
   return buildGroupedSelectionLines(repeatedSelections, cartItem.qty);
 }
 
+function collectCartSelectionCounts(cartItems: CartItem[]) {
+  const groupedSelections = new Map<string, Map<string, number>>();
+
+  cartItems.forEach((cartItem) => {
+    const selectionUnits = cartItem.unitSelections?.length
+      ? cartItem.unitSelections
+      : Array.from({ length: cartItem.qty }, () => ({ ...cartItem.selections }));
+
+    selectionUnits.forEach((selection) => {
+      Object.entries(selection).forEach(([key, value]) => {
+        if (!value) return;
+
+        const optionCounts = groupedSelections.get(key) ?? new Map<string, number>();
+        appendCount(optionCounts, value);
+        groupedSelections.set(key, optionCounts);
+      });
+    });
+  });
+
+  return groupedSelections;
+}
+
+function buildAddOnsSummaryLines(cartItems: CartItem[]) {
+  const lines: string[] = [];
+  const papitasQty = cartItems
+    .filter((cartItem) => cartItem.item.id === "papitas-fritas")
+    .reduce((sum, cartItem) => sum + cartItem.qty, 0);
+  const groupedSelections = collectCartSelectionCounts(cartItems);
+  const bebidaCounts = groupedSelections.get("bebida");
+  const salsaCounts = groupedSelections.get("salsa");
+
+  if (papitasQty > 0) {
+    lines.push(`Papitas extra: ${papitasQty}`);
+  }
+
+  if (bebidaCounts?.size) {
+    lines.push(`Bebidas: ${formatCountSummary(bebidaCounts)}`);
+  }
+
+  if (salsaCounts?.size) {
+    lines.push(`Salsas: ${formatCountSummary(salsaCounts)}`);
+  }
+
+  return lines;
+}
+
 function getRemovalUnitLabels(item: MenuItem, qty: number) {
   if (item.removalUnitLabels?.length) {
     return Array.from({ length: qty }).flatMap((_, comboIndex) =>
@@ -149,14 +195,20 @@ function getRemovalIngredientsForUnit(item: MenuItem, unitIndex: number) {
   return item.removalUnitIngredients?.[unitIndex] ?? item.removableIngredients ?? [];
 }
 
+function getOptionUnitLabel(item: MenuItem, index: number) {
+  if (item.category === "combo-individual") return `Combo ${index + 1}`;
+  if (item.id === "bebida") return `Bebida ${index + 1}`;
+  return `Unidad ${index + 1}`;
+}
+
 function buildGroupedRemovalLines(cartItem: CartItem) {
   if (cartItem.unitRemovals?.length) {
     if (cartItem.item.removalUnitLabels?.length) {
       const labels = getRemovalUnitLabels(cartItem.item, cartItem.qty);
-      return cartItem.unitRemovals.flatMap((removals, index) =>
-        removals.length
-          ? [`* ${labels[index] ?? `Hamburguesa ${index + 1}`} sin ${formatIngredientList(removals)}`]
-          : []
+      return labels.map((label, index) =>
+        cartItem.unitRemovals?.[index]?.length
+          ? `* ${label} sin ${formatIngredientList(cartItem.unitRemovals[index])}`
+          : `* ${label}: normal`
       );
     }
 
@@ -257,7 +309,7 @@ export function MenuPage() {
   }, [cartFeedback]);
 
   useEffect(() => {
-    if (productModalStep !== "options" || selectedItem?.category !== "combo-individual") return;
+    if (productModalStep !== "options" || !selectedItem || !usesPerUnitOptions(selectedItem)) return;
 
     const nextElement = document.getElementById(`combo-config-${activeComboOptionIndex + 1}`);
     nextElement?.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -322,7 +374,7 @@ export function MenuPage() {
     setSelectedItem(item);
     setSelectedQty(1);
     setSelectedOptions(defaults);
-    setSelectedUnitOptions(item.category === "combo-individual" ? [defaults] : []);
+    setSelectedUnitOptions(usesPerUnitOptions(item) ? [defaults] : []);
     setSelectedRemovals([]);
     setSelectedUnitRemovals(usesPerUnitRemovals(item) ? getRemovalUnitLabels(item, 1).map(() => []) : []);
     setEditingCartItemId(null);
@@ -365,7 +417,7 @@ export function MenuPage() {
 
     setActiveComboOptionIndex((prev) => Math.min(prev, Math.max(0, nextQty - 1)));
 
-    if (selectedItem.category === "combo-individual") {
+    if (usesPerUnitOptions(selectedItem)) {
       setSelectedUnitOptions((prev) => {
         const base =
           prev[0] ??
@@ -384,24 +436,29 @@ export function MenuPage() {
 
   function addSelectedItemToCart() {
     if (!selectedItem) return;
+    const perUnitOptionsEnabled = usesPerUnitOptions(selectedItem);
     const perUnitRemovalsEnabled = usesPerUnitRemovals(selectedItem);
     const normalizedSelections =
-      selectedItem.category === "combo-individual" ? {} : selectedOptions;
+      perUnitOptionsEnabled ? {} : selectedOptions;
     const normalizedUnitSelections =
-      selectedItem.category === "combo-individual" ? selectedUnitOptions.slice(0, selectedQty) : undefined;
+      perUnitOptionsEnabled ? selectedUnitOptions.slice(0, selectedQty) : undefined;
     const normalizedRemovals =
       perUnitRemovalsEnabled ? [] : selectedRemovals;
     const normalizedUnitRemovals =
       perUnitRemovalsEnabled ? selectedUnitRemovals.slice(0, getRemovalUnitLabels(selectedItem, selectedQty).length) : undefined;
     const removalUnitLabels = getRemovalUnitLabels(selectedItem, selectedQty);
+    const unitSignatureCount = Math.max(
+      perUnitOptionsEnabled ? selectedQty : 0,
+      perUnitRemovalsEnabled ? removalUnitLabels.length : 0
+    );
     const signature = buildCartSignature(
       selectedItem.id,
-      perUnitRemovalsEnabled
+      perUnitOptionsEnabled || perUnitRemovalsEnabled
         ? Object.fromEntries(
-            Array.from({ length: removalUnitLabels.length }, (_, index) => [
+            Array.from({ length: unitSignatureCount }, (_, index) => [
               `unit-${index + 1}`,
               [
-                ...(selectedItem.category === "combo-individual"
+                ...(perUnitOptionsEnabled
                   ? [
                       Object.entries(normalizedUnitSelections?.[index] ?? {})
                         .sort(([a], [b]) => a.localeCompare(b))
@@ -560,13 +617,13 @@ export function MenuPage() {
     });
   }
 
-  function renderUnitSelections(unitSelections?: Record<string, string>[]) {
+  function renderUnitSelections(unitSelections?: Record<string, string>[], item?: MenuItem) {
     if (!unitSelections || unitSelections.length === 0) return null;
 
     return unitSelections.map((selection, index) => (
       <div key={`combo-${index + 1}`} className="mt-1 rounded-xl bg-slate-50 px-2 py-1">
         <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500">
-          Combo {index + 1}
+          {item ? getOptionUnitLabel(item, index) : `Combo ${index + 1}`}
         </div>
         {renderSelections(selection)}
       </div>
@@ -599,7 +656,7 @@ export function MenuPage() {
   function hasAllRequiredSelections() {
     if (!selectedItem?.options?.length) return true;
 
-    if (selectedItem.category === "combo-individual") {
+    if (usesPerUnitOptions(selectedItem)) {
       return selectedUnitOptions.length === selectedQty
         && selectedUnitOptions.every((selection) =>
           selectedItem.options?.every((group) => Boolean(selection[group.id]))
@@ -649,7 +706,7 @@ export function MenuPage() {
   }
 
   function handleComboUnitOptionSelect(comboIndex: number, groupId: string, choice: string) {
-    if (!selectedItem || selectedItem.category !== "combo-individual") return;
+    if (!selectedItem || !usesPerUnitOptions(selectedItem)) return;
 
     setSelectedUnitOptions((prev) => {
       const nextSelections = prev.map((selection, index) =>
@@ -835,11 +892,15 @@ export function MenuPage() {
       lines.pop();
     }
 
+    const addOnsSummaryLines = buildAddOnsSummaryLines(cart);
+    if (addOnsSummaryLines.length) {
+      lines.push("");
+      lines.push("*Resumen de agregados:*");
+      addOnsSummaryLines.forEach((line) => lines.push(line));
+    }
+
     lines.push("");
     lines.push(`Subtotal: *$${formatPrice(subtotal)}*`);
-    if (orderType === "delivery") {
-      lines.push(`Delivery agregado: *$${formatPrice(deliveryFee)}*`);
-    }
     lines.push(`Total: *$${formatPrice(total)}*`);
     return lines.join("\n");
   }
@@ -1413,7 +1474,11 @@ export function MenuPage() {
                         {productModalStep === "quantity"
                           ? "Selecciona la cantidad"
                           : productModalStep === "options"
-                            ? "Elige bebida y salsa"
+                            ? selectedItem.id === "bebida"
+                              ? "Elige sabor de bebida"
+                              : selectedItem.category === "combo-individual"
+                                ? "Elige bebida y salsa"
+                                : "Elige opciones"
                             : "Quita ingredientes si quieres"}
                       </div>
                     </div>
@@ -1455,7 +1520,7 @@ export function MenuPage() {
                 </div>
                 ) : null}
 
-                {productModalStep === "options" && selectedItem.category === "combo-individual" ? (
+                {productModalStep === "options" && usesPerUnitOptions(selectedItem) ? (
                   <div className="col-span-full max-h-72 space-y-3 overflow-y-auto pr-1">
                     {Array.from({ length: selectedQty }).map((_, comboIndex) => (
                       <div
@@ -1469,7 +1534,7 @@ export function MenuPage() {
                       >
                         {selectedQty > 1 ? (
                           <div className="mb-2 flex items-center justify-between gap-2">
-                            <div className="text-sm font-semibold text-slate-900">Combo {comboIndex + 1}</div>
+                            <div className="text-sm font-semibold text-slate-900">{getOptionUnitLabel(selectedItem, comboIndex)}</div>
                             {activeComboOptionIndex === comboIndex ? (
                               <span className="rounded-full bg-red-100 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-red-700">
                                 En curso
@@ -1625,7 +1690,7 @@ export function MenuPage() {
                   </div>
                 ) : null}
 
-                {productModalStep === "options" && selectedItem.category !== "combo-individual" ? (
+                {productModalStep === "options" && !usesPerUnitOptions(selectedItem) ? (
                   <div className="col-span-full space-y-4">
                     {(selectedItem.options ?? []).map((group) => (
                       <div key={group.id} className="space-y-2">
@@ -1756,7 +1821,7 @@ export function MenuPage() {
                             </div>
                             <div className="mt-1 space-y-1">
                             {cartItem.unitSelections?.length
-                              ? renderUnitSelections(cartItem.unitSelections)
+                              ? renderUnitSelections(cartItem.unitSelections, cartItem.item)
                               : renderSelections(cartItem.selections)}
                             {cartItem.unitSelections?.length
                               ? renderUnitRemovals(cartItem.unitRemovals, "Combo")
@@ -1780,7 +1845,7 @@ export function MenuPage() {
                             </div>
                             <div className="mt-1 space-y-1">
                               {cartItem.unitSelections?.length
-                                ? renderUnitSelections(cartItem.unitSelections)
+                                ? renderUnitSelections(cartItem.unitSelections, cartItem.item)
                                 : renderSelections(cartItem.selections)}
                               {cartItem.unitSelections?.length
                                 ? renderUnitRemovals(cartItem.unitRemovals, "Combo")

@@ -34,7 +34,7 @@ import bbqImage from "../../../img/salsas/bbq.webp";
 import chickFillAImage from "../../../img/salsas/chick-fill-a.webp";
 import type { MenuItem, MenuTab, MenuOptionGroup } from "./menuUtils";
 
-export const comboDrinkOptions = ["Sprite", "Coca-Cola", "Coca Zero", "Fanta", "Sin bebida"];
+export const comboDrinkOptions = ["Sprite", "Coca-Cola", "Coca-Cola Zero", "Fanta", "Sin bebida"];
 const sideDrinkOptions = comboDrinkOptions.filter((choice) => choice !== "Sin bebida");
 export const friesSauceOptions = ["Mayonesa", "Ketchup", "Mostaza", "BBQ", "Chick Fill A"];
 export const comboFriesSauceOptions = [...friesSauceOptions, "Sin salsa"];

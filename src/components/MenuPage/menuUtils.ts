@@ -56,3 +56,7 @@ export function buildCartSignature(itemId: string, selections: Record<string, st
 export function usesPerUnitRemovals(item: MenuItem) {
   return item.category === "combo-individual" || item.category === "hamburguesas" || item.category === "combo-familiar";
 }
+
+export function usesPerUnitOptions(item: MenuItem) {
+  return item.category === "combo-individual" || item.id === "bebida";
+}
