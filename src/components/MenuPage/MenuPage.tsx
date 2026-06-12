@@ -10,13 +10,14 @@ import {
   UserIcon,
   XMarkIcon,
 } from "@heroicons/react/24/solid";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getClassicBurgerItems, getPremiumBurgerItems, sideItems as menuSideItems, sauceItems as menuSauceItems, menuTabs, trioCombos, classicCombos, premiumCombos, familyCombos, paperoCombos } from "./menuData";
 import { formatPrice, buildCartSignature, usesPerUnitOptions, usesPerUnitRemovals } from "./menuUtils";
 import { createOrder } from "@/services/orders";
 
 import type { MenuItem, MenuTab, CartItem, ProductModalStep } from "./menuUtils";
 import type { CreateOrderPayload, OrderItemPayload } from "@/services/orders";
+import type { PointerEvent as ReactPointerEvent } from "react";
 
 const WHATSAPP_PHONE = "56956270428";
 const DELIVERY_ESTIMATE_MIN = 2000;
@@ -261,7 +262,15 @@ function buildCashPaymentSuggestions(total: number) {
 }
 
 export function MenuPage() {
+  const featuredCarouselRef = useRef<HTMLDivElement>(null);
+  const cashPaymentSectionRef = useRef<HTMLDivElement>(null);
+  const featuredCarouselPausedUntilRef = useRef(0);
+  const featuredDragStartXRef = useRef(0);
+  const featuredDragScrollLeftRef = useRef(0);
+  const isFeaturedCarouselDraggingRef = useRef(false);
+  const didFeaturedCarouselDragRef = useRef(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isOrderDetailOpen, setIsOrderDetailOpen] = useState(false);
   const [isMenuPopupOpen, setIsMenuPopupOpen] = useState(shouldShowMenuScheduleNotice);
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [selectedQty, setSelectedQty] = useState(1);
@@ -315,6 +324,40 @@ export function MenuPage() {
     nextElement?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [activeComboOptionIndex, productModalStep, selectedItem]);
 
+  useEffect(() => {
+    if (paymentMethod !== "cash") return;
+
+    const timeoutId = window.setTimeout(() => {
+      cashPaymentSectionRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }, 100);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [paymentMethod]);
+
+  useEffect(() => {
+    const carousel = featuredCarouselRef.current;
+    if (!carousel) return;
+
+    const intervalId = window.setInterval(() => {
+      if (performance.now() < featuredCarouselPausedUntilRef.current) return;
+
+      const track = carousel.firstElementChild;
+      const firstRepeatedItem = track?.children[track.children.length / 2] as HTMLElement | undefined;
+      if (!firstRepeatedItem) return;
+
+      if (carousel.scrollLeft >= firstRepeatedItem.offsetLeft) {
+        carousel.scrollLeft -= firstRepeatedItem.offsetLeft;
+      }
+
+      carousel.scrollLeft += 1;
+    }, 20);
+
+    return () => window.clearInterval(intervalId);
+  }, []);
+
   const classicBurgerItems = getClassicBurgerItems();
   const premiumBurgerItems = getPremiumBurgerItems();
   const featuredItems = [
@@ -339,6 +382,49 @@ export function MenuPage() {
     || (paymentMethod === "cash"
       && (cashPaymentType === "exact" || normalizedCashAmount >= total));
 
+  function pauseFeaturedCarousel() {
+    featuredCarouselPausedUntilRef.current = performance.now() + 2000;
+  }
+
+  function openCart() {
+    setIsOrderDetailOpen(false);
+    setIsCartOpen(true);
+  }
+
+  function startFeaturedCarouselDrag(event: ReactPointerEvent<HTMLDivElement>) {
+    const carousel = featuredCarouselRef.current;
+    if (!carousel) return;
+
+    pauseFeaturedCarousel();
+    isFeaturedCarouselDraggingRef.current = true;
+    didFeaturedCarouselDragRef.current = false;
+    featuredDragStartXRef.current = event.clientX;
+    featuredDragScrollLeftRef.current = carousel.scrollLeft;
+    carousel.setPointerCapture(event.pointerId);
+  }
+
+  function moveFeaturedCarouselDrag(event: ReactPointerEvent<HTMLDivElement>) {
+    const carousel = featuredCarouselRef.current;
+    if (!carousel || !isFeaturedCarouselDraggingRef.current) return;
+
+    const distance = event.clientX - featuredDragStartXRef.current;
+    if (Math.abs(distance) > 4) {
+      didFeaturedCarouselDragRef.current = true;
+    }
+
+    carousel.scrollLeft = featuredDragScrollLeftRef.current - distance;
+    pauseFeaturedCarousel();
+  }
+
+  function stopFeaturedCarouselDrag(event: ReactPointerEvent<HTMLDivElement>) {
+    isFeaturedCarouselDraggingRef.current = false;
+    pauseFeaturedCarousel();
+
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+  }
+
   function renderMenuTabButton(tab: (typeof menuTabs)[number]) {
     const isActive = activeMenuTab === tab.id;
 
@@ -347,21 +433,21 @@ export function MenuPage() {
         key={tab.id}
         type="button"
         onClick={() => setActiveMenuTab(tab.id)}
-        className={`group inline-flex min-w-[190px] items-center gap-3 rounded-[22px] border px-3.5 py-3 text-left transition duration-200 ${
+        className={`group inline-flex w-[45vw] min-w-[144px] max-w-[170px] shrink-0 items-center gap-2 rounded-[20px] border px-2.5 py-2.5 text-left transition duration-200 ${
           isActive
             ? "border-slate-900 bg-slate-900 text-white shadow-xl shadow-slate-900/20"
             : "border-slate-200 bg-white text-slate-800 shadow-sm shadow-slate-200/70 hover:-translate-y-0.5 hover:border-red-200 hover:shadow-md"
         }`}
       >
         <span
-          className={`inline-flex h-12 w-12 shrink-0 overflow-hidden rounded-2xl ring-1 ${
+          className={`inline-flex h-9 w-9 shrink-0 overflow-hidden rounded-xl ring-1 ${
             isActive ? "bg-white/15 ring-white/25" : "bg-slate-100 ring-black/5"
           }`}
         >
           <img src={tab.icon} alt={tab.iconAlt} className="h-full w-full object-cover" />
         </span>
         <span className="min-w-0">
-          <span className="block text-sm font-semibold leading-tight">{tab.label}</span>
+          <span className="block whitespace-nowrap text-[11px] font-bold leading-tight tracking-tight sm:text-sm">{tab.label}</span>
         </span>
       </button>
     );
@@ -792,7 +878,7 @@ export function MenuPage() {
             key={item.id}
             type="button"
             onClick={() => openProductModal(item)}
-            className={`group relative grid h-[112px] grid-cols-[112px_minmax(0,1fr)] overflow-hidden rounded-2xl border bg-white text-left shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-lg ${
+            className={`group relative grid h-[136px] grid-cols-[136px_minmax(0,1fr)] overflow-hidden rounded-2xl border bg-white text-left shadow-md shadow-slate-950/5 transition duration-200 hover:-translate-y-0.5 hover:shadow-xl ${
               item.badge === "Nuevo"
                 ? "border-red-200 ring-1 ring-red-100"
                 : item.favorite
@@ -800,7 +886,7 @@ export function MenuPage() {
                   : "border-slate-200"
             }`}
           >
-            <div className="relative h-full aspect-square overflow-hidden bg-slate-100">
+            <div className="relative aspect-square h-full overflow-hidden border-r border-slate-100 bg-slate-100">
               {item.image ? (
                 <img
                   src={item.image}
@@ -821,26 +907,17 @@ export function MenuPage() {
                 </span>
               ) : null}
             </div>
-            <div className="flex min-w-0 flex-col justify-between gap-2 p-2.5">
+            <div className="flex min-w-0 flex-col justify-center px-3.5 py-3">
               <div className="min-w-0">
                 <div className="flex items-start justify-between gap-2">
                   <h6 className="text-base font-black leading-tight text-slate-950">{item.title}</h6>
-                  <span className="shrink-0 rounded-full bg-red-50 px-2 py-1 text-sm font-black text-red-700">
+                  <span className="shrink-0 rounded-full bg-red-50 px-2.5 py-1 text-sm font-black text-red-700 ring-1 ring-red-100">
                     ${formatPrice(item.price)}
                   </span>
                 </div>
-                <p className="mt-1 overflow-hidden text-xs font-medium leading-4 text-slate-600 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">
+                <p className="mt-1.5 overflow-hidden text-xs font-medium leading-[1.15rem] text-slate-600 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">
                   {item.description}
                 </p>
-              </div>
-              <div className="flex items-center justify-between gap-2">
-                <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-600">
-                  Personalizable
-                </span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-slate-950 px-3 py-1.5 text-xs font-black text-white transition group-hover:bg-red-700">
-                  <ShoppingCartIcon className="h-3.5 w-3.5" />
-                  Agregar
-                </span>
               </div>
             </div>
           </button>
@@ -998,20 +1075,6 @@ export function MenuPage() {
       </div>
 
       <section className="-mx-3 space-y-3 border-y border-red-100 bg-white px-3 py-4">
-        <style>{`
-          @keyframes featuredMarquee {
-            from { transform: translateX(0); }
-            to { transform: translateX(-50%); }
-          }
-          .featured-marquee-track {
-            animation: featuredMarquee 34s linear infinite;
-          }
-          @media (prefers-reduced-motion: reduce) {
-            .featured-marquee-track {
-              animation: none;
-            }
-          }
-        `}</style>
         <div className="flex items-center justify-between gap-3">
           <div>
             <h4 className="text-lg font-black uppercase tracking-wide text-slate-950">Destacados</h4>
@@ -1021,13 +1084,27 @@ export function MenuPage() {
             Top picks
           </span>
         </div>
-        <div className="overflow-hidden pb-1">
-          <div className="featured-marquee-track flex w-max gap-3">
+        <div
+          ref={featuredCarouselRef}
+          onPointerDown={startFeaturedCarouselDrag}
+          onPointerMove={moveFeaturedCarouselDrag}
+          onPointerUp={stopFeaturedCarouselDrag}
+          onPointerCancel={stopFeaturedCarouselDrag}
+          onWheel={pauseFeaturedCarousel}
+          className="cursor-grab touch-pan-y overflow-x-auto pb-1 active:cursor-grabbing [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          <div className="flex w-max gap-3">
             {featuredLoopItems.map((combo, index) => (
               <div key={`${combo.id}-${index}`} className="flex w-[190px] shrink-0 flex-col items-start">
                 <button
                   type="button"
-                  onClick={() => openProductModal(combo)}
+                  onClick={() => {
+                    if (didFeaturedCarouselDragRef.current) {
+                      didFeaturedCarouselDragRef.current = false;
+                      return;
+                    }
+                    openProductModal(combo);
+                  }}
                   className="relative w-full aspect-square overflow-hidden rounded-xl border-2 border-red-700 bg-white shadow-lg shadow-red-950/10 transition hover:scale-105"
                 >
                   <img src={combo.image} alt={combo.imageAlt} className="h-full w-full object-cover" />
@@ -1356,7 +1433,7 @@ export function MenuPage() {
           >
             <button
               aria-label="Abrir carrito"
-              onClick={() => setIsCartOpen(true)}
+              onClick={openCart}
               style={{
                 boxShadow: "0 0 12px 2px rgba(255,255,255,0.25)",
               }}
@@ -1789,8 +1866,8 @@ export function MenuPage() {
       {isCartOpen ? (
         <div className="fixed inset-0 z-50 flex min-h-[100dvh] items-end justify-center">
           <div className="absolute inset-0 bg-black/50" onClick={() => setIsCartOpen(false)} />
-          <div className="relative max-h-[calc(100dvh-1rem)] w-full max-w-md overflow-y-auto rounded-t-3xl bg-white p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-2xl">
-            <div className="flex items-center justify-between">
+          <div className="relative flex max-h-[calc(100dvh-1rem)] w-full max-w-md flex-col overflow-hidden rounded-t-3xl bg-white shadow-2xl">
+            <div className="flex shrink-0 items-center justify-between border-b border-slate-100 p-4">
               <div>
                 <h3 className="text-lg font-semibold text-slate-900">Tu carrito</h3>
                 <p className="text-sm text-slate-500">Revisa lo que ya agregaste antes de pedir.</p>
@@ -1798,13 +1875,32 @@ export function MenuPage() {
               <button className="text-sm text-slate-500" onClick={() => setIsCartOpen(false)}>Cerrar</button>
             </div>
 
-            <div className="mt-4 max-h-56 space-y-3 overflow-y-auto">
-              {cart.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-slate-200 p-4 text-sm text-slate-500">
-                  Tu carrito esta vacio.
-                </div>
-              ) : (
-                cart.map((cartItem) => (
+            <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4">
+              <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                <button
+                  type="button"
+                  onClick={() => setIsOrderDetailOpen((isOpen) => !isOpen)}
+                  className="flex w-full items-center justify-between gap-3 px-3.5 py-3 text-left"
+                  aria-expanded={isOrderDetailOpen}
+                >
+                  <div>
+                    <div className="text-sm font-bold text-slate-950">Detalle del pedido</div>
+                    <div className="text-xs text-slate-500">
+                      {totalCount} {totalCount === 1 ? "producto" : "productos"}
+                    </div>
+                  </div>
+                  <span className={`text-lg font-black text-red-700 transition-transform ${isOrderDetailOpen ? "rotate-45" : ""}`}>
+                    +
+                  </span>
+                </button>
+
+                {isOrderDetailOpen ? (
+                  <div className="max-h-56 space-y-3 overflow-y-auto border-t border-slate-100 p-3">
+                    {cart.length === 0 ? (
+                      <div className="rounded-2xl border border-dashed border-slate-200 p-4 text-sm text-slate-500">
+                        Tu carrito esta vacio.
+                      </div>
+                    ) : cart.map((cartItem) => (
                   <div key={cartItem.id} className="rounded-2xl border border-slate-200 p-3">
                     <div className="flex items-start justify-between gap-3">
                       {canEditCartItem(cartItem) ? (
@@ -1879,9 +1975,10 @@ export function MenuPage() {
                       </div>
                     </div>
                   </div>
-                ))
-              )}
-            </div>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
 
             <div className="mt-4 space-y-4 border-t border-slate-100 pt-4">
               <div className="rounded-2xl border border-slate-100 bg-slate-50/80 p-3 shadow-sm">
@@ -2013,7 +2110,7 @@ export function MenuPage() {
               </div>
 
               {paymentMethod === "cash" ? (
-                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
+                <div ref={cashPaymentSectionRef} className="scroll-mb-40 rounded-2xl border border-slate-200 bg-slate-50 p-3">
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <div className="text-sm font-bold text-slate-950">¿Con cuanto pagas?</div>
@@ -2097,25 +2194,19 @@ export function MenuPage() {
                 <div className="rounded-2xl bg-red-50 px-3 py-2 text-xs font-bold text-red-700">Debes elegir un metodo de pago.</div>
               ) : null}
             </div>
-
-            <div className="mt-4 space-y-2 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
-              <div className="flex items-center justify-between text-sm font-medium text-slate-600">
-                <span>Subtotal</span>
-                <span>${formatPrice(subtotal)}</span>
-              </div>
-              {orderType === "delivery" ? (
-                <div className="flex items-center justify-between text-sm font-medium text-slate-600">
-                  <span>Delivery</span>
-                  <span>+ ${formatPrice(deliveryFee)}</span>
-                </div>
-              ) : null}
-              <div className="flex items-center justify-between border-t border-slate-100 pt-2">
-                <div className="text-sm font-black uppercase tracking-[0.12em] text-slate-500">Total</div>
-                <div className="text-2xl font-black text-slate-950">${formatPrice(total)}</div>
-              </div>
             </div>
 
-            <div className="mt-4">
+            <div className="shrink-0 border-t border-slate-200 bg-white px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-3 shadow-[0_-12px_30px_rgba(15,23,42,0.08)]">
+              <div className="mb-3 flex items-center justify-between">
+                <div>
+                  <div className="text-xs font-black uppercase tracking-[0.12em] text-slate-500">Total</div>
+                  {orderType === "delivery" ? (
+                    <div className="text-[11px] font-medium text-slate-500">Incluye delivery</div>
+                  ) : null}
+                </div>
+                <div className="text-2xl font-black text-slate-950">${formatPrice(total)}</div>
+              </div>
+
               <button
                 type="button"
                 disabled={
