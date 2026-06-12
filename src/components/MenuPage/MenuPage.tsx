@@ -11,7 +11,7 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/solid";
 import { useEffect, useRef, useState } from "react";
-import { getClassicBurgerItems, getPremiumBurgerItems, sideItems as menuSideItems, sauceItems as menuSauceItems, menuTabs, trioCombos, classicCombos, premiumCombos, familyCombos, paperoCombos } from "./menuData";
+import { getBurgerItems, getClassicBurgerItems, getPremiumBurgerItems, sideItems as menuSideItems, sauceItems as menuSauceItems, menuTabs, trioCombos, classicCombos, premiumCombos, familyCombos, paperoCombos } from "./menuData";
 import { formatPrice, buildCartSignature, usesPerUnitOptions, usesPerUnitRemovals } from "./menuUtils";
 import { createOrder } from "@/services/orders";
 
@@ -360,8 +360,16 @@ export function MenuPage() {
 
   const classicBurgerItems = getClassicBurgerItems();
   const premiumBurgerItems = getPremiumBurgerItems();
+  const burgerItems = getBurgerItems();
+  const newItems = [
+    burgerItems.find((item) => item.id === "quesito"),
+    burgerItems.find((item) => item.id === "la-most"),
+    trioCombos.find((item) => item.id === "trio-bacon"),
+    trioCombos.find((item) => item.id === "trio-la-most"),
+    trioCombos.find((item) => item.id === "trio-quesito"),
+  ].filter((item): item is MenuItem => Boolean(item));
   const featuredItems = [
-    trioCombos.find((item) => item.id === "trio-premiun"),
+    trioCombos.find((item) => item.id === "trio-la-most"),
     familyCombos.find((item) => item.id === "combo-familiar"),
     premiumCombos.find((item) => item.id === "combo-smoke-criminal-xl"),
     classicCombos.find((item) => item.id === "combo-bacon"),
@@ -1073,6 +1081,43 @@ export function MenuPage() {
         <h3 className="text-2xl font-bold text-slate-900">Todos nuestros productos</h3>
         <p className="text-sm text-slate-600">Presiona cualquier producto para configurarlo y agregarlo al carrito.</p>
       </div>
+
+      <section className="-mx-3 space-y-3 border-y border-red-100 bg-red-50/60 px-3 py-4">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h4 className="text-lg font-black uppercase tracking-wide text-slate-950">Nuevas</h4>
+            <p className="text-xs font-semibold text-slate-600">Recién llegadas al menú</p>
+          </div>
+          <span className="rounded-full bg-red-700 px-3 py-1 text-xs font-black uppercase tracking-wide text-white shadow-sm">
+            Nuevo
+          </span>
+        </div>
+        <div className="-mx-3 overflow-x-auto px-3 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="flex w-max gap-3 snap-x snap-mandatory">
+            {newItems.map((item) => (
+              <div key={item.id} className="flex w-[170px] shrink-0 snap-start flex-col items-start">
+                <button
+                  type="button"
+                  onClick={() => openProductModal(item)}
+                  className="relative aspect-square w-full overflow-hidden rounded-2xl border-2 border-red-200 bg-white shadow-lg shadow-red-950/10 transition hover:scale-[1.02]"
+                >
+                  <img src={item.image} alt={item.imageAlt} className="h-full w-full object-cover" />
+                  <span className="absolute left-2 top-2 rounded-full bg-red-700 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-white shadow-md">
+                    Nuevo
+                  </span>
+                </button>
+                <div className="mt-2 w-full">
+                  <div className="text-sm font-black text-slate-950">{item.title}</div>
+                  <div className="mt-0.5 line-clamp-2 text-[11px] font-medium leading-tight text-slate-600">
+                    {item.description}
+                  </div>
+                  <div className="mt-1 text-base font-black text-red-700">${formatPrice(item.price)}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       <section className="-mx-3 space-y-3 border-y border-red-100 bg-white px-3 py-4">
         <div className="flex items-center justify-between gap-3">

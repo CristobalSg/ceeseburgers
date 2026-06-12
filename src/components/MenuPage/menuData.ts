@@ -1,9 +1,9 @@
 import comboClasicasFullImg from "../../../img/combos/01-full-clasicas.webp";
 import comboFamiliarImg from "../../../img/combos/02-combo-familiar.webp";
 import comboBaconLoversImg from "../../../img/combos/03-full-bacon.webp";
-import trioFamiliarImg from "../../../img/trios/01-trio-familiar.webp";
-import trioPremiunImg from "../../../img/trios/02-trio-premiun.webp";
-import trioPremiunSmokeImg from "../../../img/trios/03-trio-premiun-smoke.webp";
+import trioBaconImg from "../../../img/trios/cs-trio-bacon.webp";
+import trioLaMostImg from "../../../img/trios/cs-trio-la-most.webp";
+import trioQuesitoImg from "../../../img/trios/cs-trio-quesito.webp";
 import comboClasicaIndividualImg from "../../../img/combos-individual/clasicos/01-combo-clasico.webp";
 import comboItalianaIndividualImg from "../../../img/combos-individual/clasicos/02-combo-italiana.webp";
 import comboBaconIndividualImg from "../../../img/combos-individual/clasicos/03-combo-bacon.webp";
@@ -23,6 +23,8 @@ import hambRompedietaDosImg from "../../../img/hamb-solas/rompedieta-dos.webp";
 import hambRompedietitaImg from "../../../img/hamb-solas/rompedietita-i.webp";
 import hambSmokeCriminalImg from "../../../img/hamb-solas/smoke-criminal.webp";
 import hambSmokeCriminalXlImg from "../../../img/hamb-solas/smoke-criminal-xl.webp";
+import hambQuesitoImg from "../../../img/hamb-solas/cs-quesito.webp";
+import hambLaMostImg from "../../../img/hamb-solas/cs-most.webp";
 import friesImage from "../../../img/acompaniamiento/papas.webp";
 import drinkImage from "../../../img/acompaniamiento/bebidas.webp";
 import nuggetsX5Image from "../../../img/acompaniamiento/nuggets-x5.webp";
@@ -45,6 +47,8 @@ function createOptionGroup(id: string, label: string, choices: string[]): MenuOp
 
 const clasicaRemovableIngredients = ["Tomate", "Lechuga", "Aderezo", "Queso cheddar"];
 const baconRemovableIngredients = ["Tocino", "Salsa BBQ", "Cebolla caramelizada", "Queso cheddar"];
+const quesitoRemovableIngredients = ["Queso cheddar", "Cebolla", "Pepinillos", "Mostaza", "Ketchup"];
+const laMostRemovableIngredients = ["Queso cheddar", "Cebolla grillada", "Pepinillos", "Tocino", "Mostaza", "Ketchup"];
 
 const burgerImagesBySlug: Partial<Record<string, string>> = {
   "cs-bacon": hambBaconImg,
@@ -55,9 +59,11 @@ const burgerImagesBySlug: Partial<Record<string, string>> = {
   "rompedietita-i": hambRompedietitaImg,
   "smoke-criminal": hambSmokeCriminalImg,
   "smoke-criminal-xl": hambSmokeCriminalXlImg,
+  "quesito": hambQuesitoImg,
+  "la-most": hambLaMostImg,
 };
-const newBurgerSlugs = new Set(["rompedietita-i", "smoke-criminal", "smoke-criminal-xl"]);
-const classicBurgerSlugs = ["rompedietita-i", "cs-clasica", "cs-italiana", "cs-bacon", "smoke-criminal"];
+const newBurgerSlugs = new Set(["quesito", "la-most", "rompedietita-i", "smoke-criminal", "smoke-criminal-xl"]);
+const classicBurgerSlugs = ["quesito", "la-most", "rompedietita-i", "cs-clasica", "cs-italiana", "cs-bacon", "smoke-criminal"];
 const premiumBurgerSlugs = ["cs-nueva", "cs-romp-ii", "smoke-criminal-xl"];
 
 export const offerItems: MenuItem[] = [
@@ -107,37 +113,37 @@ const comboSmokeCriminalXl: MenuItem = {
 
 export const trioCombos: MenuItem[] = [
   {
-    id: "trio-familiar",
-    title: "Trio Familiar",
-    description: "1 Bacon + 2 Clasicas",
-    price: 5990,
-    image: trioFamiliarImg,
-    imageAlt: "Trio Familiar con una Bacon y dos Clasicas",
+    id: "trio-bacon",
+    title: "Trío Bacon",
+    description: "3 hamburguesas Bacon",
+    price: 6590,
+    image: trioBaconImg,
+    imageAlt: "Trío de tres hamburguesas Bacon",
     category: "combo-familiar",
-    removalUnitLabels: ["Bacon", "Clasica 1", "Clasica 2"],
-    removalUnitIngredients: [baconRemovableIngredients, clasicaRemovableIngredients, clasicaRemovableIngredients],
+    removalUnitLabels: ["Bacon 1", "Bacon 2", "Bacon 3"],
+    removalUnitIngredients: [baconRemovableIngredients, baconRemovableIngredients, baconRemovableIngredients],
   },
   {
-    id: "trio-premiun",
-    title: "Trio Premiun",
-    description: "2 Bacon + 1 Clasica",
-    price: 6390,
-    image: trioPremiunImg,
-    imageAlt: "Trio Premiun con dos Bacon y una Clasica",
+    id: "trio-la-most",
+    title: "Trío La Most",
+    description: "3 hamburguesas La Most",
+    price: 7290,
+    image: trioLaMostImg,
+    imageAlt: "Trío de tres hamburguesas La Most",
     category: "combo-familiar",
-    removalUnitLabels: ["Bacon 1", "Bacon 2", "Clasica"],
-    removalUnitIngredients: [baconRemovableIngredients, baconRemovableIngredients, clasicaRemovableIngredients],
+    removalUnitLabels: ["La Most 1", "La Most 2", "La Most 3"],
+    removalUnitIngredients: [laMostRemovableIngredients, laMostRemovableIngredients, laMostRemovableIngredients],
   },
   {
-    id: "trio-premiun-smoke",
-    title: "Trio Premiun Smoke",
-    description: "3 Smoke Criminal",
-    price: 6690,
-    image: trioPremiunSmokeImg,
-    imageAlt: "Trio Premiun Smoke con tres Smoke Criminal",
+    id: "trio-quesito",
+    title: "Trío Quesito",
+    description: "3 hamburguesas Quesito",
+    price: 5790,
+    image: trioQuesitoImg,
+    imageAlt: "Trío de tres hamburguesas Quesito",
     category: "combo-familiar",
-    removableIngredients: ["BBQ", "Mayo", "Tocino", "Cheddar", "Cebolla crispy"],
-    removalUnitLabels: ["Smoke Criminal 1", "Smoke Criminal 2", "Smoke Criminal 3"],
+    removalUnitLabels: ["Quesito 1", "Quesito 2", "Quesito 3"],
+    removalUnitIngredients: [quesitoRemovableIngredients, quesitoRemovableIngredients, quesitoRemovableIngredients],
   },
 ];
 
@@ -301,6 +307,28 @@ export const paperoCombos: MenuItem[] = [
 ];
 
 const burgerItems: MenuItem[] = [
+  {
+    id: "quesito",
+    title: "Quesito",
+    description: "Pan, hamburguesa de 90g, queso cheddar, cebolla, pepinillos, mostaza y ketchup.",
+    price: 1990,
+    image: hambQuesitoImg,
+    imageAlt: "Hamburguesa Quesito con cheddar, cebolla y pepinillos",
+    category: "hamburguesas",
+    badge: "Nuevo",
+    removableIngredients: quesitoRemovableIngredients,
+  },
+  {
+    id: "la-most",
+    title: "La Most",
+    description: "Pan, hamburguesa de 90g, queso cheddar, cebolla grillada con toques de mostaza, pepinillos, tocino, mostaza y ketchup.",
+    price: 2690,
+    image: hambLaMostImg,
+    imageAlt: "Hamburguesa La Most con cheddar, tocino, cebolla grillada y pepinillos",
+    category: "hamburguesas",
+    badge: "Nuevo",
+    removableIngredients: laMostRemovableIngredients,
+  },
   {
     id: "cs-bacon",
     title: "Bacon",
