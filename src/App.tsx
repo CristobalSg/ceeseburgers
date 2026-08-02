@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 import { AnnouncementBar } from "./components/AnnouncementBar";
 import { AboutSection } from "./components/AboutSection";
 import { BlogTeaser } from "./components/BlogTeaser";
@@ -14,9 +16,11 @@ import { BackToTop } from "./components/BackToTop";
 import { SocialLinks } from "./components/SocialLinks";
 import { BlogList } from "./components/BlogList";
 import { BlogPostPage } from "./components/BlogPostPage";
+import { ClosedNoticeModal } from "./components/ClosedNoticeModal";
 import { getBlogPostBySlug } from "./data/blogPosts";
 import { StorySection } from "./components/StorySection";
 import { ValueProps } from "./components/ValueProps";
+import { AdminPage } from "./components/admin/AdminPage";
 
 import logoImage from "../img/logo.webp";
 
@@ -28,9 +32,19 @@ export default function App() {
   const path = window.location.pathname;
   const blogDetailMatch = path.match(/^\/blog\/([^/]+)$/);
   const matchedPost = blogDetailMatch ? getBlogPostBySlug(blogDetailMatch[1]) ?? null : null;
+  const withClosedNotice = (page: ReactNode) => (
+    <>
+      {page}
+      <ClosedNoticeModal />
+    </>
+  );
+
+  if (path.startsWith("/admin")) {
+    return <AdminPage />;
+  }
 
   if (path === "/blog") {
-    return (
+    return withClosedNotice(
       <Layout
         header={
           <div className="space-y-3">
@@ -50,7 +64,7 @@ export default function App() {
   }
 
   if (path === "/menu") {
-    return (
+    return withClosedNotice(
       <Layout
         header={
           <div className="space-y-3">
@@ -70,7 +84,7 @@ export default function App() {
   }
 
   if (path === "/ceesepuntos") {
-    return (
+    return withClosedNotice(
       <div className="min-h-screen bg-slate-100 text-slate-900">
         <div className="fixed inset-x-0 top-4 z-40 px-4 sm:px-6 lg:px-10">
           <div className="mx-auto w-full max-w-6xl">
@@ -96,7 +110,7 @@ export default function App() {
   }
 
   if (path === "/ceesepuntos/ranking") {
-    return (
+    return withClosedNotice(
       <Layout
         header={
           <div className="space-y-3">
@@ -116,7 +130,7 @@ export default function App() {
   }
 
   if (blogDetailMatch) {
-    return (
+    return withClosedNotice(
       <Layout
         header={
           <div className="space-y-3">
@@ -135,7 +149,7 @@ export default function App() {
     );
   }
 
-  return (
+  return withClosedNotice(
     <div className="min-h-screen bg-slate-100 text-slate-900">
       <div className="fixed inset-x-0 top-4 z-40 px-4 sm:px-6 lg:px-10">
         <div className="mx-auto w-full max-w-6xl">
